@@ -33,7 +33,7 @@ AC_CustomControl_Simulink::AC_CustomControl_Simulink(AC_CustomControl& frontend,
 {
     AP_Param::setup_object_defaults(this, var_info);
 
-    simulink_controller.initialize();
+    ardupilot_controller_v1_Obj.initialize();
 }
 
 // update controller
@@ -87,7 +87,7 @@ Vector3f AC_CustomControl_Simulink::update(void)
     // '<Root>/Output'
     float arg_Output[3];
 
-    simulink_controller.step(arg_attitude_error, arg_rate_ff, arg_rate_meas, arg_Output);
+    ardupilot_controller_v1_Obj.step(arg_attitude_error, arg_rate_ff, arg_rate_meas, arg_Output);
 
     // return what arducopter main controller outputted
     return Vector3f(arg_Output[0], arg_Output[1], arg_Output[2]);

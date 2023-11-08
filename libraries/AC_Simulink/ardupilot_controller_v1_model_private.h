@@ -3,22 +3,24 @@
 // course requirements at degree granting institutions only.  Not for
 // government, commercial, or other organizational use.
 //
-// File: ardupilot_controller_v1_types.h
+// File: ardupilot_controller_v1_model_private.h
 //
-// Code generated for Simulink model 'ardupilot_controller_v1'.
+// Code generated for Simulink model 'ardupilot_controller_v1_model'.
 //
-// Model version                  : 1.4
+// Model version                  : 1.7
 // Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Tue Nov  7 14:38:48 2023
+// C/C++ source code generated on : Wed Nov  8 14:17:45 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: Intel->x86-64 (Windows64)
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef RTW_HEADER_ardupilot_controller_v1_types_h_
-#define RTW_HEADER_ardupilot_controller_v1_types_h_
-#endif                           // RTW_HEADER_ardupilot_controller_v1_types_h_
+#ifndef RTW_HEADER_ardupilot_controller_v1_model_private_h_
+#define RTW_HEADER_ardupilot_controller_v1_model_private_h_
+#include "rtwtypes.h"
+#include "ardupilot_controller_v1_model_types.h"
+#endif                   // RTW_HEADER_ardupilot_controller_v1_model_private_h_
 
 //
 // File trailer for generated code.

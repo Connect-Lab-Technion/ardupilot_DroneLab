@@ -1,0 +1,8 @@
+libraries
+*/*_ert_rtw
+*/*.asv
+*/*.zip
+*/*.slxc
+*/slprj
+*/*_code
+

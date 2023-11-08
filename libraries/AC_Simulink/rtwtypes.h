@@ -5,11 +5,11 @@
 //
 // File: rtwtypes.h
 //
-// Code generated for Simulink model 'ardupilot_controller_v1'.
+// Code generated for Simulink model 'ardupilot_controller_v1_model'.
 //
-// Model version                  : 1.4
+// Model version                  : 1.7
 // Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Tue Nov  7 14:38:48 2023
+// C/C++ source code generated on : Wed Nov  8 14:17:45 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: Intel->x86-64 (Windows64)
