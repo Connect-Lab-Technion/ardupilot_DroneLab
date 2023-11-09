@@ -17,7 +17,7 @@ public:
     Vector3f update(void) override;
     void reset(void) override;
 
-    ardupilot_controller_v1_model ardupilot_controller_v1_Obj;
+    ardupilot_controller_v1_model simulink_controller;
 
     // user settable parameters
     static const struct AP_Param::GroupInfo var_info[];
