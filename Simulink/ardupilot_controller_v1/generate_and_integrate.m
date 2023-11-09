@@ -15,6 +15,9 @@ fprintf("****** GENERATE | INTEGRATE | BUILDERATE ******\n\n")
 %       wrapper to that of the generated code. 
 %    5. Compiling the source code into a flashable binary. 
 %    TODO 6. Flashing the binary onto the flight controller. 
+% 
+% Created by: Joseph Attias (josephattias@campus.technion.ac.il)
+% Created on: Nov 9, 2023
 
 %% The project files should reflect the project folder name 
 projectdir = pwd;
@@ -30,8 +33,9 @@ end
 
 %% Archive the past library folder 
 currentDateTime = string(datetime("now","Format","MMM-dd-uuuu_HHmmss"));
-% TODO Check to see if the code is any different. Something like a checksum
-% hash comparison. 
+% TODO Check to see if the code is any different. Something like a checksum hash comparison. 
+% Or use the response string from code-generation: 
+    % "0 of 1 models built (1 models already up to date)"
 
 try movefile("../../libraries/AC_Simulink","../libraries/AC_Simulink_"+currentDateTime);
     fprintf("\n*** Past AC_Simulink archived at: "+ ... 
