@@ -35,6 +35,7 @@ copyfile(projectname+"_code/"+projectname+"/"+projectname+"_model_ert_rtw","../.
 fprintf("\n*** Building source code ***\n")
 cd('../..');
 system('./waf configure');
-% system('./waf copter')
+system('./waf copter')
 cd(projectdir);
+
 %% upload command
