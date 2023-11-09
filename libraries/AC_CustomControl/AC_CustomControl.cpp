@@ -6,8 +6,9 @@
 
 
 #include "AC_CustomControl_Backend.h"
-#include "AC_CustomControl_Simulink.h"
 #include "AC_CustomControl_PID.h"
+#include "AC_CustomControl_Empty.h"
+#include "AC_CustomControl_Simulink.h"
 #include <GCS_MAVLink/GCS.h>
 
 // table of user settable parameters
@@ -28,7 +29,7 @@ const AP_Param::GroupInfo AC_CustomControl::var_info[] = {
     AP_GROUPINFO("_AXIS_MASK", 2, AC_CustomControl, _custom_controller_mask, 0),
 
     // parameters for empty controller. only used as a template, no need for param table 
-    // AP_SUBGROUPVARPTR(_backend, "1_", 6, AC_CustomControl, _backend_var_info[0]),
+    AP_SUBGROUPVARPTR(_backend, "1_", 6, AC_CustomControl, _backend_var_info[0]),
 
     // parameters for PID controller
     AP_SUBGROUPVARPTR(_backend, "2_", 7, AC_CustomControl, _backend_var_info[1]),

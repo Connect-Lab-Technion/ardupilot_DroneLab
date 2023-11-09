@@ -26,4 +26,5 @@ end
 unzip(projectname+"_model.zip",projectname+"_code")
 copyfile(projectname+"_code/"+projectname+"/"+projectname+"_model_ert_rtw","../../libraries/AC_Simulink/");
 
-
+%% Modify code files with standard name 
+% TODO
