@@ -1,3 +1,12 @@
+# ArduPilot Project - Controls Lab Extension 
+This repo was forked from the ardupilt source code for a simulink based controls lab. 
+
+Students should use the `./Simulink/` directory for their projects. The project folder, simulink head, and matlab head should follow the example naming patterns: `project/project_model.slx` and `project/project_variables.m` 
+
+Development is underway for a wrapper following the instructor's controller design.
+
+
+Now starts the Ardupilot source code README:
 # ArduPilot Project
 
 <a href="https://ardupilot.org/discord"><img src="https://img.shields.io/discord/674039678562861068.svg" alt="Discord">
