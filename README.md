@@ -5,6 +5,11 @@ Students should use the `./Simulink/` directory for their projects. The project 
 
 Development is underway for a wrapper following the instructor's controller design.
 
+## Environment setup: 
+Follow the instructions in [this link](https://ardupilot.org/dev/docs/building-the-code.html), but use this git repo instead on the default ardupilot one. 
+``` bash
+git clone --recurse-submodules https://github.com/Connect-Lab-Technion/ardupilot_DroneLab/
+```
 
 Now starts the Ardupilot source code README:
 # ArduPilot Project
