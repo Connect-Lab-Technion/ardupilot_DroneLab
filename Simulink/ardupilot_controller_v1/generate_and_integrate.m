@@ -75,9 +75,9 @@ cd('../..');
 fprintf("\n*** Configuring source code for flight controller ***\n")
 system('./waf configure');
 fprintf("\n*** Building ArduCopter source code ***\n")
-system('./waf copter');
+system('./waf copter -j8');
 cd(projectdir);
 
 %% upload command
-% TODO 
-
+fprintf("\n*** Uploading to flight controller ***\n")
+system('./waf copter --upload')
