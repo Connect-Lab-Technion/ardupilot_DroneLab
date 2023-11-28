@@ -39,3 +39,8 @@
 	path = modules/Micro-CDR
 	url = https://github.com/ardupilot/Micro-CDR.git
 	branch = master
+[submodule "modules/simulink_mavlink"]
+	path = modules/simulink_mavlink
+	url = https://github.com/Connect-Lab-Technion/simulink_mavlink 
+
+	
