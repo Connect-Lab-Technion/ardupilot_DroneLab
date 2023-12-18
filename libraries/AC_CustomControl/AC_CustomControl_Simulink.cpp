@@ -56,41 +56,66 @@ Vector3f AC_CustomControl_Simulink::update(void)
             break;
     }
 
-    // run custom controller after here
-     Quaternion attitude_body, attitude_target;
-    _ahrs->get_quat_body_to_ned(attitude_body);
-
-    attitude_target = _att_control->get_attitude_target_quat();
-    // This vector represents the angular error to rotate the thrust vector using x and y and heading using z
-    Vector3f attitude_error;
-    float _thrust_angle, _thrust_error_angle;
-    _att_control->thrust_heading_rotation_angles(attitude_target, attitude_body, attitude_error, _thrust_angle, _thrust_error_angle);
-
-    // recalculate ang vel feedforward from attitude target model
-    // rotation from the target frame to the body frame
-    Quaternion rotation_target_to_body = attitude_body.inverse() * attitude_target;
-    // target angle velocity vector in the body frame
-    Vector3f ang_vel_body_feedforward = rotation_target_to_body * _att_control->get_attitude_target_ang_vel();
-
-    Vector3f gyro_latest = _ahrs->get_gyro_latest();
+    // *** run custom controller after here ***
 
 
-    // '<Root>/attitude_error'
-    float arg_attitude_error[3]{ attitude_error.x, attitude_error.y, attitude_error.z };
+    // Here are the reference calls for each input 
 
-    // '<Root>/rate_ff'
-    float arg_rate_ff[3]{ ang_vel_body_feedforward.x, ang_vel_body_feedforward.y, ang_vel_body_feedforward.z};
+    // '<Root>/accel'
+    // Vector3f accel_ef = _ahrs.get_accel_ef();
+    AP_InertialSensor &_ins = AP::ins(); 
+    Vector3f accVec = _ins.get_accel(); 
 
-    // '<Root>/rate_meas'
-    float arg_rate_meas[3]{ gyro_latest.x, gyro_latest.y, gyro_latest.z };
+    // '<Root>/gyro'
 
-    // '<Root>/Output'
-    float arg_Output[3];
+    // '<Root>/bat_V'
 
-    simulink_controller.step(arg_attitude_error, arg_rate_ff, arg_rate_meas, arg_Output);
+    // '<Root>/pos_est'
+
+    // '<Root>/vel_est'
+
+    // '<Root>/yaw_opticalfow'
+
+    // '<Root>/pos_ref'
+
+    // '<Root>/orient_ref'
+
+
+    // Below is the integration between reference calls and the simulink code.
+    // '<Root>/accel'
+    float arg_accel[3]{ accVec.x, accVec.y, accVec.z };
+
+    // '<Root>/gyro'
+    float arg_gyro[3]{ 0.0F, 0.0F, 0.0F };
+
+    // '<Root>/bat_V'
+    float arg_bat_V{ 0.0F };
+
+    // '<Root>/pos_est'
+    float arg_pos_est[3]{ 0.0F, 0.0F, 0.0F };
+
+    // '<Root>/vel_est'
+    float arg_vel_est[3]{ 0.0F, 0.0F, 0.0F };
+
+    // '<Root>/yaw_opticalfow'
+    float arg_yaw_opticalfow{ 0.0F };
+
+    // '<Root>/pos_ref'
+    float arg_pos_ref[3]{ 0.0F, 0.0F, 0.0F };
+
+    // '<Root>/orient_ref'
+    float arg_orient_ref[3]{ 0.0F, 0.0F, 0.0F };
+
+    // '<Root>/torque_ref'
+    float arg_torque_ref[3];
+
+
+    simulink_controller.step(arg_accel, arg_gyro, &arg_bat_V, arg_pos_est,
+        arg_vel_est, &arg_yaw_opticalfow, arg_pos_ref, arg_orient_ref,
+        arg_torque_ref);
 
     // return what arducopter main controller outputted
-    return Vector3f(arg_Output[0], arg_Output[1], arg_Output[2]);
+    return Vector3f(arg_torque_ref[0], arg_torque_ref[1], arg_torque_ref[2]);
 }
 
 // reset controller to avoid build up on the ground

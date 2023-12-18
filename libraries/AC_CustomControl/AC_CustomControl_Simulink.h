@@ -1,7 +1,10 @@
 #pragma once
 
 #include "AC_CustomControl_Backend.h"
-#include <AC_Simulink/ardupilot_controller_v1_model.h>
+#include <AC_Simulink/wrapper_template_model.h>
+
+#include <AP_AHRS/AP_AHRS.h>
+#include <AP_InertialSensor/AP_InertialSensor.h> 
 
 #ifndef CUSTOMCONTROL_Simulink_ENABLED
     #define CUSTOMCONTROL_Simulink_ENABLED AP_CUSTOMCONTROL_ENABLED
@@ -17,7 +20,7 @@ public:
     Vector3f update(void) override;
     void reset(void) override;
 
-    ardupilot_controller_v1_model simulink_controller;
+    wrapper_template_model simulink_controller;
 
     // user settable parameters
     static const struct AP_Param::GroupInfo var_info[];
