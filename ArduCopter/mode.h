@@ -95,6 +95,7 @@ public:
         AUTOROTATE =   26,  // Autonomous autorotation
         AUTO_RTL =     27,  // Auto RTL, this is not a true mode, AUTO will report as this mode if entered to perform a DO_LAND_START Landing sequence
         TURTLE =       28,  // Flip over after crash
+        LAB =          99, // Custom mode for the Connect Lab Drone Course .. based on GUIDED and a custom position controller.
 
         // Mode number 127 reserved for the "drone show mode" in the Skybrush
         // fork at https://github.com/skybrush-io/ardupilot
@@ -1159,6 +1160,147 @@ private:
 
 };
 
+
+class ModeLab : public Mode {
+
+
+    // inherit constructor
+    using Mode::Mode;
+    Number mode_number() const override { return Number::LAB; }
+
+    bool init(bool ignore_checks) override;
+    void run() override;
+
+    bool requires_GPS() const override { return false; }
+    bool has_manual_throttle() const override { return false; }
+    // bool allows_arming(AP_Arming::Method method) const override; // TODO, what is AP_Arming 
+    bool is_autopilot() const override { return true; }
+    bool has_user_takeoff(bool must_navigate) const override { return true; }
+
+    // bool requires_terrain_failsafe() const override { return true; } // Probably not but may be helpful with optical flow. TODO
+
+    // Sets lab's angular target submode: Using a rotation quaternion, angular velocity, and climbrate or thrust (depends on user option)
+    // attitude_quat: IF zero: ang_vel (angular velocity) must be provided even if all zeroes
+    //                IF non-zero: attitude_control is performed using both the attitude quaternion and angular velocity
+    // ang_vel: angular velocity (rad/s)
+    // climb_rate_cms_or_thrust: represents either the climb_rate (cm/s) or thrust scaled from [0, 1], unitless
+    // use_thrust: IF true: climb_rate_cms_or_thrust represents thrust
+    //             IF false: climb_rate_cms_or_thrust represents climb_rate (cm/s)
+    void set_angle(const Quaternion &attitude_quat, const Vector3f &ang_vel, float climb_rate_cms_or_thrust, bool use_thrust);
+
+    bool set_destination(const Vector3f& destination, bool use_yaw = false, float yaw_cd = 0.0, bool use_yaw_rate = false, float yaw_rate_cds = 0.0, bool yaw_relative = false, bool terrain_alt = false);
+    bool set_destination(const Location& dest_loc, bool use_yaw = false, float yaw_cd = 0.0, bool use_yaw_rate = false, float yaw_rate_cds = 0.0, bool yaw_relative = false);
+    bool get_wp(Location &loc) const override;
+    void set_accel(const Vector3f& acceleration, bool use_yaw = false, float yaw_cd = 0.0, bool use_yaw_rate = false, float yaw_rate_cds = 0.0, bool yaw_relative = false, bool log_request = true);
+    void set_velocity(const Vector3f& velocity, bool use_yaw = false, float yaw_cd = 0.0, bool use_yaw_rate = false, float yaw_rate_cds = 0.0, bool yaw_relative = false, bool log_request = true);
+    void set_velaccel(const Vector3f& velocity, const Vector3f& acceleration, bool use_yaw = false, float yaw_cd = 0.0, bool use_yaw_rate = false, float yaw_rate_cds = 0.0, bool yaw_relative = false, bool log_request = true);
+    bool set_destination_posvel(const Vector3f& destination, const Vector3f& velocity, bool use_yaw = false, float yaw_cd = 0.0, bool use_yaw_rate = false, float yaw_rate_cds = 0.0, bool yaw_relative = false);
+    bool set_destination_posvelaccel(const Vector3f& destination, const Vector3f& velocity, const Vector3f& acceleration, bool use_yaw = false, float yaw_cd = 0.0, bool use_yaw_rate = false, float yaw_rate_cds = 0.0, bool yaw_relative = false);
+
+    // get position, velocity and acceleration targets
+    const Vector3p& get_target_pos() const;
+    const Vector3f& get_target_vel() const;
+    const Vector3f& get_target_accel() const;
+
+    // returns true if GUIDED_OPTIONS param suggests SET_ATTITUDE_TARGET's "thrust" field should be interpreted as thrust instead of climb rate
+    bool set_attitude_target_provides_thrust() const;
+    bool stabilizing_pos_xy() const;
+    bool stabilizing_vel_xy() const;
+    bool use_wpnav_for_position_control() const;
+
+    void limit_clear();
+    void limit_init_time_and_pos();
+    void limit_set(uint32_t timeout_ms, float alt_min_cm, float alt_max_cm, float horiz_max_cm);
+    bool limit_check();
+
+    bool is_taking_off() const override;
+    
+    bool set_speed_xy(float speed_xy_cms) override;
+    bool set_speed_up(float speed_up_cms) override;
+    bool set_speed_down(float speed_down_cms) override;
+
+    // initialises position controller to implement take-off
+    // takeoff_alt_cm is interpreted as alt-above-home (in cm) or alt-above-terrain if a rangefinder is available
+    bool do_user_takeoff_start(float takeoff_alt_cm) override;
+
+    enum class SubMode {
+        TakeOff,
+        WP,
+        Pos,
+        PosVelAccel,
+        VelAccel,
+        Accel,
+        Angle,
+    };
+
+    SubMode submode() const { return guided_mode; }
+
+    void angle_control_start();
+    void angle_control_run();
+
+    // return guided mode timeout in milliseconds. Only used for velocity, acceleration, angle control, and angular rate control
+    uint32_t get_timeout_ms() const;
+
+    bool use_pilot_yaw() const override;
+
+    // pause continue in guided mode
+    bool pause() override;
+    bool resume() override;
+
+    // true if weathervaning is allowed in guided
+#if WEATHERVANE_ENABLED == ENABLED
+    bool allows_weathervaning(void) const override;
+#endif
+
+protected:
+
+    const char *name() const override { return "GUIDED"; }
+    const char *name4() const override { return "GUID"; }
+
+    uint32_t wp_distance() const override;
+    int32_t wp_bearing() const override;
+    float crosstrack_error() const override;
+
+private:
+
+    // enum for GUID_OPTIONS parameter
+    enum class Options : int32_t {
+        AllowArmingFromTX   = (1U << 0),
+        // this bit is still available, pilot yaw was mapped to bit 2 for symmetry with auto
+        IgnorePilotYaw      = (1U << 2),
+        SetAttitudeTarget_ThrustAsThrust = (1U << 3),
+        DoNotStabilizePositionXY = (1U << 4),
+        DoNotStabilizeVelocityXY = (1U << 5),
+        WPNavUsedForPosControl = (1U << 6),
+        AllowWeatherVaning = (1U << 7)
+    };
+
+    // wp controller
+    void wp_control_start();
+    void wp_control_run();
+
+    void pva_control_start();
+    void pos_control_start();
+    void accel_control_start();
+    void velaccel_control_start();
+    void posvelaccel_control_start();
+    void takeoff_run();
+    void pos_control_run();
+    void accel_control_run();
+    void velaccel_control_run();
+    void pause_control_run();
+    void posvelaccel_control_run();
+    void set_yaw_state(bool use_yaw, float yaw_cd, bool use_yaw_rate, float yaw_rate_cds, bool relative_angle);
+
+    // controls which controller is run (pos or vel):
+    SubMode guided_mode = SubMode::TakeOff;
+    bool send_notification;     // used to send one time notification to ground station
+    bool takeoff_complete;      // true once takeoff has completed (used to trigger retracting of landing gear)
+
+    // guided mode is paused or not
+    bool _paused;
+
+};
 
 class ModeLand : public Mode {
 
