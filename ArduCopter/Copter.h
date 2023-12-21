@@ -492,7 +492,7 @@ private:
     AC_Loiter *loiter_nav;
 
 #if AC_CUSTOMCONTROL_MULTI_ENABLED == ENABLED
-    AC_CustomControl custom_control{ahrs_view, attitude_control, motors, scheduler.get_loop_period_s()};
+    AC_CustomControl custom_control{ahrs_view, attitude_control, pos_control, motors, scheduler.get_loop_period_s()};
 #endif
 
 #if MODE_CIRCLE_ENABLED == ENABLED

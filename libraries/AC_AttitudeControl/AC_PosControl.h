@@ -266,6 +266,9 @@ public:
     /// get_stopping_point_z_cm - calculates stopping point in NEU cm based on current position, velocity, vehicle acceleration
     void get_stopping_point_z_cm(postype_t &stopping_point) const;
 
+    // get_position_neu_cm_control - returns inav position, forwarded for custom control
+    const Vector3f get_position_neu_cm_control() const { return _inav.get_position_neu_cm().topostype().tofloat(); }
+
     /// get_pos_error_cm - get position error vector between the current and target position
     const Vector3f get_pos_error_cm() const { return (_pos_target - _inav.get_position_neu_cm().topostype()).tofloat(); }
 
@@ -295,6 +298,9 @@ public:
 
     /// get_vel_target_z_cms - returns target vertical speed in cm/s
     float get_vel_target_z_cms() const { return _vel_target.z; }
+
+    // get_velocity_neu_cms_control - returns inav position, forwarded for custom control
+    const Vector3f get_velocity_neu_cms_control() const { return _inav.get_velocity_neu_cms(); }
 
 
     /// Acceleration

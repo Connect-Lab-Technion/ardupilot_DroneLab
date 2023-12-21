@@ -10,7 +10,12 @@
 
 class AC_CustomControl_Empty : public AC_CustomControl_Backend {
 public:
-    AC_CustomControl_Empty(AC_CustomControl& frontend, AP_AHRS_View*& ahrs, AC_AttitudeControl_Multi*& att_control, AP_MotorsMulticopter*& motors, float dt);
+    AC_CustomControl_Empty(AC_CustomControl& frontend, 
+                           AP_AHRS_View*& ahrs, 
+                           AC_AttitudeControl_Multi*& att_control, 
+                           AC_PosControl*& pos_control,
+                           AP_MotorsMulticopter*& motors, 
+                           float dt);
 
 
     Vector3f update(void) override;

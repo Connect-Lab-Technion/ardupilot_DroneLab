@@ -42,10 +42,15 @@ const AP_Param::GroupInfo AC_CustomControl::var_info[] = {
 
 const struct AP_Param::GroupInfo *AC_CustomControl::_backend_var_info[CUSTOMCONTROL_MAX_TYPES];
 
-AC_CustomControl::AC_CustomControl(AP_AHRS_View*& ahrs, AC_AttitudeControl_Multi*& att_control, AP_MotorsMulticopter*& motors, float dt) :
+AC_CustomControl::AC_CustomControl(AP_AHRS_View*& ahrs, 
+                                   AC_AttitudeControl_Multi*& att_control, 
+                                   AC_PosControl*& pos_control,
+                                   AP_MotorsMulticopter*& motors, 
+                                   float dt) :
     _dt(dt),
     _ahrs(ahrs),
     _att_control(att_control),
+    _pos_control(pos_control),
     _motors(motors)
 {
     AP_Param::setup_object_defaults(this, var_info);
@@ -63,11 +68,11 @@ void AC_CustomControl::init(void)
             // _backend_var_info[get_type()] = AC_CustomControl_Empty::var_info;
             break;
         case CustomControlType::CONT_PID:
-            _backend = new AC_CustomControl_PID(*this, _ahrs, _att_control, _motors, _dt);
+            _backend = new AC_CustomControl_PID(*this, _ahrs, _att_control, _pos_control, _motors, _dt);
             _backend_var_info[get_type()] = AC_CustomControl_PID::var_info;
             break;
         case CustomControlType::CONT_Simulink:
-            _backend = new AC_CustomControl_Simulink(*this, _ahrs, _att_control, _motors, _dt);
+            _backend = new AC_CustomControl_Simulink(*this, _ahrs, _att_control, _pos_control, _motors, _dt);
             _backend_var_info[get_type()] = AC_CustomControl_Simulink::var_info;
             break;
         default:

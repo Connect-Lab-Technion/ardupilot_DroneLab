@@ -3,9 +3,6 @@
 #include "AC_CustomControl_Backend.h"
 #include <AC_Simulink/wrapper_template_model.h>
 
-#include <AP_AHRS/AP_AHRS.h>
-#include <AP_InertialSensor/AP_InertialSensor.h> 
-
 #ifndef CUSTOMCONTROL_Simulink_ENABLED
     #define CUSTOMCONTROL_Simulink_ENABLED AP_CUSTOMCONTROL_ENABLED
 #endif
@@ -14,7 +11,12 @@
 
 class AC_CustomControl_Simulink : public AC_CustomControl_Backend {
 public:
-    AC_CustomControl_Simulink(AC_CustomControl& frontend, AP_AHRS_View*& ahrs, AC_AttitudeControl_Multi*& att_control, AP_MotorsMulticopter*& motors, float dt);
+    AC_CustomControl_Simulink(AC_CustomControl& frontend, 
+                              AP_AHRS_View*& ahrs, 
+                              AC_AttitudeControl_Multi*& att_control, 
+                              AC_PosControl*& pos_control,
+                              AP_MotorsMulticopter*& motors, 
+                              float dt);
 
 
     Vector3f update(void) override;

@@ -28,8 +28,13 @@ const AP_Param::GroupInfo AC_CustomControl_Simulink::var_info[] = {
 };
 
 // initialize in the constructor
-AC_CustomControl_Simulink::AC_CustomControl_Simulink(AC_CustomControl& frontend, AP_AHRS_View*& ahrs, AC_AttitudeControl_Multi*& att_control, AP_MotorsMulticopter*& motors, float dt) :
-    AC_CustomControl_Backend(frontend, ahrs, att_control, motors, dt)
+AC_CustomControl_Simulink::AC_CustomControl_Simulink(AC_CustomControl& frontend, 
+                                                     AP_AHRS_View*& ahrs, 
+                                                     AC_AttitudeControl_Multi*& att_control, 
+                                                     AC_PosControl*& pos_control, 
+                                                     AP_MotorsMulticopter*& motors, 
+                                                     float dt) :
+    AC_CustomControl_Backend(frontend, ahrs, att_control, pos_control, motors, dt)
 {
     AP_Param::setup_object_defaults(this, var_info);
 
@@ -62,21 +67,26 @@ Vector3f AC_CustomControl_Simulink::update(void)
     // Here are the reference calls for each input 
 
     // '<Root>/accel'
-    // Vector3f accel_ef = _ahrs.get_accel_ef();
     AP_InertialSensor &_ins = AP::ins(); 
     Vector3f accVec = _ins.get_accel(); 
 
     // '<Root>/gyro'
-
+    Vector3f gyro_latest = _ahrs->get_gyro_latest(); 
+    
     // '<Root>/bat_V'
+    // AP_BattMonitor &battery = AP::battery(); 
+    // uint16_t volt = (uint16_t) roundf(battery.voltage() * 1000.0f); // battery voltage (expects value in mV) 
 
     // '<Root>/pos_est'
+    const Vector3f pos_est = _pos_control->get_position_neu_cm_control();
 
     // '<Root>/vel_est'
+    const Vector3f vel_est = _pos_control->get_velocity_neu_cms_control();
 
     // '<Root>/yaw_opticalfow'
 
     // '<Root>/pos_ref'
+    const Vector3p pos_ref = _pos_control->get_pos_target_cm();
 
     // '<Root>/orient_ref'
 
@@ -86,22 +96,22 @@ Vector3f AC_CustomControl_Simulink::update(void)
     float arg_accel[3]{ accVec.x, accVec.y, accVec.z };
 
     // '<Root>/gyro'
-    float arg_gyro[3]{ 0.0F, 0.0F, 0.0F };
+    float arg_gyro[3]{ gyro_latest.x, gyro_latest.y, gyro_latest.z };
 
     // '<Root>/bat_V'
-    float arg_bat_V{ 0.0F };
+    float arg_bat_V{ (float) 0.0F};
 
     // '<Root>/pos_est'
-    float arg_pos_est[3]{ 0.0F, 0.0F, 0.0F };
+    float arg_pos_est[3]{ pos_est.x, pos_est.y, pos_est.z };
 
     // '<Root>/vel_est'
-    float arg_vel_est[3]{ 0.0F, 0.0F, 0.0F };
+    float arg_vel_est[3]{ vel_est.x, vel_est.y, vel_est.z };
 
     // '<Root>/yaw_opticalfow'
     float arg_yaw_opticalfow{ 0.0F };
 
     // '<Root>/pos_ref'
-    float arg_pos_ref[3]{ 0.0F, 0.0F, 0.0F };
+    float arg_pos_ref[3]{ (float) pos_ref.x, (float) pos_ref.y, (float) pos_ref.z };
 
     // '<Root>/orient_ref'
     float arg_orient_ref[3]{ 0.0F, 0.0F, 0.0F };
