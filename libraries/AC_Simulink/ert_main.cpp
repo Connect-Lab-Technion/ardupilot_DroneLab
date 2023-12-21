@@ -5,33 +5,48 @@
 //
 // File: ert_main.cpp
 //
-// Code generated for Simulink model 'ardupilot_controller_v1_model'.
+// Code generated for Simulink model 'wrapper_template_model'.
 //
-// Model version                  : 1.7
+// Model version                  : 1.10
 // Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Thu Nov  9 12:19:14 2023
+// C/C++ source code generated on : Sun Dec 17 23:19:46 2023
 //
 // Target selection: ert.tlc
-// Embedded hardware selection: Intel->x86-64 (Windows64)
+// Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
 #include <stdio.h>              // This example main program uses printf/fflush
-#include "ardupilot_controller_v1_model.h" // Model header file
+#include "wrapper_template_model.h"    // Model header file
 
-static ardupilot_controller_v1_model ardupilot_controller_v1_mod_Obj;// Instance of model class 
+static wrapper_template_model wrapper_template_model_Obj;// Instance of model class 
 
-// '<Root>/attitude_error'
-static real32_T arg_attitude_error[3]{ 0.0F, 0.0F, 0.0F };
+// '<Root>/accel'
+static real32_T arg_accel[3]{ 0.0F, 0.0F, 0.0F };
 
-// '<Root>/rate_ff'
-static real32_T arg_rate_ff[3]{ 0.0F, 0.0F, 0.0F };
+// '<Root>/gyro'
+static real32_T arg_gyro[3]{ 0.0F, 0.0F, 0.0F };
 
-// '<Root>/rate_meas'
-static real32_T arg_rate_meas[3]{ 0.0F, 0.0F, 0.0F };
+// '<Root>/bat_V'
+static real32_T arg_bat_V{ 0.0F };
 
-// '<Root>/Output'
-static real32_T arg_Output[3];
+// '<Root>/pos_est'
+static real32_T arg_pos_est[3]{ 0.0F, 0.0F, 0.0F };
+
+// '<Root>/vel_est'
+static real32_T arg_vel_est[3]{ 0.0F, 0.0F, 0.0F };
+
+// '<Root>/yaw_opticalfow'
+static real32_T arg_yaw_opticalfow{ 0.0F };
+
+// '<Root>/pos_ref'
+static real32_T arg_pos_ref[3]{ 0.0F, 0.0F, 0.0F };
+
+// '<Root>/orient_ref'
+static real32_T arg_orient_ref[3]{ 0.0F, 0.0F, 0.0F };
+
+// '<Root>/torque_ref'
+static real32_T arg_torque_ref[3];
 
 //
 // Associating rt_OneStep with a real-time clock or interrupt service routine
@@ -53,7 +68,7 @@ void rt_OneStep(void)
 
   // Check for overrun
   if (OverrunFlag) {
-    rtmSetErrorStatus(ardupilot_controller_v1_mod_Obj.getRTM(), "Overrun");
+    rtmSetErrorStatus(wrapper_template_model_Obj.getRTM(), "Overrun");
     return;
   }
 
@@ -64,8 +79,9 @@ void rt_OneStep(void)
   // Set model inputs here
 
   // Step the model
-  ardupilot_controller_v1_mod_Obj.step(arg_attitude_error, arg_rate_ff,
-    arg_rate_meas, arg_Output);
+  wrapper_template_model_Obj.step(arg_accel, arg_gyro, &arg_bat_V, arg_pos_est,
+    arg_vel_est, &arg_yaw_opticalfow, arg_pos_ref, arg_orient_ref,
+    arg_torque_ref);
 
   // Get model outputs here
 
@@ -90,7 +106,7 @@ int_T main(int_T argc, const char *argv[])
   (void)(argv);
 
   // Initialize model
-  ardupilot_controller_v1_mod_Obj.initialize();
+  wrapper_template_model_Obj.initialize();
 
   // Attach rt_OneStep to a timer or interrupt service routine with
   //  period 0.02 seconds (base rate of the model) here.
@@ -102,13 +118,12 @@ int_T main(int_T argc, const char *argv[])
          "Generated ERT main won't simulate model step behavior. "
          "To change this behavior select the 'MAT-file logging' option.\n");
   fflush((nullptr));
-  while (rtmGetErrorStatus(ardupilot_controller_v1_mod_Obj.getRTM()) == (nullptr))
-  {
+  while (rtmGetErrorStatus(wrapper_template_model_Obj.getRTM()) == (nullptr)) {
     //  Perform application tasks here
   }
 
   // Terminate model
-  ardupilot_controller_v1_mod_Obj.terminate();
+  wrapper_template_model_Obj.terminate();
   return 0;
 }
 

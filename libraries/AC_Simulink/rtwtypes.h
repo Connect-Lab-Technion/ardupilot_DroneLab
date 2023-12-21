@@ -5,14 +5,14 @@
 //
 // File: rtwtypes.h
 //
-// Code generated for Simulink model 'ardupilot_controller_v1_model'.
+// Code generated for Simulink model 'wrapper_template_model'.
 //
-// Model version                  : 1.7
+// Model version                  : 1.10
 // Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Thu Nov  9 12:19:14 2023
+// C/C++ source code generated on : Sun Dec 17 23:19:46 2023
 //
 // Target selection: ert.tlc
-// Embedded hardware selection: Intel->x86-64 (Windows64)
+// Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
@@ -33,10 +33,10 @@
 
 //=======================================================================*
 //  Target hardware information
-//    Device type: Intel->x86-64 (Windows64)
+//    Device type: ARM Compatible->ARM Cortex-M
 //    Number of bits:     char:   8    short:   16    int:  32
 //                        long:  32
-//                        native word size:  64
+//                        native word size:  32
 //    Byte ordering: LittleEndian
 //    Signed integer division rounds to: Zero
 //    Shift right on a signed integer as arithmetic shift: on
