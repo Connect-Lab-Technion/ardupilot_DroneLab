@@ -206,6 +206,12 @@
 #endif
 
 //////////////////////////////////////////////////////////////////////////////
+// Lab mode - control vehicle's position or angles from GCS
+#ifndef MODE_LAB_ENABLED
+# define MODE_LAB_ENABLED ENABLED
+#endif
+
+//////////////////////////////////////////////////////////////////////////////
 // Loiter mode - allows vehicle to hold global position
 #ifndef MODE_LOITER_ENABLED
 # define MODE_LOITER_ENABLED ENABLED

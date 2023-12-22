@@ -33,7 +33,7 @@ struct Guided_Limit {
 } guided_limit;
 
 // init - initialise guided controller
-bool ModeGuided::init(bool ignore_checks)
+bool ModeLab::init(bool ignore_checks)
 {
     // start in velaccel control mode
     velaccel_control_start();
@@ -49,7 +49,7 @@ bool ModeGuided::init(bool ignore_checks)
 
 // run - runs the guided controller
 // should be called at 100hz or more
-void ModeGuided::run()
+void ModeLab::run()
 {
     // run pause control if the vehicle is paused
     if (_paused) {
@@ -97,27 +97,27 @@ void ModeGuided::run()
     }
  }
 
-bool ModeGuided::allows_arming(AP_Arming::Method method) const
+bool ModeLab::allows_arming(AP_Arming::Method method) const
 {
     // always allow arming from the ground station or scripting
     if (AP_Arming::method_is_GCS(method) || method == AP_Arming::Method::SCRIPTING) {
         return true;
     }
 
-    // optionally allow arming from the transmitter
-    return (copter.g2.guided_options & (uint32_t)Options::AllowArmingFromTX) != 0;
+    // // optionally allow arming from the transmitter
+    // return (copter.g2.guided_options & (uint32_t)Options::AllowArmingFromTX) != 0;
 };
 
 #if WEATHERVANE_ENABLED == ENABLED
-bool ModeGuided::allows_weathervaning() const
+bool ModeLab::allows_weathervaning() const
 {
-    return (copter.g2.guided_options.get() & (uint32_t)Options::AllowWeatherVaning) != 0;
+    return (/*copter.g2.guided_options.get() & */ (uint32_t)Options::AllowWeatherVaning) != 0;
 }
 #endif
 
 // initialises position controller to implement take-off
 // takeoff_alt_cm is interpreted as alt-above-home (in cm) or alt-above-terrain if a rangefinder is available
-bool ModeGuided::do_user_takeoff_start(float takeoff_alt_cm)
+bool ModeLab::do_user_takeoff_start(float takeoff_alt_cm)
 {
     // calculate target altitude and frame (either alt-above-ekf-origin or alt-above-terrain)
     int32_t alt_target_cm;
@@ -162,7 +162,7 @@ bool ModeGuided::do_user_takeoff_start(float takeoff_alt_cm)
 }
 
 // initialise guided mode's waypoint navigation controller
-void ModeGuided::wp_control_start()
+void ModeLab::wp_control_start()
 {
     // set to position control mode
     guided_mode = SubMode::WP;
@@ -183,7 +183,7 @@ void ModeGuided::wp_control_start()
 }
 
 // run guided mode's waypoint navigation controller
-void ModeGuided::wp_control_run()
+void ModeLab::wp_control_run()
 {
     // if not armed set throttle to zero and exit immediately
     if (is_disarmed_or_landed()) {
@@ -206,7 +206,7 @@ void ModeGuided::wp_control_run()
 }
 
 // initialise position controller
-void ModeGuided::pva_control_start()
+void ModeLab::pva_control_start()
 {
     // initialise horizontal speed, acceleration
     pos_control->set_max_speed_accel_xy(wp_nav->get_default_speed_xy(), wp_nav->get_wp_acceleration());
@@ -228,7 +228,7 @@ void ModeGuided::pva_control_start()
 }
 
 // initialise guided mode's position controller
-void ModeGuided::pos_control_start()
+void ModeLab::pos_control_start()
 {
     // set to position control mode
     guided_mode = SubMode::Pos;
@@ -238,7 +238,7 @@ void ModeGuided::pos_control_start()
 }
 
 // initialise guided mode's velocity controller
-void ModeGuided::accel_control_start()
+void ModeLab::accel_control_start()
 {
     // set guided_mode to velocity controller
     guided_mode = SubMode::Accel;
@@ -248,7 +248,7 @@ void ModeGuided::accel_control_start()
 }
 
 // initialise guided mode's velocity and acceleration controller
-void ModeGuided::velaccel_control_start()
+void ModeLab::velaccel_control_start()
 {
     // set guided_mode to velocity controller
     guided_mode = SubMode::VelAccel;
@@ -258,7 +258,7 @@ void ModeGuided::velaccel_control_start()
 }
 
 // initialise guided mode's position, velocity and acceleration controller
-void ModeGuided::posvelaccel_control_start()
+void ModeLab::posvelaccel_control_start()
 {
     // set guided_mode to velocity controller
     guided_mode = SubMode::PosVelAccel;
@@ -267,12 +267,12 @@ void ModeGuided::posvelaccel_control_start()
     pva_control_start();
 }
 
-bool ModeGuided::is_taking_off() const
+bool ModeLab::is_taking_off() const
 {
     return guided_mode == SubMode::TakeOff && !takeoff_complete;
 }
 
-bool ModeGuided::set_speed_xy(float speed_xy_cms)
+bool ModeLab::set_speed_xy(float speed_xy_cms)
 {
     // initialise horizontal speed, acceleration
     pos_control->set_max_speed_accel_xy(speed_xy_cms, wp_nav->get_wp_acceleration());
@@ -280,7 +280,7 @@ bool ModeGuided::set_speed_xy(float speed_xy_cms)
     return true;
 }
 
-bool ModeGuided::set_speed_up(float speed_up_cms)
+bool ModeLab::set_speed_up(float speed_up_cms)
 {
     // initialize vertical speeds and acceleration
     pos_control->set_max_speed_accel_z(wp_nav->get_default_speed_down(), speed_up_cms, wp_nav->get_accel_z());
@@ -288,7 +288,7 @@ bool ModeGuided::set_speed_up(float speed_up_cms)
     return true;
 }
 
-bool ModeGuided::set_speed_down(float speed_down_cms)
+bool ModeLab::set_speed_down(float speed_down_cms)
 {
     // initialize vertical speeds and acceleration
     pos_control->set_max_speed_accel_z(speed_down_cms, wp_nav->get_default_speed_up(), wp_nav->get_accel_z());
@@ -297,7 +297,7 @@ bool ModeGuided::set_speed_down(float speed_down_cms)
 }
 
 // initialise guided mode's angle controller
-void ModeGuided::angle_control_start()
+void ModeLab::angle_control_start()
 {
     // set guided_mode to velocity controller
     guided_mode = SubMode::Angle;
@@ -326,7 +326,7 @@ void ModeGuided::angle_control_start()
 // set_destination - sets guided mode's target destination
 // Returns true if the fence is enabled and guided waypoint is within the fence
 // else return false if the waypoint is outside the fence
-bool ModeGuided::set_destination(const Vector3f& destination, bool use_yaw, float yaw_cd, bool use_yaw_rate, float yaw_rate_cds, bool relative_yaw, bool terrain_alt)
+bool ModeLab::set_destination(const Vector3f& destination, bool use_yaw, float yaw_cd, bool use_yaw_rate, float yaw_rate_cds, bool relative_yaw, bool terrain_alt)
 {
 #if AP_FENCE_ENABLED
     // reject destination if outside the fence
@@ -399,7 +399,7 @@ bool ModeGuided::set_destination(const Vector3f& destination, bool use_yaw, floa
     return true;
 }
 
-bool ModeGuided::get_wp(Location& destination) const
+bool ModeLab::get_wp(Location& destination) const
 {
     switch (guided_mode) {
     case SubMode::WP:
@@ -418,7 +418,7 @@ bool ModeGuided::get_wp(Location& destination) const
 // sets guided mode's target from a Location object
 // returns false if destination could not be set (probably caused by missing terrain data)
 // or if the fence is enabled and guided waypoint is outside the fence
-bool ModeGuided::set_destination(const Location& dest_loc, bool use_yaw, float yaw_cd, bool use_yaw_rate, float yaw_rate_cds, bool relative_yaw)
+bool ModeLab::set_destination(const Location& dest_loc, bool use_yaw, float yaw_cd, bool use_yaw_rate, float yaw_rate_cds, bool relative_yaw)
 {
 #if AP_FENCE_ENABLED
     // reject destination outside the fence.
@@ -501,7 +501,7 @@ bool ModeGuided::set_destination(const Location& dest_loc, bool use_yaw, float y
 }
 
 // set_velaccel - sets guided mode's target velocity and acceleration
-void ModeGuided::set_accel(const Vector3f& acceleration, bool use_yaw, float yaw_cd, bool use_yaw_rate, float yaw_rate_cds, bool relative_yaw, bool log_request)
+void ModeLab::set_accel(const Vector3f& acceleration, bool use_yaw, float yaw_cd, bool use_yaw_rate, float yaw_rate_cds, bool relative_yaw, bool log_request)
 {
     // check we are in velocity control mode
     if (guided_mode != SubMode::Accel) {
@@ -525,13 +525,13 @@ void ModeGuided::set_accel(const Vector3f& acceleration, bool use_yaw, float yaw
 }
 
 // set_velocity - sets guided mode's target velocity
-void ModeGuided::set_velocity(const Vector3f& velocity, bool use_yaw, float yaw_cd, bool use_yaw_rate, float yaw_rate_cds, bool relative_yaw, bool log_request)
+void ModeLab::set_velocity(const Vector3f& velocity, bool use_yaw, float yaw_cd, bool use_yaw_rate, float yaw_rate_cds, bool relative_yaw, bool log_request)
 {
     set_velaccel(velocity, Vector3f(), use_yaw, yaw_cd, use_yaw_rate, yaw_rate_cds, relative_yaw, log_request);
 }
 
 // set_velaccel - sets guided mode's target velocity and acceleration
-void ModeGuided::set_velaccel(const Vector3f& velocity, const Vector3f& acceleration, bool use_yaw, float yaw_cd, bool use_yaw_rate, float yaw_rate_cds, bool relative_yaw, bool log_request)
+void ModeLab::set_velaccel(const Vector3f& velocity, const Vector3f& acceleration, bool use_yaw, float yaw_cd, bool use_yaw_rate, float yaw_rate_cds, bool relative_yaw, bool log_request)
 {
     // check we are in velocity control mode
     if (guided_mode != SubMode::VelAccel) {
@@ -555,13 +555,13 @@ void ModeGuided::set_velaccel(const Vector3f& velocity, const Vector3f& accelera
 }
 
 // set_destination_posvel - set guided mode position and velocity target
-bool ModeGuided::set_destination_posvel(const Vector3f& destination, const Vector3f& velocity, bool use_yaw, float yaw_cd, bool use_yaw_rate, float yaw_rate_cds, bool relative_yaw)
+bool ModeLab::set_destination_posvel(const Vector3f& destination, const Vector3f& velocity, bool use_yaw, float yaw_cd, bool use_yaw_rate, float yaw_rate_cds, bool relative_yaw)
 {
     return set_destination_posvelaccel(destination, velocity, Vector3f(), use_yaw, yaw_cd, use_yaw_rate, yaw_rate_cds, relative_yaw);
 }
 
 // set_destination_posvelaccel - set guided mode position, velocity and acceleration target
-bool ModeGuided::set_destination_posvelaccel(const Vector3f& destination, const Vector3f& velocity, const Vector3f& acceleration, bool use_yaw, float yaw_cd, bool use_yaw_rate, float yaw_rate_cds, bool relative_yaw)
+bool ModeLab::set_destination_posvelaccel(const Vector3f& destination, const Vector3f& velocity, const Vector3f& acceleration, bool use_yaw, float yaw_cd, bool use_yaw_rate, float yaw_rate_cds, bool relative_yaw)
 {
 #if AP_FENCE_ENABLED
     // reject destination if outside the fence
@@ -593,27 +593,27 @@ bool ModeGuided::set_destination_posvelaccel(const Vector3f& destination, const 
 }
 
 // returns true if GUIDED_OPTIONS param suggests SET_ATTITUDE_TARGET's "thrust" field should be interpreted as thrust instead of climb rate
-bool ModeGuided::set_attitude_target_provides_thrust() const
+bool ModeLab::set_attitude_target_provides_thrust() const
 {
-    return ((copter.g2.guided_options.get() & uint32_t(Options::SetAttitudeTarget_ThrustAsThrust)) != 0);
+    return (( /* copter.g2.guided_options.get() & */ uint32_t(Options::SetAttitudeTarget_ThrustAsThrust)) != 0);
 }
 
 // returns true if GUIDED_OPTIONS param specifies position should be controlled (when velocity and/or acceleration control is active)
-bool ModeGuided::stabilizing_pos_xy() const
+bool ModeLab::stabilizing_pos_xy() const
 {
-    return !((copter.g2.guided_options.get() & uint32_t(Options::DoNotStabilizePositionXY)) != 0);
+    return !(( /* copter.g2.guided_options.get() & */ uint32_t(Options::DoNotStabilizePositionXY)) != 0);
 }
 
 // returns true if GUIDED_OPTIONS param specifies velocity should  be controlled (when acceleration control is active)
-bool ModeGuided::stabilizing_vel_xy() const
+bool ModeLab::stabilizing_vel_xy() const
 {
-    return !((copter.g2.guided_options.get() & uint32_t(Options::DoNotStabilizeVelocityXY)) != 0);
+    return !(( /* copter.g2.guided_options.get() & */ uint32_t(Options::DoNotStabilizeVelocityXY)) != 0);
 }
 
 // returns true if GUIDED_OPTIONS param specifies waypoint navigation should be used for position control (allow path planning to be used but updates must be slower)
-bool ModeGuided::use_wpnav_for_position_control() const
+bool ModeLab::use_wpnav_for_position_control() const
 {
-    return ((copter.g2.guided_options.get() & uint32_t(Options::WPNavUsedForPosControl)) != 0);
+    return (( /* copter.g2.guided_options.get() & */ uint32_t(Options::WPNavUsedForPosControl)) != 0);
 }
 
 // Sets guided's angular target submode: Using a rotation quaternion, angular velocity, and climbrate or thrust (depends on user option)
@@ -623,7 +623,7 @@ bool ModeGuided::use_wpnav_for_position_control() const
 // climb_rate_cms_or_thrust: represents either the climb_rate (cm/s) or thrust scaled from [0, 1], unitless
 // use_thrust: IF true: climb_rate_cms_or_thrust represents thrust
 //             IF false: climb_rate_cms_or_thrust represents climb_rate (cm/s)
-void ModeGuided::set_angle(const Quaternion &attitude_quat, const Vector3f &ang_vel, float climb_rate_cms_or_thrust, bool use_thrust)
+void ModeLab::set_angle(const Quaternion &attitude_quat, const Vector3f &ang_vel, float climb_rate_cms_or_thrust, bool use_thrust)
 {
     // check we are in velocity control mode
     if (guided_mode != SubMode::Angle) {
@@ -654,7 +654,7 @@ void ModeGuided::set_angle(const Quaternion &attitude_quat, const Vector3f &ang_
 
 // takeoff_run - takeoff in guided mode
 //      called by guided_run at 100hz or more
-void ModeGuided::takeoff_run()
+void ModeLab::takeoff_run()
 {
     auto_takeoff.run();
     if (auto_takeoff.complete && !takeoff_complete) {
@@ -668,7 +668,7 @@ void ModeGuided::takeoff_run()
 
 // pos_control_run - runs the guided position controller
 // called from guided_run
-void ModeGuided::pos_control_run()
+void ModeLab::pos_control_run()
 {
     // if not armed set throttle to zero and exit immediately
     if (is_disarmed_or_landed()) {
@@ -715,7 +715,7 @@ void ModeGuided::pos_control_run()
 
 // velaccel_control_run - runs the guided velocity controller
 // called from guided_run
-void ModeGuided::accel_control_run()
+void ModeLab::accel_control_run()
 {
     // if not armed set throttle to zero and exit immediately
     if (is_disarmed_or_landed()) {
@@ -760,7 +760,7 @@ void ModeGuided::accel_control_run()
 
 // velaccel_control_run - runs the guided velocity and acceleration controller
 // called from guided_run
-void ModeGuided::velaccel_control_run()
+void ModeLab::velaccel_control_run()
 {
     // if not armed set throttle to zero and exit immediately
     if (is_disarmed_or_landed()) {
@@ -816,7 +816,7 @@ void ModeGuided::velaccel_control_run()
 
 // pause_control_run - runs the guided mode pause controller
 // called from guided_run
-void ModeGuided::pause_control_run()
+void ModeLab::pause_control_run()
 {
     // if not armed set throttle to zero and exit immediately
     if (is_disarmed_or_landed()) {
@@ -846,7 +846,7 @@ void ModeGuided::pause_control_run()
 
 // posvelaccel_control_run - runs the guided position, velocity and acceleration controller
 // called from guided_run
-void ModeGuided::posvelaccel_control_run()
+void ModeLab::posvelaccel_control_run()
 {
     // if not armed set throttle to zero and exit immediately
     if (is_disarmed_or_landed()) {
@@ -908,7 +908,7 @@ void ModeGuided::posvelaccel_control_run()
 
 // angle_control_run - runs the guided angle controller
 // called from guided_run
-void ModeGuided::angle_control_run()
+void ModeLab::angle_control_run()
 {
     float climb_rate_cms = 0.0f;
     if (!guided_angle_state.use_thrust) {
@@ -977,7 +977,7 @@ void ModeGuided::angle_control_run()
 }
 
 // helper function to set yaw state and targets
-void ModeGuided::set_yaw_state(bool use_yaw, float yaw_cd, bool use_yaw_rate, float yaw_rate_cds, bool relative_angle)
+void ModeLab::set_yaw_state(bool use_yaw, float yaw_cd, bool use_yaw_rate, float yaw_rate_cds, bool relative_angle)
 {
     if (use_yaw && relative_angle) {
         auto_yaw.set_fixed_yaw(yaw_cd * 0.01f, 0.0f, 0, relative_angle);
@@ -993,7 +993,7 @@ void ModeGuided::set_yaw_state(bool use_yaw, float yaw_cd, bool use_yaw_rate, fl
 }
 
 // returns true if pilot's yaw input should be used to adjust vehicle's heading
-bool ModeGuided::use_pilot_yaw(void) const
+bool ModeLab::use_pilot_yaw(void) const
 {
     return (copter.g2.guided_options.get() & uint32_t(Options::IgnorePilotYaw)) == 0;
 }
@@ -1001,7 +1001,7 @@ bool ModeGuided::use_pilot_yaw(void) const
 // Guided Limit code
 
 // limit_clear - clear/turn off guided limits
-void ModeGuided::limit_clear()
+void ModeLab::limit_clear()
 {
     guided_limit.timeout_ms = 0;
     guided_limit.alt_min_cm = 0.0f;
@@ -1010,7 +1010,7 @@ void ModeGuided::limit_clear()
 }
 
 // limit_set - set guided timeout and movement limits
-void ModeGuided::limit_set(uint32_t timeout_ms, float alt_min_cm, float alt_max_cm, float horiz_max_cm)
+void ModeLab::limit_set(uint32_t timeout_ms, float alt_min_cm, float alt_max_cm, float horiz_max_cm)
 {
     guided_limit.timeout_ms = timeout_ms;
     guided_limit.alt_min_cm = alt_min_cm;
@@ -1020,7 +1020,7 @@ void ModeGuided::limit_set(uint32_t timeout_ms, float alt_min_cm, float alt_max_
 
 // limit_init_time_and_pos - initialise guided start time and position as reference for limit checking
 //  only called from AUTO mode's auto_nav_guided_start function
-void ModeGuided::limit_init_time_and_pos()
+void ModeLab::limit_init_time_and_pos()
 {
     // initialise start time
     guided_limit.start_time = AP_HAL::millis();
@@ -1031,7 +1031,7 @@ void ModeGuided::limit_init_time_and_pos()
 
 // limit_check - returns true if guided mode has breached a limit
 //  used when guided is invoked from the NAV_GUIDED_ENABLE mission command
-bool ModeGuided::limit_check()
+bool ModeLab::limit_check()
 {
     // check if we have passed the timeout
     if ((guided_limit.timeout_ms > 0) && (millis() - guided_limit.start_time >= guided_limit.timeout_ms)) {
@@ -1063,22 +1063,22 @@ bool ModeGuided::limit_check()
     return false;
 }
 
-const Vector3p &ModeGuided::get_target_pos() const
+const Vector3p &ModeLab::get_target_pos() const
 {
     return guided_pos_target_cm;
 }
 
-const Vector3f& ModeGuided::get_target_vel() const
+const Vector3f& ModeLab::get_target_vel() const
 {
     return guided_vel_target_cms;
 }
 
-const Vector3f& ModeGuided::get_target_accel() const
+const Vector3f& ModeLab::get_target_accel() const
 {
     return guided_accel_target_cmss;
 }
 
-uint32_t ModeGuided::wp_distance() const
+uint32_t ModeLab::wp_distance() const
 {
     switch(guided_mode) {
     case SubMode::WP:
@@ -1092,7 +1092,7 @@ uint32_t ModeGuided::wp_distance() const
     }
 }
 
-int32_t ModeGuided::wp_bearing() const
+int32_t ModeLab::wp_bearing() const
 {
     switch(guided_mode) {
     case SubMode::WP:
@@ -1112,7 +1112,7 @@ int32_t ModeGuided::wp_bearing() const
     return 0.0;
 }
 
-float ModeGuided::crosstrack_error() const
+float ModeLab::crosstrack_error() const
 {
     switch (guided_mode) {
     case SubMode::WP:
@@ -1132,20 +1132,20 @@ float ModeGuided::crosstrack_error() const
 }
 
 // return guided mode timeout in milliseconds. Only used for velocity, acceleration, angle control, and angular rates
-uint32_t ModeGuided::get_timeout_ms() const
+uint32_t ModeLab::get_timeout_ms() const
 {
     return MAX(copter.g2.guided_timeout, 0.1) * 1000;
 }
 
 // pause guide mode
-bool ModeGuided::pause()
+bool ModeLab::pause()
 {
     _paused = true;
     return true;
 }
 
 // resume guided mode
-bool ModeGuided::resume()
+bool ModeLab::resume()
 {
     _paused = false;
     return true;

@@ -1010,7 +1010,6 @@ public:
     bool allows_arming(AP_Arming::Method method) const override;
     bool is_autopilot() const override { return true; }
     bool has_user_takeoff(bool must_navigate) const override { return true; }
-    bool in_guided_mode() const override { return true; }
 
     bool requires_terrain_failsafe() const override { return true; }
 
@@ -1163,6 +1162,7 @@ private:
 
 class ModeLab : public Mode {
 
+    friend class ParametersG2;
 
     // inherit constructor
     using Mode::Mode;
@@ -1173,9 +1173,10 @@ class ModeLab : public Mode {
 
     bool requires_GPS() const override { return false; }
     bool has_manual_throttle() const override { return false; }
-    // bool allows_arming(AP_Arming::Method method) const override; // TODO, what is AP_Arming 
+    bool allows_arming(AP_Arming::Method method) const override; // TODO, what is AP_Arming 
     bool is_autopilot() const override { return true; }
     bool has_user_takeoff(bool must_navigate) const override { return true; }
+    bool in_guided_mode() const override { return true; }
 
     // bool requires_terrain_failsafe() const override { return true; } // Probably not but may be helpful with optical flow. TODO
 
@@ -1254,8 +1255,8 @@ class ModeLab : public Mode {
 
 protected:
 
-    const char *name() const override { return "GUIDED"; }
-    const char *name4() const override { return "GUID"; }
+    const char *name() const override { return "LAB"; }
+    const char *name4() const override { return "LAB"; }
 
     uint32_t wp_distance() const override;
     int32_t wp_bearing() const override;
