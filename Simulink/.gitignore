@@ -5,4 +5,5 @@ libraries
 */*.slxc
 */slprj
 */*_code
-
+*/*.autosave
+../libraries/AC_Simulink
