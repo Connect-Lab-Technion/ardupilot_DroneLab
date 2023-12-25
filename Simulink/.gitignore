@@ -5,4 +5,4 @@ libraries
 */*.slxc
 */slprj
 */*_code
-
+*/*.autosave

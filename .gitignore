@@ -165,3 +165,8 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+
+
+# Drone lab ignores 
+/libraries/AC_Simulink
+libraries/AC_Simulink
