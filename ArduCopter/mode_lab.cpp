@@ -10,24 +10,6 @@
 // lab_init - initialise lab controller
 bool ModeLab::init(bool ignore_checks)
 {
-    // do not enter the mode when already armed or when flying
-    if (motors->armed() || SRV_Channels::get_dshot_esc_type() == 0) {
-        return false;
-    }
-
-    // perform minimal arming checks
-    if (!copter.mavlink_motor_control_check(*gcs().chan(0), true, "Lab Mode")) {
-        return false;
-    }
-
-    // do not enter the mode if sticks are not centered or throttle is not at zero
-    if (!is_zero(channel_pitch->norm_input_dz())
-        || !is_zero(channel_roll->norm_input_dz())
-        || !is_zero(channel_yaw->norm_input_dz())
-        || !is_zero(channel_throttle->norm_input_dz())) {
-        return false;
-    }
-
     // turn on notify leds
     AP_Notify::flags.esc_calibration = true;
 

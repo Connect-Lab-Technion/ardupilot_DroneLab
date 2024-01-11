@@ -70,17 +70,15 @@ extern "C"
     rtMinusInfF = rtGetMinusInfF();
   }
 
-  // Test if value is infinite
-  boolean_T rtIsInf(real_T value)
-  {
-    return (boolean_T)((value==rtInf || value==rtMinusInf) ? 1U : 0U);
-  }
-
-  // Test if single-precision value is infinite
-  boolean_T rtIsInfF(real32_T value)
-  {
-    return (boolean_T)(((value)==rtInfF || (value)==rtMinusInfF) ? 1U : 0U);
-  }
+// Test if single-precision value is infinite
+boolean_T rtIsInfF(rea 32_T value)
+{
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wfloat-equal"
+  boolean_T result = (boolean_T)((value==rtInfF || value==rtMinusInfF) ? 1U : 0U);
+  #pragma GCC diagnostic pop
+  return result;
+}
 
   // Test if value is not a number
   boolean_T rtIsNaN(real_T value)

@@ -56,41 +56,7 @@ Vector3f AC_CustomControl_Simulink::update(void)
             break;
     }
 
-    // run custom controller after here
-     Quaternion attitude_body, attitude_target;
-    _ahrs->get_quat_body_to_ned(attitude_body);
-
-    attitude_target = _att_control->get_attitude_target_quat();
-    // This vector represents the angular error to rotate the thrust vector using x and y and heading using z
-    Vector3f attitude_error;
-    float _thrust_angle, _thrust_error_angle;
-    _att_control->thrust_heading_rotation_angles(attitude_target, attitude_body, attitude_error, _thrust_angle, _thrust_error_angle);
-
-    // recalculate ang vel feedforward from attitude target model
-    // rotation from the target frame to the body frame
-    Quaternion rotation_target_to_body = attitude_body.inverse() * attitude_target;
-    // target angle velocity vector in the body frame
-    Vector3f ang_vel_body_feedforward = rotation_target_to_body * _att_control->get_attitude_target_ang_vel();
-
-    Vector3f gyro_latest = _ahrs->get_gyro_latest();
-
-
-    // '<Root>/attitude_error'
-    float arg_attitude_error[3]{ attitude_error.x, attitude_error.y, attitude_error.z };
-
-    // '<Root>/rate_ff'
-    float arg_rate_ff[3]{ ang_vel_body_feedforward.x, ang_vel_body_feedforward.y, ang_vel_body_feedforward.z};
-
-    // '<Root>/rate_meas'
-    float arg_rate_meas[3]{ gyro_latest.x, gyro_latest.y, gyro_latest.z };
-
-    // '<Root>/Output'
-    float arg_Output[3];
-
-    simulink_controller.step(arg_attitude_error, arg_rate_ff, arg_rate_meas, arg_Output);
-
-    // return what arducopter main controller outputted
-    return Vector3f(arg_Output[0], arg_Output[1], arg_Output[2]);
+    return Vector3f(0.0, 0.0, 0.0);
 }
 
 // reset controller to avoid build up on the ground
