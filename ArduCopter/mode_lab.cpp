@@ -1,6 +1,5 @@
 #include "Copter.h"
-#include <AC_ControlLab/AC_ControlLab.h>
-#include <AC_Simulink/dmitry_model.h>
+#include <AC_Simulink/dmitry_model.h>  
 dmitry_model customcontroller;
 #include <array>
 
