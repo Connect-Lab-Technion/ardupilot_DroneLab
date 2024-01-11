@@ -4,6 +4,8 @@
 
 #include "uxr/client/client.h"
 #include "ucdr/microcdr.h"
+
+#include "ardupilot_msgs/msg/GlobalPosition.h"
 #include "builtin_interfaces/msg/Time.h"
 
 #include "sensor_msgs/msg/NavSatFix.h"
@@ -31,6 +33,7 @@
 
 #if AP_DDS_UDP_ENABLED
 #include <AP_HAL/utility/Socket.h>
+#include <AP_Networking/AP_Networking_address.h>
 #endif
 
 extern const AP_HAL::HAL& hal;
@@ -64,6 +67,8 @@ private:
     static sensor_msgs_msg_Joy rx_joy_topic;
     // incoming REP147 velocity control
     static geometry_msgs_msg_TwistStamped rx_velocity_control_topic;
+    // incoming REP147 goal interface global position
+    static ardupilot_msgs_msg_GlobalPosition rx_global_position_control_topic;
     // outgoing transforms
     tf2_msgs_msg_TFMessage tx_static_transforms_topic;
     tf2_msgs_msg_TFMessage tx_dynamic_transforms_topic;
@@ -73,7 +78,8 @@ private:
     HAL_Semaphore csem;
 
     // connection parametrics
-    bool connected = true;
+    bool status_ok{false};
+    bool connected{false};
 
     static void update_topic(builtin_interfaces_msg_Time& msg);
     bool update_topic(sensor_msgs_msg_NavSatFix& msg, const uint8_t instance) WARN_IF_UNUSED;
@@ -137,23 +143,31 @@ private:
     struct {
         AP_Int32 port;
         // UDP endpoint
-        const char* ip = "127.0.0.1";
+        AP_Networking_IPV4 ip{AP_DDS_DEFAULT_UDP_IP_ADDR};
         // UDP Allocation
         uxrCustomTransport transport;
         SocketAPM *socket;
     } udp;
 #endif
+    // pointer to transport's communication structure
+    uxrCommunication *comm{nullptr};
 
     // client key we present
-    static constexpr uint32_t uniqueClientKey = 0xAAAABBBB;
+    static constexpr uint32_t key = 0xAAAABBBB;
 
 public:
+    ~AP_DDS_Client();
+
     bool start(void);
     void main_loop(void);
 
-    //! @brief Initialize the client's transport, uxr session, and IO stream(s)
+    //! @brief Initialize the client's transport
     //! @return True on successful initialization, false on failure
-    bool init() WARN_IF_UNUSED;
+    bool init_transport() WARN_IF_UNUSED;
+
+    //! @brief Initialize the client's uxr session and IO stream(s)
+    //! @return True on successful initialization, false on failure
+    bool init_session() WARN_IF_UNUSED;
 
     //! @brief Set up the client's participants, data read/writes,
     //         publishers, subscribers

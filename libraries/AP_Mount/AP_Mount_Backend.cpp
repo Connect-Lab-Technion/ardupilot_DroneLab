@@ -46,6 +46,26 @@ bool AP_Mount_Backend::has_pitch_control() const
     return (_params.pitch_angle_min < _params.pitch_angle_max);
 }
 
+bool AP_Mount_Backend::valid_mode(MAV_MOUNT_MODE mode) const
+{
+    switch (mode) {
+    case MAV_MOUNT_MODE_RETRACT...MAV_MOUNT_MODE_HOME_LOCATION:
+        return true;
+    case MAV_MOUNT_MODE_ENUM_END:
+        return false;
+    }
+    return false;
+}
+
+bool AP_Mount_Backend::set_mode(MAV_MOUNT_MODE mode)
+{
+    if (!valid_mode(mode)) {
+        return false;
+    }
+    _mode = mode;
+    return true;
+}
+
 // set angle target in degrees
 // yaw_is_earth_frame (aka yaw_lock) should be true if yaw angle is earth-frame, false if body-frame
 void AP_Mount_Backend::set_angle_target(float roll_deg, float pitch_deg, float yaw_deg, bool yaw_is_earth_frame)
@@ -142,6 +162,8 @@ void AP_Mount_Backend::send_gimbal_device_attitude_status(mavlink_channel_t chan
     if (!get_attitude_quaternion(att_quat)) {
         return;
     }
+    Vector3f ang_velocity { nanf(""), nanf(""), nanf("") };
+    IGNORE_RETURN(get_angular_velocity(ang_velocity));
 
     // construct quaternion array
     const float quat_array[4] = {att_quat.q1, att_quat.q2, att_quat.q3, att_quat.q4};
@@ -152,9 +174,9 @@ void AP_Mount_Backend::send_gimbal_device_attitude_status(mavlink_channel_t chan
                                                    AP_HAL::millis(),    // autopilot system time
                                                    get_gimbal_device_flags(),
                                                    quat_array,    // attitude expressed as quaternion
-                                                   std::numeric_limits<double>::quiet_NaN(),    // roll axis angular velocity (NaN for unknown)
-                                                   std::numeric_limits<double>::quiet_NaN(),    // pitch axis angular velocity (NaN for unknown)
-                                                   std::numeric_limits<double>::quiet_NaN(),    // yaw axis angular velocity (NaN for unknown)
+                                                   ang_velocity.x,    // roll axis angular velocity (NaN for unknown)
+                                                   ang_velocity.y,    // pitch axis angular velocity (NaN for unknown)
+                                                   ang_velocity.z,    // yaw axis angular velocity (NaN for unknown)
                                                    0,                                           // failure flags (not supported)
                                                    std::numeric_limits<double>::quiet_NaN(),    // delta_yaw (NaN for unknonw)
                                                    std::numeric_limits<double>::quiet_NaN(),    // delta_yaw_velocity (NaN for unknonw)
@@ -336,6 +358,9 @@ MAV_RESULT AP_Mount_Backend::handle_command_do_gimbal_manager_configure(const ma
         return MAV_RESULT_FAILED;
     }
 
+    // backup the current values so we can detect a change
+    mavlink_control_id_t prev_control_id = mavlink_control_id;
+
     // convert negative packet1 and packet2 values
     int16_t new_sysid = packet.param1;
     switch (new_sysid) {
@@ -358,6 +383,11 @@ MAV_RESULT AP_Mount_Backend::handle_command_do_gimbal_manager_configure(const ma
             mavlink_control_id.sysid = packet.param1;
             mavlink_control_id.compid = packet.param2;
             break;
+    }
+
+    // send gimbal_manager_status if control has changed
+    if (prev_control_id != mavlink_control_id) {
+        gcs().send_message(MSG_GIMBAL_MANAGER_STATUS);
     }
 
     return MAV_RESULT_ACCEPTED;
@@ -547,6 +577,47 @@ void AP_Mount_Backend::calculate_poi()
     }
 }
 #endif
+
+// change to RC_TARGETING mode if rc inputs have changed by more than the dead zone
+// should be called on every update
+void AP_Mount_Backend::set_rctargeting_on_rcinput_change()
+{
+    // exit immediately if no RC input
+    if (!rc().has_valid_input()) {
+        return;
+    }
+
+    const RC_Channel *roll_ch = rc().find_channel_for_option(_instance == 0 ? RC_Channel::AUX_FUNC::MOUNT1_ROLL : RC_Channel::AUX_FUNC::MOUNT2_ROLL);
+    const RC_Channel *pitch_ch = rc().find_channel_for_option(_instance == 0 ? RC_Channel::AUX_FUNC::MOUNT1_PITCH : RC_Channel::AUX_FUNC::MOUNT2_PITCH);
+    const RC_Channel *yaw_ch = rc().find_channel_for_option(_instance == 0 ? RC_Channel::AUX_FUNC::MOUNT1_YAW : RC_Channel::AUX_FUNC::MOUNT2_YAW);
+
+    // get rc input
+    const int16_t roll_in = (roll_ch == nullptr) ? 0 : roll_ch->get_radio_in();
+    const int16_t pitch_in = (pitch_ch == nullptr) ? 0 : pitch_ch->get_radio_in();
+    const int16_t yaw_in = (yaw_ch == nullptr) ? 0 : yaw_ch->get_radio_in();
+
+    // if not in RC_TARGETING or RETRACT modes then check for RC change
+    if (get_mode() != MAV_MOUNT_MODE_RC_TARGETING && get_mode() != MAV_MOUNT_MODE_RETRACT) {
+        // get dead zones
+        const int16_t roll_dz = (roll_ch == nullptr) ? 10 : MAX(roll_ch->get_dead_zone(), 10);
+        const int16_t pitch_dz = (pitch_ch == nullptr) ? 10 : MAX(pitch_ch->get_dead_zone(), 10);
+        const int16_t yaw_dz = (yaw_ch == nullptr) ? 10 : MAX(yaw_ch->get_dead_zone(), 10);
+
+        // check if RC input has changed by more than the dead zone
+        if ((abs(last_rc_input.roll_in - roll_in) > roll_dz) ||
+            (abs(last_rc_input.pitch_in - pitch_in) > pitch_dz) ||
+            (abs(last_rc_input.yaw_in - yaw_in) > yaw_dz)) {
+            set_mode(MAV_MOUNT_MODE_RC_TARGETING);
+        }
+    }
+
+    // if in RC_TARGETING or RETRACT mode then store last RC input
+    if (get_mode() == MAV_MOUNT_MODE_RC_TARGETING || get_mode() == MAV_MOUNT_MODE_RETRACT) {
+        last_rc_input.roll_in = roll_in;
+        last_rc_input.pitch_in = pitch_in;
+        last_rc_input.yaw_in = yaw_in;
+    }
+}
 
 // get pilot input (in the range -1 to +1) received through RC
 void AP_Mount_Backend::get_rc_input(float& roll_in, float& pitch_in, float& yaw_in) const

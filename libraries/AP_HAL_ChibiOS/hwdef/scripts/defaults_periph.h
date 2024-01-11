@@ -122,6 +122,10 @@
 #define AP_BATTERY_ESC_ENABLED 0
 #endif
 
+#ifndef AP_BATTERY_WATT_MAX_ENABLED
+#define AP_BATTERY_WATT_MAX_ENABLED 0
+#endif
+
 // disable compass calibrations on periphs; cal is done on the autopilot
 #ifndef COMPASS_CAL_ENABLED
 #define COMPASS_CAL_ENABLED 0
@@ -331,7 +335,7 @@
 #endif
 
 #ifndef AP_UART_MONITOR_ENABLED
-#define AP_UART_MONITOR_ENABLED defined(HAL_PERIPH_ENABLE_GPS) && (GPS_MOVING_BASELINE || BOARD_FLASH_SIZE>=256)
+#define AP_UART_MONITOR_ENABLED defined(HAL_PERIPH_ENABLE_SERIAL_OPTIONS) || (defined(HAL_PERIPH_ENABLE_GPS) && (GPS_MOVING_BASELINE || BOARD_FLASH_SIZE>=256))
 #endif
 
 #ifndef HAL_BOARD_LOG_DIRECTORY
@@ -385,3 +389,10 @@
 #define AP_TERRAIN_AVAILABLE 0
 #endif
 
+#ifndef AP_ICENGINE_ENABLED
+#define AP_ICENGINE_ENABLED 0
+#endif
+
+#ifndef AP_FILTER_ENABLED
+#define AP_FILTER_ENABLED 0
+#endif

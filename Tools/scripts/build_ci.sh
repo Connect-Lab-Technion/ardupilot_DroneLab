@@ -89,7 +89,7 @@ function run_autotest() {
     if [ "$NAME" == "Examples" ]; then
         w="$w --speedup=5 --timeout=14400 --debug --no-clean"
     fi
-    Tools/autotest/autotest.py --show-test-timings --waf-configure-args="$w" "$BVEHICLE" "$RVEHICLE"
+    Tools/autotest/autotest.py --show-test-timings --junit --waf-configure-args="$w" "$BVEHICLE" "$RVEHICLE"
     ccache -s && ccache -z
 }
 
@@ -144,6 +144,8 @@ for t in $CI_BUILD_TARGET; do
         continue
     fi
     if [ "$t" == "sitltest-rover" ]; then
+        sudo apt-get update || /bin/true
+        sudo apt-get install -y ppp || /bin/true
         run_autotest "Rover" "build.Rover" "test.Rover"
         continue
     fi
@@ -325,6 +327,20 @@ for t in $CI_BUILD_TARGET; do
         continue
     fi
 
+    if [ "$t" == "CubeOrange-PPP" ]; then
+        echo "Building CubeOrange-PPP"
+        $waf configure --board CubeOrange --enable-ppp
+        $waf clean
+        $waf copter
+        continue
+    fi
+
+    if [ "$t" == "CubeOrange-SOHW" ]; then
+        echo "Building CubeOrange-SOHW"
+        Tools/scripts/sitl-on-hardware/sitl-on-hw.py --vehicle plane --simclass Plane --board CubeOrange
+        continue
+    fi
+    
     if [ "$t" == "dds-stm32h7" ]; then
         echo "Building with DDS support on a STM32H7"
         $waf configure --board Durandal --enable-dds
@@ -451,7 +467,7 @@ for t in $CI_BUILD_TARGET; do
     fi
 
     if [ "$t" == "param_parse" ]; then
-        for v in Rover AntennaTracker ArduCopter ArduPlane ArduSub Blimp; do
+        for v in Rover AntennaTracker ArduCopter ArduPlane ArduSub Blimp AP_Periph; do
             python Tools/autotest/param_metadata/param_parse.py --vehicle $v
         done
         continue

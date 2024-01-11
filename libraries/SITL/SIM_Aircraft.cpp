@@ -490,7 +490,7 @@ float Aircraft::perpendicular_distance_to_rangefinder_surface() const
 {
     switch ((Rotation)sitl->sonar_rot.get()) {
     case Rotation::ROTATION_PITCH_270:
-        return sitl->height_agl;
+        return sitl->state.height_agl;
     case ROTATION_NONE ... ROTATION_YAW_315:
         return sitl->measure_distance_at_angle_bf(location, sitl->sonar_rot.get()*45);
     default:
@@ -607,7 +607,11 @@ void Aircraft::update_home()
 void Aircraft::update_model(const struct sitl_input &input)
 {
     local_ground_level = 0.0f;
-    update(input);
+    if (sitl != nullptr) {
+        update(input);
+    } else {
+        time_advance();
+    }
 }
 
 /*

@@ -149,6 +149,15 @@ class Board:
             )
             cfg.msg("Enabled custom controller", 'no', color='YELLOW')
 
+        if cfg.options.enable_ppp:
+            env.CXXFLAGS += ['-DAP_NETWORKING_BACKEND_PPP=1']
+
+        if cfg.options.disable_networking:
+            env.CXXFLAGS += ['-DAP_NETWORKING_ENABLED=0']
+
+        if cfg.options.enable_networking_tests:
+            env.CXXFLAGS += ['-DAP_NETWORKING_TESTS_ENABLED=1']
+            
         d = env.get_merged_dict()
         # Always prepend so that arguments passed in the command line get
         # the priority.
@@ -433,22 +442,24 @@ class Board:
                 '-Wl,--gc-sections',
             ]
 
-        if self.with_can and not cfg.env.AP_PERIPH:
-            env.AP_LIBRARIES += [
-                'AP_DroneCAN',
-                'modules/DroneCAN/libcanard/*.c',
-                ]
-            if cfg.options.enable_dronecan_tests:
+        if self.with_can:
+            # for both AP_Perip and main fw enable deadlines
+            env.DEFINES.update(CANARD_ENABLE_DEADLINE = 1)
+
+            if not cfg.env.AP_PERIPH:
+                env.AP_LIBRARIES += [
+                    'AP_DroneCAN',
+                    'modules/DroneCAN/libcanard/*.c',
+                    ]
+                if cfg.options.enable_dronecan_tests:
+                    env.DEFINES.update(AP_TEST_DRONECAN_DRIVERS = 1)
+
                 env.DEFINES.update(
-                    AP_TEST_DRONECAN_DRIVERS = 1
+                    DRONECAN_CXX_WRAPPERS = 1,
+                    USE_USER_HELPERS = 1,
+                    CANARD_ALLOCATE_SEM=1
                 )
 
-            env.DEFINES.update(
-                DRONECAN_CXX_WRAPPERS = 1,
-                USE_USER_HELPERS = 1,
-                CANARD_ENABLE_DEADLINE = 1,
-                CANARD_ALLOCATE_SEM=1
-            )
 
 
         if cfg.options.build_dates:
@@ -457,8 +468,8 @@ class Board:
         # We always want to use PRI format macros
         cfg.define('__STDC_FORMAT_MACROS', 1)
 
-        if cfg.options.disable_ekf2:
-            env.CXXFLAGS += ['-DHAL_NAVEKF2_AVAILABLE=0']
+        if cfg.options.enable_ekf2:
+            env.CXXFLAGS += ['-DHAL_NAVEKF2_AVAILABLE=1']
 
         if cfg.options.disable_ekf3:
             env.CXXFLAGS += ['-DHAL_NAVEKF3_AVAILABLE=0']
@@ -639,6 +650,8 @@ class sitl(Board):
             AP_BARO_PROBE_EXTERNAL_I2C_BUSES = 1,
         )
 
+        env.BOARD_CLASS = "SITL"
+
         cfg.define('AP_SIM_ENABLED', 1)
         cfg.define('HAL_WITH_SPI', 1)
         cfg.define('HAL_WITH_RAMTRON', 1)
@@ -648,6 +661,12 @@ class sitl(Board):
 
         cfg.define('AP_NOTIFY_LP5562_BUS', 2)
         cfg.define('AP_NOTIFY_LP5562_ADDR', 0x30)
+
+        try:
+            env.CXXFLAGS.remove('-DHAL_NAVEKF2_AVAILABLE=0')
+        except ValueError:
+            pass
+        env.CXXFLAGS += ['-DHAL_NAVEKF2_AVAILABLE=1']
 
         if self.with_can:
             cfg.define('HAL_NUM_CAN_IFACES', 2)
@@ -669,6 +688,10 @@ class sitl(Board):
             '-Werror=missing-declarations',
         ]
 
+        if not cfg.options.disable_networking and not 'clang' in cfg.env.COMPILER_CC:
+            # lwip doesn't build with clang
+            env.CXXFLAGS += ['-DAP_NETWORKING_ENABLED=1']
+        
         if cfg.options.ubsan or cfg.options.ubsan_abort:
             env.CXXFLAGS += [
                 "-fsanitize=undefined",
@@ -785,6 +808,7 @@ class sitl(Board):
         # whitelist of compilers which we should build with -Werror
         gcc_whitelist = frozenset([
                 ('11','3','0'),
+                ('11','4','0'),
                 ('12','1','0'),
             ])
 
@@ -832,6 +856,8 @@ class sitl_periph_gps(sitl):
             HAL_PERIPH_ENABLE_RPM = 1,
             HAL_PERIPH_ENABLE_RC_OUT = 1,
             HAL_PERIPH_ENABLE_ADSB = 1,
+            HAL_PERIPH_ENABLE_SERIAL_OPTIONS = 1,
+            AP_ICENGINE_ENABLED = 0,
             AP_AIRSPEED_ENABLED = 1,
             AP_AIRSPEED_AUTOCAL_ENABLE = 0,
             AP_AHRS_ENABLED = 1,
@@ -862,18 +888,24 @@ class sitl_periph_gps(sitl):
             AP_CAN_SLCAN_ENABLED = 0,
             HAL_PROXIMITY_ENABLED = 0,
             AP_SCRIPTING_ENABLED = 0,
-            HAL_NAVEKF2_AVAILABLE = 0,
             HAL_NAVEKF3_AVAILABLE = 0,
             HAL_PWM_COUNT = 32,
             HAL_WITH_ESC_TELEM = 1,
             AP_RTC_ENABLED = 0,
         )
 
+        try:
+            env.CXXFLAGS.remove('-DHAL_NAVEKF2_AVAILABLE=1')
+        except ValueError:
+            pass
+        env.CXXFLAGS += ['-DHAL_NAVEKF2_AVAILABLE=0']
 
 class esp32(Board):
     abstract = True
     toolchain = 'xtensa-esp32-elf'
     def configure_env(self, cfg, env):
+        env.BOARD_CLASS = "ESP32"
+
         def expand_path(p):
             print("USING EXPRESSIF IDF:"+str(env.idf))
             return cfg.root.find_dir(env.IDF+p).abspath()
@@ -886,7 +918,6 @@ class esp32(Board):
         cfg.load('esp32')
         env.DEFINES.update(
             CONFIG_HAL_BOARD = 'HAL_BOARD_ESP32',
-            AP_SIM_ENABLED = 0,
         )
 
         tt = self.name[5:] #leave off 'esp32' so we just get 'buzz','diy','icarus, etc
@@ -898,6 +929,15 @@ class esp32(Board):
             HAL_HAVE_HARDWARE_DOUBLE = '1',
         )
 
+        if self.name.endswith("empty"):
+            # for empty targets build as SIM-on-HW
+            env.DEFINES.update(AP_SIM_ENABLED = 1)
+            env.AP_LIBRARIES += [
+                'SITL',
+            ]
+        else:
+            env.DEFINES.update(AP_SIM_ENABLED = 0)
+
         env.AP_LIBRARIES += [
             'AP_HAL_ESP32',
         ]
@@ -905,6 +945,7 @@ class esp32(Board):
         env.CFLAGS += [
             '-fno-inline-functions',
             '-mlongcalls',
+            '-fsingle-precision-constant',
         ]
         env.CFLAGS.remove('-Werror=undef')
 
@@ -920,6 +961,7 @@ class esp32(Board):
                          '-Wno-sign-compare',
                          '-fno-inline-functions',
                          '-mlongcalls',
+                         '-fsingle-precision-constant', # force const vals to be float , not double. so 100.0 means 100.0f 
                          '-fno-threadsafe-statics',
                          '-DCYGWIN_BUILD']
         env.CXXFLAGS.remove('-Werror=undef')
@@ -965,6 +1007,7 @@ class chibios(Board):
 
         cfg.load('chibios')
         env.BOARD = self.name
+        env.BOARD_CLASS = "ChibiOS"
 
         env.DEFINES.update(
             CONFIG_HAL_BOARD = 'HAL_BOARD_CHIBIOS',
@@ -1129,7 +1172,8 @@ class chibios(Board):
         ]
 
         env.INCLUDES += [
-            cfg.srcnode.find_dir('libraries/AP_GyroFFT/CMSIS_5/include').abspath()
+            cfg.srcnode.find_dir('libraries/AP_GyroFFT/CMSIS_5/include').abspath(),
+            cfg.srcnode.find_dir('modules/lwip/src/include/compat/posix').abspath()
         ]
 
         # whitelist of compilers which we should build with -Werror
@@ -1140,6 +1184,7 @@ class chibios(Board):
             ('9','3','1'),
             ('10','2','1'),
             ('11','3','0'),
+            ('11','4','0'),
         ])
 
         if cfg.env.HAL_CANFD_SUPPORTED:
@@ -1203,6 +1248,8 @@ class linux(Board):
         if cfg.options.board == 'linux':
             self.with_can = True
         super(linux, self).configure_env(cfg, env)
+
+        env.BOARD_CLASS = "LINUX"
 
         env.DEFINES.update(
             CONFIG_HAL_BOARD = 'HAL_BOARD_LINUX',
@@ -1506,6 +1553,19 @@ class obal(linux):
             CONFIG_HAL_BOARD_SUBTYPE = 'HAL_BOARD_SUBTYPE_LINUX_OBAL_V1',
         )
 
+class canzero(linux):
+    toolchain = 'arm-linux-gnueabihf'
+
+    def __init__(self):
+        self.with_can = True
+
+    def configure_env(self, cfg, env):
+        super(canzero, self).configure_env(cfg, env)
+
+        env.DEFINES.update(
+            CONFIG_HAL_BOARD_SUBTYPE = 'HAL_BOARD_SUBTYPE_LINUX_CANZERO',
+        )
+        
 class SITL_static(sitl):
     def configure_env(self, cfg, env):
         super(SITL_static, self).configure_env(cfg, env)

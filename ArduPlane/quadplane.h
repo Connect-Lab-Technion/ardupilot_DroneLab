@@ -156,7 +156,6 @@ public:
         int16_t  target_climb_rate;
         int16_t  climb_rate;
         float    throttle_mix;
-        float    speed_scaler;
         uint8_t  transition_state;
         uint8_t  assist;
     };
@@ -189,6 +188,9 @@ public:
       only called when in an auto-throttle mode
      */
     bool should_disable_TECS() const;
+
+    // Get pilot throttle input with deadzone, this will return 50% throttle in failsafe!
+    float get_throttle_input() const;
 
 private:
     AP_AHRS &ahrs;

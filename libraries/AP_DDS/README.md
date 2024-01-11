@@ -149,8 +149,6 @@ Follow the steps to use the microROS Agent
     - Do "Creating the micro-ROS agent"
     - Source your ROS workspace
 
-Until this [PR](https://github.com/micro-ROS/micro-ROS.github.io/pull/401) is merged, ignore the notes about `foxy`. It works on `humble`.
-
 ## Using the ROS 2 CLI to Read Ardupilot Data
 
 After your setups are complete, do the following:
@@ -191,7 +189,7 @@ Next, follow the associated section for your chosen transport, and finally you c
 - Run SITL (remember to kill any terminals running ardupilot SITL beforehand)
   ```console
   # assuming we are using /dev/pts/1 for Ardupilot SITL
-  sim_vehicle.py -v ArduPlane -DG --console --enable-dds -A "--uartC=uart:/dev/pts/1"
+  sim_vehicle.py -v ArduPlane -DG --console --enable-dds -A "--serial1=uart:/dev/pts/1"
   ```
 
 ## Use ROS 2 CLI
@@ -218,6 +216,7 @@ Published topics:
  * /rosout [rcl_interfaces/msg/Log] 1 publisher
 
 Subscribed topics:
+ * /ap/cmd_gps_pose [ardupilot_msgs/msg/GlobalPosition] 1 subscriber
  * /ap/cmd_vel [geometry_msgs/msg/TwistStamped] 1 subscriber
  * /ap/joy [sensor_msgs/msg/Joy] 1 subscriber
  * /ap/tf [tf2_msgs/msg/TFMessage] 1 subscriber
@@ -252,7 +251,7 @@ In order to consume the transforms, it's highly recommended to [create and run a
 
 ## Using ROS 2 services
 
-The `AP_DDS` libraary exposes services which are automatically mapped to ROS 2 
+The `AP_DDS` library exposes services which are automatically mapped to ROS 2 
 services using appropriate naming conventions for topics and message and service
 types. An earlier version of `AP_DDS` required the use of the eProsima
 [Integration Service](https://github.com/eProsima/Integration-Service) to map
@@ -313,6 +312,10 @@ cp /opt/ros/humble/share/builtin_interfaces/msg/Time.idl libraries/AP_DDS/Idl/bu
 # Build the code again with the `--enable-dds` flag as described above
 ```
 
+If the message is custom for ardupilot, first create the ROS message in `Tools/ros2/ardupilot_msgs/msg/GlobalPosition.msg`.
+Then, build ardupilot_msgs with colcon.
+Finally, copy the IDL folder from the install directory into the source tree.
+
 ### Rules for adding topics and services to `dds_xrce_profile.xml`
 
 Topics and services available from `AP_DDS` are automatically mapped into ROS 2
@@ -338,7 +341,7 @@ Note that a service interface always requires a Request / Response pair.
 #### ROS 2 topic and service names
 
 The ROS 2 design article: [Topic and Service name mapping to DDS](https://design.ros2.org/articles/topic_and_service_names.html) describes the mapping of ROS 2 topic and service
-names to DDS. Each ROS 2 subsytem is provided a prefix when mapped to DDS.
+names to DDS. Each ROS 2 subsystem is provided a prefix when mapped to DDS.
 The request / response pair for services require an additional suffix.
 
 | ROS 2 subsystem | DDS Prefix | DDS Suffix |
@@ -379,3 +382,40 @@ This will run the tools automatically when you commit. If there are changes, jus
   pre-commit install
   git commit
   ```
+
+## Testing DDS on Hardware
+
+### With Serial
+
+The easiest way to test DDS is to make use of some boards providing two serial interfaces over USB such as the Pixhawk 6X.
+The [Pixhawk6X/hwdef.dat](../AP_HAL_ChibiOS/hwdef/Pixhawk6X/hwdef.dat) file has this info.
+```
+SERIAL_ORDER OTG1 UART7 UART5 USART1 UART8 USART2 UART4 USART3 OTG2
+```
+
+For example, build, flash, and set up OTG2 for DDS
+```bash
+./waf configure --board Pixhawk6X --enable-dds
+./waf plane --upload
+mavproxy.py --console
+param set DDS_ENABLE 1
+# Check the hwdef file for which port is OTG2
+param set SERIAL8_PROTOCOL 45
+param set SERIAL8_BAUD 115
+reboot
+```
+
+Then run the Micro ROS agent
+```bash
+cd /path/to/ros2_ws
+source install/setup.bash
+cd src/ardupilot/libraries/AP_DDS
+ros2 run micro_ros_agent micro_ros_agent serial -b 115200  -r dds_xrce_profile.xml -D /dev/serial/by-id/usb-ArduPilot_Pixhawk6X_210028000151323131373139-if02
+```
+
+If connection fails, instead of running the Micro ROS agent, debug the stream
+```bash
+python3 -m serial.tools.miniterm /dev/serial/by-id/usb-ArduPilot_Pixhawk6X_210028000151323131373139-if02  115200 --echo --encoding hexlify
+```
+
+The same steps can be done for physical serial ports once the above works to isolate software and hardware issues.

@@ -1,3 +1,7 @@
+#include "AP_Vehicle_config.h"
+
+#if AP_VEHICLE_ENABLED
+
 #include "AP_Vehicle.h"
 
 #include <AP_BLHeli/AP_BLHeli.h>
@@ -22,6 +26,7 @@
 #include <AP_IOMCU/AP_IOMCU.h>
 extern AP_IOMCU iomcu;
 #endif
+#include <AP_Scripting/AP_Scripting.h>
 
 #define SCHED_TASK(func, rate_hz, max_time_micros, prio) SCHED_TASK_CLASS(AP_Vehicle, &vehicle, func, rate_hz, max_time_micros, prio)
 
@@ -210,8 +215,42 @@ const AP_Param::GroupInfo AP_Vehicle::var_info[] = {
     // @Group: NET_
     // @Path: ../AP_Networking/AP_Networking.cpp
     AP_SUBGROUPINFO(networking, "NET_", 21, AP_Vehicle, AP_Networking),
+
+    /*
+      the NET_Pn_ parameters need to be in AP_Vehicle as otherwise we
+      are too deep in the parameter tree
+     */
+
+#if AP_NETWORKING_NUM_PORTS > 0
+    // @Group: NET_P1_
+    // @Path: ../AP_Networking/AP_Networking_port.cpp
+    AP_SUBGROUPINFO(networking.ports[0], "NET_P1_", 22, AP_Vehicle, AP_Networking::Port),
 #endif
 
+#if AP_NETWORKING_NUM_PORTS > 1
+    // @Group: NET_P2_
+    // @Path: ../AP_Networking/AP_Networking_port.cpp
+    AP_SUBGROUPINFO(networking.ports[1], "NET_P2_", 23, AP_Vehicle, AP_Networking::Port),
+#endif
+
+#if AP_NETWORKING_NUM_PORTS > 2
+    // @Group: NET_P3_
+    // @Path: ../AP_Networking/AP_Networking_port.cpp
+    AP_SUBGROUPINFO(networking.ports[2], "NET_P3_", 24, AP_Vehicle, AP_Networking::Port),
+#endif
+
+#if AP_NETWORKING_NUM_PORTS > 3
+    // @Group: NET_P4_
+    // @Path: ../AP_Networking/AP_Networking_port.cpp
+    AP_SUBGROUPINFO(networking.ports[3], "NET_P4_", 25, AP_Vehicle, AP_Networking::Port),
+#endif
+#endif // AP_NETWORKING_ENABLED
+
+#if AP_FILTER_ENABLED
+    // @Group: FILT
+    // @Path: ../Filter/AP_Filter.cpp
+    AP_SUBGROUPINFO(filters, "FILT", 26, AP_Vehicle, AP_Filters),
+#endif
     AP_GROUPEND
 };
 
@@ -279,14 +318,14 @@ void AP_Vehicle::setup()
     gcs().init();
 #endif
 
-#if AP_NETWORKING_ENABLED
-    networking.init();
-#endif
-
     // initialise serial ports
     serial_manager.init();
 #if HAL_GCS_ENABLED
     gcs().setup_console();
+#endif
+
+#if AP_NETWORKING_ENABLED
+    networking.init();
 #endif
 
     // Register scheduler_delay_cb, which will run anytime you have
@@ -389,6 +428,10 @@ void AP_Vehicle::setup()
 #endif
 
     custom_rotations.init();
+
+#if AP_FILTER_ENABLED
+    filters.init();
+#endif
 
 #if HAL_WITH_ESC_TELEM && HAL_GYROFFT_ENABLED
     for (uint8_t i = 0; i<ESC_TELEM_MAX_ESCS; i++) {
@@ -524,11 +567,12 @@ const AP_Scheduler::Task AP_Vehicle::scheduler_tasks[] = {
 #if HAL_EFI_ENABLED
     SCHED_TASK_CLASS(AP_EFI,       &vehicle.efi,            update,                   50, 200, 250),
 #endif
-#if HAL_INS_ACCELCAL_ENABLED
     SCHED_TASK(one_Hz_update,                                                         1, 100, 252),
-#endif
 #if HAL_WITH_ESC_TELEM && HAL_GYROFFT_ENABLED
     SCHED_TASK(check_motor_noise,      5,     50, 252),
+#endif
+#if AP_FILTER_ENABLED
+    SCHED_TASK_CLASS(AP_Filters,   &vehicle.filters,        update,                   1, 100, 252),
 #endif
     SCHED_TASK(update_arming,          1,     50, 253),
 };
@@ -806,6 +850,7 @@ void AP_Vehicle::reboot(bool hold_in_bootloader)
 #if OSD_ENABLED
 void AP_Vehicle::publish_osd_info()
 {
+#if AP_MISSION_ENABLED
     AP_Mission *mission = AP::mission();
     if (mission == nullptr) {
         return;
@@ -828,6 +873,7 @@ void AP_Vehicle::publish_osd_info()
     }
     nav_info.wp_number = mission->get_current_nav_index();
     osd->set_nav_info(nav_info);
+#endif
 }
 #endif
 
@@ -903,6 +949,14 @@ void AP_Vehicle::one_Hz_update(void)
         }
 #endif
     }
+
+#if AP_SCRIPTING_ENABLED
+    AP_Scripting *scripting = AP_Scripting::get_singleton();
+    if (scripting != nullptr) {
+        scripting->update();
+    }
+#endif
+
 }
 
 void AP_Vehicle::check_motor_noise()
@@ -981,3 +1035,4 @@ AP_Vehicle *vehicle()
 
 };
 
+#endif  // AP_VEHICLE_ENABLED

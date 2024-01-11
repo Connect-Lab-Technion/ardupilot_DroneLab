@@ -159,14 +159,14 @@ public:
 
         // 110: Telemetry control
         //
-        k_param_gcs0 = 110,         // stream rates for uartA
-        k_param_gcs1,               // stream rates for uartC
+        k_param_gcs0 = 110,         // stream rates for SERIAL0
+        k_param_gcs1,               // stream rates for SERIAL1
         k_param_sysid_this_mav,
         k_param_sysid_my_gcs,
         k_param_serial1_baud_old,   // deprecated
         k_param_telem_delay,
         k_param_serial0_baud_old,   // deprecated
-        k_param_gcs2,               // stream rates for uartD
+        k_param_gcs2,               // stream rates for SERIAL2
         k_param_serial2_baud_old,   // deprecated
         k_param_serial2_protocol,   // deprecated
 
@@ -542,9 +542,26 @@ public:
     AP_Int8 crow_flap_aileron_matching;
 
     // Forward throttle battery voltage compensation
-    AP_Float fwd_thr_batt_voltage_max;
-    AP_Float fwd_thr_batt_voltage_min;
-    AP_Int8  fwd_thr_batt_idx;
+    class FWD_BATT_CMP {
+    public:
+        // Calculate the throttle scale to compensate for battery voltage drop
+        void update();
+
+        // Apply throttle scale to min and max limits
+        void apply_min_max(int8_t &min_throttle, int8_t &max_throttle) const;
+
+        // Apply throttle scale to throttle demand
+        float apply_throttle(float throttle) const;
+
+        AP_Float batt_voltage_max;
+        AP_Float batt_voltage_min;
+        AP_Int8  batt_idx;
+
+    private:
+        bool enabled;
+        float ratio;
+    } fwd_batt_cmp;
+
 
 #if OFFBOARD_GUIDED == ENABLED
     // guided yaw heading PID

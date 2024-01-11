@@ -18,6 +18,12 @@ import signal
 import sys
 import time
 import traceback
+from datetime import datetime
+from typing import List
+from typing import Tuple
+from typing import Dict
+import importlib.util
+
 import pexpect
 import fnmatch
 import operator
@@ -28,6 +34,7 @@ import random
 import tempfile
 import threading
 import enum
+from pathlib import Path
 
 from MAVProxy.modules.lib import mp_util
 from MAVProxy.modules.lib import mp_elevation
@@ -1466,19 +1473,21 @@ class Result(object):
         self.reason = None
         self.exception = None
         self.debug_filename = None
+        self.time_elapsed = 0.0
         # self.passed = False
 
     def __str__(self):
         ret = "  %s (%s)" % (self.test.name, self.test.description)
         if self.passed:
-            return ret + " OK"
+            return f"{ret} OK"
         if self.reason is not None:
-            ret += " (" + self.reason + ")"
+            ret += f" ({self.reason} )"
         if self.exception is not None:
-            ret += " (" + str(self.exception) + ")"
+            ret += f" ({str(self.exception)})"
         if self.debug_filename is not None:
-            ret += " (see " + self.debug_filename + ")"
-
+            ret += f" (see {self.debug_filename})"
+        if self.time_elapsed is not None:
+            ret += f" (duration {self.time_elapsed} s)"
         return ret
 
 
@@ -1512,6 +1521,7 @@ class TestSuite(ABC):
                  ubsan_abort=False,
                  num_aux_imus=0,
                  dronecan_tests=False,
+                 generate_junit=False,
                  build_opts={}):
 
         self.start_time = time.time()
@@ -1540,6 +1550,14 @@ class TestSuite(ABC):
         self.ubsan_abort = ubsan_abort
         self.build_opts = build_opts
         self.num_aux_imus = num_aux_imus
+        self.generate_junit = generate_junit
+        if generate_junit:
+            try:
+                spec = importlib.util.find_spec("junitparser")
+                if spec is None:
+                    raise ImportError
+            except ImportError as e:
+                raise ImportError(f"Junit export need junitparser package.\n {e} \nTry: python3 -m pip install junitparser")
 
         self.mavproxy = None
         self._mavproxy = None  # for auto-cleanup on failed tests
@@ -2924,7 +2942,7 @@ class TestSuite(ABC):
                                    wipe=False,
                                    set_streamrate_callback=None,
                                    binary=None):
-        '''customisations could be "--uartF=sim:nmea" '''
+        '''customisations could be "--serial5=sim:nmea" '''
         self.contexts[-1].sitl_commandline_customised = True
         self.mav.close()
         self.stop_SITL()
@@ -3439,34 +3457,13 @@ class TestSuite(ABC):
         if ex is not None:
             raise ex
 
-    def LogDownload(self):
-        '''Test Onboard Log Download'''
-        if self.is_tracker():
-            # tracker starts armed, which is annoying
-            return
-        self.progress("Ensuring we have contents we care about")
-        self.set_parameter("LOG_FILE_DSRMROT", 1)
-        self.set_parameter("LOG_DISARMED", 0)
-        self.reboot_sitl()
-        original_log_list = self.log_list()
-        for i in range(0, 10):
-            self.wait_ready_to_arm()
-            self.arm_vehicle()
-            self.delay_sim_time(1)
-            self.disarm_vehicle()
-        new_log_list = self.log_list()
-        new_log_count = len(new_log_list) - len(original_log_list)
-        if new_log_count != 10:
-            raise NotAchievedException("Expected exactly 10 new logs got %u (%s) to (%s)" %
-                                       (new_log_count, original_log_list, new_log_list))
-        self.progress("Directory contents: %s" % str(new_log_list))
-
+    def download_full_log_list(self, print_logs=True):
         tstart = self.get_sim_time()
         self.mav.mav.log_request_list_send(self.sysid_thismav(),
                                            1, # target component
                                            0,
-                                           0xff)
-        logs = []
+                                           0xffff)
+        logs = {}
         last_id = None
         num_logs = None
         while True:
@@ -3476,10 +3473,11 @@ class TestSuite(ABC):
             m = self.mav.recv_match(type='LOG_ENTRY',
                                     blocking=True,
                                     timeout=1)
-            self.progress("Received (%s)" % str(m))
+            if print_logs:
+                self.progress("Received (%s)" % str(m))
             if m is None:
                 continue
-            logs.append(m)
+            logs[m.id] = m
             if last_id is None:
                 if m.num_logs == 0:
                     # caller to guarantee this works:
@@ -3506,7 +3504,134 @@ class TestSuite(ABC):
                                 timeout=2)
         if m is not None:
             raise NotAchievedException("Received extra LOG_ENTRY?!")
+        return logs
 
+    def TestLogDownloadWrap(self):
+        """Test log wrapping."""
+        if self.is_tracker():
+            # tracker starts armed, which is annoying
+            return
+        self.progress("Ensuring we have contents we care about")
+        self.set_parameter("LOG_FILE_DSRMROT", 1)
+        self.set_parameter("LOG_DISARMED", 0)
+        self.reboot_sitl()
+        logspath = Path("logs")
+
+        def create_num_logs(num_logs, logsdir, clear_logsdir=True):
+            if clear_logsdir:
+                shutil.rmtree(logsdir, ignore_errors=True)
+                logsdir.mkdir()
+            lastlogfile_path = logsdir / Path("LASTLOG.TXT")
+            self.progress(f"Add LASTLOG.TXT file with counter at {num_logs}")
+            with open(lastlogfile_path, 'w') as lastlogfile:
+                lastlogfile.write(f"{num_logs}\n")
+            self.progress(f"Create fakelogs from 1 to {num_logs} on logs directory")
+            for ii in range(1, num_logs + 1):
+                new_log = logsdir / Path(f"{str(ii).zfill(8)}.BIN")
+                with open(new_log, 'w+') as logfile:
+                    logfile.write(f"I AM LOG {ii}\n")
+                    logfile.write('1' * ii)
+
+        def verify_logs(test_log_num):
+            try:
+                wrap = False
+                offset = 0
+                max_logs_num = int(self.get_parameter("LOG_MAX_FILES"))
+                if test_log_num > max_logs_num:
+                    wrap = True
+                    offset = test_log_num - max_logs_num
+                    test_log_num = max_logs_num
+                logs_dict = self.download_full_log_list(print_logs=False)
+                if len(logs_dict) != test_log_num:
+                    raise NotAchievedException(
+                        f"Didn't get the full log list, expect {test_log_num} got {len(logs_dict)}")
+                self.progress("Checking logs size are matching")
+                start_log = offset if wrap else 1
+                for ii in range(start_log, test_log_num + 1 - offset):
+                    log_i = logspath / Path(f"{str(ii + offset).zfill(8)}.BIN")
+                    if logs_dict[ii].size != log_i.stat().st_size:
+                        logs_dict = self.download_full_log_list(print_logs=False)
+                        # sometimes we don't have finish writing the log, so get it again prevent failure
+                        if logs_dict[ii].size != log_i.stat().st_size:
+                            raise NotAchievedException(
+                                f"Log{ii} size mismatch : {logs_dict[ii].size} vs {log_i.stat().st_size}"
+                            )
+                if wrap:
+                    self.progress("Checking wrapped logs size are matching")
+                    for ii in range(1, offset):
+                        log_i = logspath / Path(f"{str(ii).zfill(8)}.BIN")
+                        if logs_dict[test_log_num + 1 - offset + ii].size != log_i.stat().st_size:
+                            self.progress(f"{logs_dict[test_log_num + 1 - offset + ii]}")
+                            raise NotAchievedException(
+                                f"Log{test_log_num + 1 - offset + ii} size mismatch :"
+                                f" {logs_dict[test_log_num + 1 - offset + ii].size} vs {log_i.stat().st_size}"
+                            )
+            except NotAchievedException as e:
+                shutil.rmtree(logspath, ignore_errors=True)
+                logspath.mkdir()
+                with open(logspath / Path("LASTLOG.TXT"), 'w') as lastlogfile:
+                    lastlogfile.write("1\n")
+                raise e
+
+        def add_and_verify_log(test_log_num):
+            self.wait_ready_to_arm()
+            self.arm_vehicle()
+            self.delay_sim_time(1)
+            self.disarm_vehicle()
+            self.delay_sim_time(10)
+            verify_logs(test_log_num + 1)
+
+        def create_and_verify_logs(test_log_num, clear_logsdir=True):
+            self.progress(f"Test {test_log_num} logs")
+            create_num_logs(test_log_num, logspath, clear_logsdir)
+            self.reboot_sitl()
+            verify_logs(test_log_num)
+            self.start_subsubtest("Adding one more log")
+            add_and_verify_log(test_log_num)
+
+        self.start_subtest("Checking log list match with filesystem info")
+        create_and_verify_logs(500)
+        create_and_verify_logs(10)
+        create_and_verify_logs(1)
+
+        self.start_subtest("Change LOG_MAX_FILES and Checking log list match with filesystem info")
+        self.set_parameter("LOG_MAX_FILES", 250)
+        create_and_verify_logs(250)
+        self.set_parameter("LOG_MAX_FILES", 1)
+        create_and_verify_logs(1)
+
+        self.start_subtest("Change LOG_MAX_FILES, don't clear old logs and Checking log list match with filesystem info")
+        self.set_parameter("LOG_MAX_FILES", 500)
+        create_and_verify_logs(500)
+        self.set_parameter("LOG_MAX_FILES", 250)
+        create_and_verify_logs(250, clear_logsdir=False)
+
+        # cleanup
+        shutil.rmtree(logspath, ignore_errors=True)
+
+    def TestLogDownload(self):
+        """Test Onboard Log Download."""
+        if self.is_tracker():
+            # tracker starts armed, which is annoying
+            return
+        self.progress("Ensuring we have contents we care about")
+        self.set_parameter("LOG_FILE_DSRMROT", 1)
+        self.set_parameter("LOG_DISARMED", 0)
+        self.reboot_sitl()
+        original_log_list = self.log_list()
+        for i in range(0, 10):
+            self.wait_ready_to_arm()
+            self.arm_vehicle()
+            self.delay_sim_time(1)
+            self.disarm_vehicle()
+        new_log_list = self.log_list()
+        new_log_count = len(new_log_list) - len(original_log_list)
+        if new_log_count != 10:
+            raise NotAchievedException("Expected exactly 10 new logs got %u (%s) to (%s)" %
+                                       (new_log_count, original_log_list, new_log_list))
+        self.progress("Directory contents: %s" % str(new_log_list))
+
+        self.download_full_log_list()
         log_id = 5
         ofs = 6
         count = 2
@@ -3847,15 +3972,19 @@ class TestSuite(ABC):
         if not temp_ok:
             raise NotAchievedException("target temperature")
 
+    def message_has_field_values_field_values_equal(self, fieldname, value, got, epsilon=None):
+        if isinstance(value, float):
+            if math.isnan(value) or math.isnan(got):
+                return math.isnan(value) and math.isnan(got)
+
+        if type(value) is not str and epsilon is not None:
+            return abs(got - value) <= epsilon
+
+        return got == value
+
     def message_has_field_values(self, m, fieldvalues, verbose=True, epsilon=None):
         for (fieldname, value) in fieldvalues.items():
             got = getattr(m, fieldname)
-            if math.isnan(value) or math.isnan(got):
-                equal = math.isnan(value) and math.isnan(got)
-            elif epsilon is not None:
-                equal = abs(got - value) <= epsilon
-            else:
-                equal = got == value
 
             value_string = value
             got_string = got
@@ -3869,7 +3998,9 @@ class TestSuite(ABC):
                 value_string = "%s (%s)" % (value, enum[value].name)
                 got_string = "%s (%s)" % (got, enum[got].name)
 
-            if not equal:
+            if not self.message_has_field_values_field_values_equal(
+                    fieldname, value, got, epsilon=epsilon
+            ):
                 # see if this is an enumerated field:
                 self.progress(self.dump_message_verbose(m))
                 self.progress("Expected %s.%s to be %s, got %s" %
@@ -3915,7 +4046,16 @@ class TestSuite(ABC):
         return m
 
     # FIXME: try to use wait_and_maintain here?
-    def wait_message_field_values(self, message, fieldvalues, timeout=10, epsilon=None, instance=None, minimum_duration=None):
+    def wait_message_field_values(self,
+                                  message,
+                                  fieldvalues,
+                                  timeout=10,
+                                  epsilon=None,
+                                  instance=None,
+                                  minimum_duration=None,
+                                  verbose=False,
+                                  very_verbose=False,
+                                  ):
 
         tstart = self.get_sim_time_cached()
         pass_start = None
@@ -3923,8 +4063,13 @@ class TestSuite(ABC):
             now = self.get_sim_time_cached()
             if now - tstart > timeout:
                 raise NotAchievedException("Field never reached values")
-            m = self.assert_receive_message(message, instance=instance)
-            if self.message_has_field_values(m, fieldvalues, epsilon=epsilon):
+            m = self.assert_receive_message(
+                message,
+                instance=instance,
+                verbose=verbose,
+                very_verbose=very_verbose,
+            )
+            if self.message_has_field_values(m, fieldvalues, epsilon=epsilon, verbose=verbose):
                 if minimum_duration is not None:
                     if pass_start is None:
                         pass_start = now
@@ -4122,6 +4267,144 @@ class TestSuite(ABC):
         mavproxy.expect("Finished downloading", timeout=120)
         self.mavproxy_unload_module(mavproxy, 'log')
         self.stop_mavproxy(mavproxy)
+
+    def TestLogDownloadMAVProxyNetwork(self, upload_logs=False):
+        """Download latest log over network port"""
+        self.context_push()
+        self.set_parameters({
+            "NET_ENABLED": 1,
+            "LOG_DISARMED": 1,
+            "LOG_DARM_RATEMAX": 1, # make small logs
+            # UDP client
+            "NET_P1_TYPE": 1,
+            "NET_P1_PROTOCOL": 2,
+            "NET_P1_PORT": 16001,
+            "NET_P1_IP0": 127,
+            "NET_P1_IP1": 0,
+            "NET_P1_IP2": 0,
+            "NET_P1_IP3": 1,
+            # UDP server
+            "NET_P2_TYPE": 2,
+            "NET_P2_PROTOCOL": 2,
+            "NET_P2_PORT": 16002,
+            "NET_P2_IP0": 0,
+            "NET_P2_IP1": 0,
+            "NET_P2_IP2": 0,
+            "NET_P2_IP3": 0,
+            # TCP client
+            "NET_P3_TYPE": 3,
+            "NET_P3_PROTOCOL": 2,
+            "NET_P3_PORT": 16003,
+            "NET_P3_IP0": 127,
+            "NET_P3_IP1": 0,
+            "NET_P3_IP2": 0,
+            "NET_P3_IP3": 1,
+            # TCP server
+            "NET_P4_TYPE": 4,
+            "NET_P4_PROTOCOL": 2,
+            "NET_P4_PORT": 16004,
+            "NET_P4_IP0": 0,
+            "NET_P4_IP1": 0,
+            "NET_P4_IP2": 0,
+            "NET_P4_IP3": 0,
+            })
+        self.reboot_sitl()
+        endpoints = [('UDPClient', ':16001') ,
+                     ('UDPServer', 'udpout:127.0.0.1:16002'),
+                     ('TCPClient', 'tcpin:0.0.0.0:16003'),
+                     ('TCPServer', 'tcp:127.0.0.1:16004')]
+        for name, e in endpoints:
+            self.progress("Downloading log with %s %s" % (name, e))
+            filename = "MAVProxy-downloaded-net-log-%s.BIN" % name
+
+            mavproxy = self.start_mavproxy(master=e, options=['--source-system=123'])
+            self.mavproxy_load_module(mavproxy, 'log')
+            self.wait_heartbeat()
+            mavproxy.send("log list\n")
+            mavproxy.expect("numLogs")
+            # ensure the full list of logs has come out
+            for i in range(5):
+                self.wait_heartbeat()
+            mavproxy.send("log download latest %s\n" % filename)
+            mavproxy.expect("Finished downloading", timeout=120)
+            self.mavproxy_unload_module(mavproxy, 'log')
+            self.stop_mavproxy(mavproxy)
+
+        self.set_parameters({
+            # multicast UDP client
+            "NET_P1_TYPE": 1,
+            "NET_P1_PROTOCOL": 2,
+            "NET_P1_PORT": 16005,
+            "NET_P1_IP0": 239,
+            "NET_P1_IP1": 255,
+            "NET_P1_IP2": 145,
+            "NET_P1_IP3": 50,
+            # Broadcast UDP client
+            "NET_P2_TYPE": 1,
+            "NET_P2_PROTOCOL": 2,
+            "NET_P2_PORT": 16006,
+            "NET_P2_IP0": 255,
+            "NET_P2_IP1": 255,
+            "NET_P2_IP2": 255,
+            "NET_P2_IP3": 255,
+            "NET_P3_TYPE": -1,
+            "NET_P4_TYPE": -1,
+            "LOG_DISARMED": 0,
+            })
+        self.reboot_sitl()
+        endpoints = [('UDPMulticast', 'mcast:16005') ,
+                     ('UDPBroadcast', ':16006')]
+        for name, e in endpoints:
+            self.progress("Downloading log with %s %s" % (name, e))
+            filename = "MAVProxy-downloaded-net-log-%s.BIN" % name
+
+            mavproxy = self.start_mavproxy(master=e, options=['--source-system=123'])
+            self.mavproxy_load_module(mavproxy, 'log')
+            self.wait_heartbeat()
+            mavproxy.send("log list\n")
+            mavproxy.expect("numLogs")
+            # ensure the full list of logs has come out
+            for i in range(5):
+                self.wait_heartbeat()
+            mavproxy.send("log download latest %s\n" % filename)
+            mavproxy.expect("Finished downloading", timeout=120)
+            self.mavproxy_unload_module(mavproxy, 'log')
+            self.stop_mavproxy(mavproxy)
+
+        self.context_pop()
+
+    def TestLogDownloadMAVProxyCAN(self, upload_logs=False):
+        """Download latest log over CAN serial port"""
+        self.context_push()
+        self.set_parameters({
+            "CAN_P1_DRIVER": 1,
+            "LOG_DISARMED": 1,
+            })
+        self.reboot_sitl()
+        self.set_parameters({
+            "CAN_D1_UC_SER_EN": 1,
+            "CAN_D1_UC_S1_NOD": 125,
+            "CAN_D1_UC_S1_IDX": 4,
+            "CAN_D1_UC_S1_BD": 57600,
+            "CAN_D1_UC_S1_PRO": 2,
+            })
+        self.reboot_sitl()
+        filename = "MAVProxy-downloaded-can-log.BIN"
+        # port 15550 is in SITL_Periph_State.h as SERIAL4 udpclient:127.0.0.1:15550
+        mavproxy = self.start_mavproxy(master=':15550')
+        mavproxy.expect("Detected vehicle")
+        self.mavproxy_load_module(mavproxy, 'log')
+        mavproxy.send("log list\n")
+        mavproxy.expect("numLogs")
+        # ensure the full list of logs has come out
+        for i in range(5):
+            self.wait_heartbeat()
+        mavproxy.send("set shownoise 0\n")
+        mavproxy.send("log download latest %s\n" % filename)
+        mavproxy.expect("Finished downloading", timeout=120)
+        self.mavproxy_unload_module(mavproxy, 'log')
+        self.stop_mavproxy(mavproxy)
+        self.context_pop()
 
     def show_gps_and_sim_positions(self, on_off):
         """Allow to display gps and actual position on map."""
@@ -5897,10 +6180,12 @@ class TestSuite(ABC):
     def set_current_waypoint_using_mav_cmd_do_set_mission_current(
             self,
             seq,
+            reset=0,
             target_sysid=1,
             target_compid=1):
         self.run_cmd(mavutil.mavlink.MAV_CMD_DO_SET_MISSION_CURRENT,
                      p1=seq,
+                     p2=reset,
                      timeout=1,
                      target_sysid=target_sysid,
                      target_compid=target_compid)
@@ -6092,6 +6377,58 @@ class TestSuite(ABC):
                                        0)
         m = self.assert_receive_message('AUTOPILOT_VERSION', timeout=10)
         return m.capabilities
+
+    def decode_flight_sw_version(self, flight_sw_version: int):
+        """ Decode 32 bit flight_sw_version mavlink parameter
+        corresponds to encoding in ardupilot GCS_MAVLINK::send_autopilot_version."""
+        fw_type_id = (flight_sw_version >> 0) % 256
+        patch = (flight_sw_version >> 8) % 256
+        minor = (flight_sw_version >> 16) % 256
+        major = (flight_sw_version >> 24) % 256
+        if fw_type_id == 0:
+            fw_type = "dev"
+        elif fw_type_id == 64:
+            fw_type = "alpha"
+        elif fw_type_id == 128:
+            fw_type = "beta"
+        elif fw_type_id == 192:
+            fw_type = "rc"
+        elif fw_type_id == 255:
+            fw_type = "official"
+        else:
+            fw_type = "undefined"
+        return major, minor, patch, fw_type
+
+    def get_autopilot_firmware_version(self):
+        self.mav.mav.command_long_send(self.sysid_thismav(),
+                                       1,
+                                       mavutil.mavlink.MAV_CMD_REQUEST_AUTOPILOT_CAPABILITIES,
+                                       0,  # confirmation
+                                       1,  # 1: Request autopilot version
+                                       0,
+                                       0,
+                                       0,
+                                       0,
+                                       0,
+                                       0)
+        m = self.assert_receive_message('AUTOPILOT_VERSION', timeout=10)
+        self.fcu_firmware_version = self.decode_flight_sw_version(m.flight_sw_version)
+
+        def hex_values_to_int(hex_values):
+            # Convert ascii codes to characters
+            hex_chars = [chr(int(hex_value)) for hex_value in hex_values]
+            # Convert hex characters to integers, handle \x00 case
+            int_values = [0 if hex_char == '\x00' else int(hex_char, 16) for hex_char in hex_chars]
+            return int_values
+
+        fcu_hash_to_hex = ""
+        for i in hex_values_to_int(m.flight_custom_version):
+            fcu_hash_to_hex += f"{i:x}"
+        self.fcu_firmware_hash = fcu_hash_to_hex
+        self.progress(f"Firmware Version {self.fcu_firmware_version}")
+        self.progress(f"Firmware hash {self.fcu_firmware_hash}")
+        self.githash = util.get_git_hash(short=True)
+        self.progress(f"Git hash {self.githash}")
 
     def GetCapabilities(self):
         '''Get Capabilities'''
@@ -7993,6 +8330,7 @@ Also, ignores heartbeats not from our target system'''
             passed = False
 
         result = Result(test)
+        result.time_elapsed = self.test_timings[desc]
 
         ardupilot_alive = False
         try:
@@ -8107,7 +8445,7 @@ Also, ignores heartbeats not from our target system'''
     def defaults_filepath(self):
         return None
 
-    def start_mavproxy(self, sitl_rcin_port=None):
+    def start_mavproxy(self, sitl_rcin_port=None, master=None, options=None):
         self.start_mavproxy_count += 1
         if self.mavproxy is not None:
             return self.mavproxy
@@ -8122,11 +8460,21 @@ Also, ignores heartbeats not from our target system'''
         if sitl_rcin_port is None:
             sitl_rcin_port = self.sitl_rcin_port()
 
+        if master is None:
+            master = 'tcp:127.0.0.1:%u' % self.adjust_ardupilot_port(5762)
+
+        if options is None:
+            options = self.mavproxy_options()
+        else:
+            op = self.mavproxy_options().copy()
+            op.extend(options)
+            options = op
+
         mavproxy = util.start_MAVProxy_SITL(
             self.vehicleinfo_key(),
-            master='tcp:127.0.0.1:%u' % self.adjust_ardupilot_port(5762),
+            master=master,
             logfile=self.mavproxy_logfile,
-            options=self.mavproxy_options(),
+            options=options,
             pexpect_timeout=pexpect_timeout,
             sitl_rcin_port=sitl_rcin_port,
         )
@@ -8280,6 +8628,7 @@ Also, ignores heartbeats not from our target system'''
         # recv_match and those will not be in self.mav.messages until
         # you do this!
         self.wait_heartbeat()
+        self.get_autopilot_firmware_version()
         self.progress("Sim time: %f" % (self.get_sim_time(),))
         self.apply_default_parameters()
 
@@ -11271,7 +11620,7 @@ switch value'''
         if not self.current_onboard_log_contains_message(messagetype):
             raise NotAchievedException("Current onboard log does not contain message %s" % messagetype)
 
-    def run_tests(self, tests):
+    def run_tests(self, tests) -> List[Result]:
         """Autotest vehicle in SITL."""
         if self.run_tests_called:
             raise ValueError("run_tests called twice")
@@ -11608,8 +11957,8 @@ switch value'''
         self.set_parameter("GPS_TYPE2", 5) # GPS2 is NMEA
         port = self.spare_network_port()
         self.customise_SITL_commandline([
-            "--uartE=tcp:%u" % port, # GPS2 is NMEA....
-            "--uartF=tcpclient:127.0.0.1:%u" % port, # serial5 spews to localhost port
+            "--serial4=tcp:%u" % port, # GPS2 is NMEA....
+            "--serial5=tcpclient:127.0.0.1:%u" % port, # serial5 spews to localhost port
         ])
         self.do_timesync_roundtrip()
         self.wait_gps_fix_type_gte(3)
@@ -12225,7 +12574,7 @@ switch value'''
         })
         port = self.spare_network_port()
         self.customise_SITL_commandline([
-            "--uartF=tcp:%u" % port # serial5 spews to localhost port
+            "--serial5=tcp:%u" % port # serial5 spews to localhost port
         ])
         frsky = FRSkyPassThrough(("127.0.0.1", port),
                                  get_time=self.get_sim_time_cached)
@@ -12316,7 +12665,7 @@ switch value'''
         })
         port = self.spare_network_port()
         self.customise_SITL_commandline([
-            "--uartF=tcp:%u" % port # serial5 spews to localhost port
+            "--serial5=tcp:%u" % port # serial5 spews to localhost port
         ])
         frsky = FRSkyPassThrough(("127.0.0.1", port),
                                  get_time=self.get_sim_time_cached)
@@ -12471,7 +12820,7 @@ switch value'''
         self.set_parameter("SERIAL5_PROTOCOL", 10) # serial5 is FRSky passthrough
         port = self.spare_network_port()
         self.customise_SITL_commandline([
-            "--uartF=tcp:%u" % port # serial5 spews to localhost port
+            "--serial5=tcp:%u" % port # serial5 spews to localhost port
         ])
         frsky = FRSkyPassThrough(("127.0.0.1", port))
         frsky.connect()
@@ -12746,7 +13095,7 @@ switch value'''
         self.set_parameter("RPM1_TYPE", 10) # enable SITL RPM sensor
         port = self.spare_network_port()
         self.customise_SITL_commandline([
-            "--uartF=tcp:%u" % port # serial5 spews to localhost port
+            "--serial5=tcp:%u" % port # serial5 spews to localhost port
         ])
         frsky = FRSkySPort(("127.0.0.1", port), verbose=True)
         self.wait_ready_to_arm()
@@ -12819,7 +13168,7 @@ switch value'''
         self.set_parameter("SERIAL5_PROTOCOL", 3) # serial5 is FRSky output
         port = self.spare_network_port()
         self.customise_SITL_commandline([
-            "--uartF=tcp:%u" % port # serial5 spews to localhost port
+            "--serial5=tcp:%u" % port # serial5 spews to localhost port
         ])
         frsky = FRSkyD(("127.0.0.1", port))
         self.wait_ready_to_arm()
@@ -12938,7 +13287,7 @@ switch value'''
         self.set_parameter("SERIAL5_PROTOCOL", 25) # serial5 is LTM output
         port = self.spare_network_port()
         self.customise_SITL_commandline([
-            "--uartF=tcp:%u" % port  # serial5 spews to localhost port
+            "--serial5=tcp:%u" % port  # serial5 spews to localhost port
         ])
         ltm = LTM(("127.0.0.1", port))
         self.wait_ready_to_arm()
@@ -12981,7 +13330,7 @@ switch value'''
         self.set_parameter("SERIAL5_PROTOCOL", 17) # serial5 is DEVO output
         port = self.spare_network_port()
         self.customise_SITL_commandline([
-            "--uartF=tcp:%u" % port  # serial5 spews to localhost port
+            "--serial5=tcp:%u" % port  # serial5 spews to localhost port
         ])
         devo = DEVO(("127.0.0.1", port))
         self.wait_ready_to_arm()
@@ -13054,7 +13403,7 @@ switch value'''
         self.set_parameter("MSP_OPTIONS", 1) # telemetry (unpolled) mode
         port = self.spare_network_port()
         self.customise_SITL_commandline([
-            "--uartF=tcp:%u" % port # serial5 spews to localhost port
+            "--serial5=tcp:%u" % port # serial5 spews to localhost port
         ])
         msp = MSP_DJI(("127.0.0.1", port))
         self.wait_ready_to_arm()
@@ -13082,7 +13431,7 @@ switch value'''
             self.set_parameter("SERIAL5_PROTOCOL", 23) # serial5 is RCIN input
             port = self.spare_network_port()
             self.customise_SITL_commandline([
-                "--uartF=tcp:%u" % port # serial5 reads from to localhost port
+                "--serial5=tcp:%u" % port # serial5 reads from to localhost port
             ])
             crsf = CRSF(("127.0.0.1", port))
             crsf.connect()
@@ -13165,7 +13514,7 @@ switch value'''
             (6, "SBP", None, "SBP", 5, 'detected'),
             # (7, "SBP2", 9, "SBP2", 5),  # broken, "waiting for config data"
             (8, "NOVA", 15, "NOVA", 5, 'detected'),  # no attempt to auto-detect this in AP_GPS
-            (11, "GSOF", 11, "GSOF", 5, 'detected'),
+            (11, "GSOF", 11, "GSOF", 5, 'specified'), # no attempt to auto-detect this in AP_GPS
             (19, "MSP", 19, "MSP", 32, 'specified'),  # no attempt to auto-detect this in AP_GPS
             # (9, "FILE"),
         ]
@@ -13497,7 +13846,7 @@ SERIAL5_BAUD 128
             print("Had to force-reset SITL %u times" %
                   (self.forced_post_test_sitl_reboots,))
 
-    def autotest(self, tests=None, allow_skips=True):
+    def autotest(self, tests=None, allow_skips=True, step_name=None):
         """Autotest used by ArduPilot autotest CI."""
         if tests is None:
             tests = self.tests()
@@ -13538,8 +13887,48 @@ SERIAL5_BAUD 128
                 print(str(failure))
 
         self.post_tests_announcements()
+        if self.generate_junit:
+            if step_name is None:
+                step_name = "Unknown_step_name"
+            step_name.replace(".", "_")
+            self.create_junit_report(step_name, results, skip_list)
 
         return len(self.fail_list) == 0
+
+    def create_junit_report(self, test_name: str, results: List[Result], skip_list: List[Tuple[Test, Dict[str, str]]]) -> None:
+        """Generate Junit report from the autotest results"""
+        from junitparser import TestCase, TestSuite, JUnitXml, Skipped, Failure
+        frame = self.vehicleinfo_key()
+        xml_filename = f"autotest_result_{frame}_{test_name}_junit.xml"
+        self.progress(f"Writing test result in jUnit format to {xml_filename}\n")
+
+        suite = TestSuite(f"Autotest {frame} {test_name}")
+        suite.timestamp = datetime.now().replace(microsecond=0).isoformat()
+        for result in results:
+            case = TestCase(f"{result.test.name}", f"{frame}", result.time_elapsed)
+            # f"{result.test.description}"
+            # case.file ## TODO : add file properties to match test location
+            if not result.passed:
+                case.result = [Failure(f"see {result.debug_filename}", f"{result.exception}")]
+            suite.add_testcase(case)
+        for skipped in skip_list:
+            (test, reason) = skipped
+            case = TestCase(f"{test.name}", f"{test.function}")
+            case.result = [Skipped(f"Skipped : {reason}")]
+
+        suite.add_property("Firmware Version Major", self.fcu_firmware_version[0])
+        suite.add_property("Firmware Version Minor", self.fcu_firmware_version[1])
+        suite.add_property("Firmware Version Rev", self.fcu_firmware_version[2])
+        suite.add_property("Firmware hash", self.fcu_firmware_hash)
+        suite.add_property("Git hash", self.githash)
+        mavproxy_version = util.MAVProxy_version()
+        suite.add_property("Mavproxy Version Major", mavproxy_version[0])
+        suite.add_property("Mavproxy Version Minor", mavproxy_version[1])
+        suite.add_property("Mavproxy Version Rev", mavproxy_version[2])
+
+        xml = JUnitXml()
+        xml.add_testsuite(suite)
+        xml.write(xml_filename, pretty=True)
 
     def mavfft_fttd(self, sensor_type, sensor_instance, since, until):
         '''display fft for raw ACC data in current logfile'''

@@ -261,7 +261,7 @@ bool Morse::parse_sensors(const char *json)
 bool Morse::connect_sockets(void)
 {
     if (!sensors_sock) {
-        sensors_sock = new SocketAPM(false);
+        sensors_sock = new SocketAPM_native(false);
         if (!sensors_sock) {
             AP_HAL::panic("Out of memory for sensors socket");
         }
@@ -280,7 +280,7 @@ bool Morse::connect_sockets(void)
         printf("Sensors connected\n");
     }
     if (!control_sock) {
-        control_sock = new SocketAPM(false);
+        control_sock = new SocketAPM_native(false);
         if (!control_sock) {
             AP_HAL::panic("Out of memory for control socket");
         }
@@ -602,7 +602,7 @@ void Morse::send_report(void)
     if (now < 10000) {
         // don't send lidar reports until 10s after startup. This
         // avoids a windows threading issue with non-blocking sockets
-        // and the initial wait on uartA
+        // and the initial wait on SERIAL0
         return;
     }
 #endif

@@ -180,6 +180,11 @@ def options(opt):
         action='store_true',
         default=False,
         help='enable OS level thread statistics.')
+
+    g.add_option('--enable-ppp',
+        action='store_true',
+        default=False,
+        help='enable PPP networking.')
     
     g.add_option('--bootloader',
         action='store_true',
@@ -267,9 +272,14 @@ submodules at specific revisions.
                  help="Enables GPS logging")
     
     g.add_option('--enable-dds', action='store_true',
-                 help="Enable the dds client to connect with ROS2/DDS"
-    )
+                 help="Enable the dds client to connect with ROS2/DDS.")
 
+    g.add_option('--disable-networking', action='store_true',
+                 help="Disable the networking API code")
+
+    g.add_option('--enable-networking-tests', action='store_true',
+                 help="Enable the networking test code. Automatically enables networking.")
+    
     g.add_option('--enable-dronecan-tests', action='store_true',
                  default=False,
                  help="Enables DroneCAN tests in sitl")
@@ -355,10 +365,10 @@ configuration in order to save typing.
         default=False,
         help='Use flash storage emulation.')
 
-    g.add_option('--disable-ekf2',
+    g.add_option('--enable-ekf2',
         action='store_true',
         default=False,
-        help='Configure without EKF2.')
+        help='Configure with EKF2.')
 
     g.add_option('--disable-ekf3',
         action='store_true',
@@ -542,6 +552,8 @@ def configure(cfg):
     cfg.recurse('libraries/AP_GPS')
     cfg.recurse('libraries/AP_HAL_SITL')
     cfg.recurse('libraries/SITL')
+
+    cfg.recurse('libraries/AP_Networking')
 
     cfg.start_msg('Scripting runtime checks')
     if cfg.options.scripting_checks:

@@ -404,13 +404,7 @@ bool Copter::set_circle_rate(float rate_dps)
 // set desired speed (m/s). Used for scripting.
 bool Copter::set_desired_speed(float speed)
 {
-    // exit if vehicle is not in auto mode
-    if (!flightmode->is_autopilot()) {
-        return false;
-    }
-
-    wp_nav->set_speed_xy(speed * 100.0f);
-    return true;
+    return flightmode->set_speed_xy(speed * 100.0f);
 }
 
 #if MODE_AUTO_ENABLED == ENABLED
@@ -671,6 +665,13 @@ void Copter::one_hz_loop()
 #endif
 
     AP_Notify::flags.flying = !ap.land_complete;
+
+    // slowly update the PID notches with the average loop rate
+    attitude_control->set_notch_sample_rate(AP::scheduler().get_filtered_loop_rate_hz());
+    pos_control->get_accel_z_pid().set_notch_sample_rate(AP::scheduler().get_filtered_loop_rate_hz());
+#if AC_CUSTOMCONTROL_MULTI_ENABLED == ENABLED
+    custom_control.set_notch_sample_rate(AP::scheduler().get_filtered_loop_rate_hz());
+#endif
 }
 
 void Copter::init_simple_bearing()

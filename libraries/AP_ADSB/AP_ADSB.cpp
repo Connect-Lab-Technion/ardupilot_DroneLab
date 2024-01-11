@@ -37,7 +37,7 @@
 #include <AP_Logger/AP_Logger.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
 #include <GCS_MAVLink/GCS.h>
-
+#include <AP_RTC/AP_RTC.h>
 
 #define VEHICLE_TIMEOUT_MS              5000   // if no updates in this time, drop it from the list
 #define ADSB_SQUAWK_OCTAL_DEFAULT       1200
@@ -365,7 +365,9 @@ void AP_ADSB::update(void)
 
     // Altitude difference between sea level pressure and current
     // pressure (in metres)
-    loc.baro_alt_press_diff_sea_level = baro.get_altitude_difference(SSL_AIR_PRESSURE, baro.get_pressure());
+    if (loc.baro_is_healthy) {
+        loc.baro_alt_press_diff_sea_level = baro.get_altitude_difference(SSL_AIR_PRESSURE, baro.get_pressure());
+    }
 
     update(loc);
 }
