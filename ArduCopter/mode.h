@@ -377,23 +377,39 @@ public:
     // end pass-through functions
 };
 
+#if MODE_LAB_ENABLED == ENABLED
 class ModeLab : public Mode {
 
 public:
     // inherit constructor
-    using Mode::Mode;
+    using Mode::Mode;    
+    Number mode_number() const override { return Number::LAB; }
+
     bool init(bool ignore_checks) override;
     void run() override;
+    void exit() override;
 
     bool requires_GPS() const override { return false; }
-    bool has_manual_throttle() const override { return false; }
-    bool allows_arming(bool from_gcs) const override { return true; };
-    bool is_autopilot() const override { return true; }
+    bool has_manual_throttle() const override { return true; }
+    bool allows_arming(AP_Arming::Method method) const override;
+    bool is_autopilot() const override { return false; }
+    void change_motor_direction(bool reverse);
+    void output_to_motors() override;
 
 protected:
     const char *name() const override { return "LAB"; }
     const char *name4() const override { return "LAB"; }
-}
+
+private: 
+    void arm_motors();
+    void disarm_motors();
+
+    float motors_output;
+    uint32_t last_throttle_warning_output_ms;
+
+};
+#endif
+
 
 #if MODE_ACRO_ENABLED == ENABLED
 class ModeAcro : public Mode {
