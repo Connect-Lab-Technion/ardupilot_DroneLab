@@ -1,0 +1,8 @@
+
+# https://ardupilot.org/dev/docs/ekf2-estimation-system.html
+EK2_ENABLE 1
+AHRS_EKF_TYPE 2
+EK2_GPS_TYPE 3
+EK2_ALT_SOURCE 1
+EK2_GPS_CHECK 0
+TERRAIN_ENABLE 0
