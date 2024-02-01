@@ -1,5 +1,7 @@
 #include "Copter.h"
+#include <AC_ControlLab/AC_ControlLab.h>
 
+#include <array>
 
 #if MODE_LAB_ENABLED == ENABLED
 
@@ -10,27 +12,12 @@
 // lab_init - initialise lab controller
 bool ModeLab::init(bool ignore_checks)
 {
-    // do not enter the mode when already armed or when flying
-    if (motors->armed() || SRV_Channels::get_dshot_esc_type() == 0) {
-        return false;
-    }
-
-    // perform minimal arming checks
-    if (!copter.mavlink_motor_control_check(*gcs().chan(0), true, "Lab Mode")) {
-        return false;
-    }
-
-    // do not enter the mode if sticks are not centered or throttle is not at zero
-    if (!is_zero(channel_pitch->norm_input_dz())
-        || !is_zero(channel_roll->norm_input_dz())
-        || !is_zero(channel_yaw->norm_input_dz())
-        || !is_zero(channel_throttle->norm_input_dz())) {
-        return false;
-    }
-
     // turn on notify leds
     AP_Notify::flags.esc_calibration = true;
-
+    motor_out_1 = 0.0f;
+    motor_out_2 = 0.0f;
+    motor_out_3 = 0.0f;
+    motor_out_4 = 0.0f;
     return true;
 }
 
@@ -39,8 +26,10 @@ bool ModeLab::init(bool ignore_checks)
 // should be called at 100hz or more
 void ModeLab::run()
 {
-    motors_output = 1;
-
+    motor_out_1 = 1.0f;
+    motor_out_2 = 1.0f;
+    motor_out_3 = 1.0f;
+    motor_out_4 = 1.0f;
 }
 
 bool ModeLab::allows_arming(AP_Arming::Method method) const
@@ -128,7 +117,7 @@ void ModeLab::output_to_motors()
     if (is_zero(channel_throttle->norm_input_dz())) {
         const uint32_t now = AP_HAL::millis();
         if (now - last_throttle_warning_output_ms > 5000) {
-            gcs().send_text(MAV_SEVERITY_WARNING, "Turtle: raise throttle to arm");
+            gcs().send_text(MAV_SEVERITY_WARNING, "LAB: raise throttle to arm");
             last_throttle_warning_output_ms = now;
         }
 
@@ -141,6 +130,7 @@ void ModeLab::output_to_motors()
     // check if motor are allowed to spin
     const bool allow_output = motors->armed() && motors->get_interlock();
 
+    float motor_outputs[] = {motor_out_1, motor_out_2, motor_out_3, motor_out_4};
     for (uint8_t i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; ++i) {
         if (!motors->is_motor_enabled(i)) {
             continue;
@@ -154,7 +144,7 @@ void ModeLab::output_to_motors()
             continue;
         }
 
-        int16_t pwm = motors->get_pwm_output_min() + (motors->get_pwm_output_max() - motors->get_pwm_output_min()) * motors_output;
+        int16_t pwm = motors->get_pwm_output_min() + (motors->get_pwm_output_max() - motors->get_pwm_output_min()) * motor_outputs[i];
 
         motors->rc_write(i, pwm);
     }

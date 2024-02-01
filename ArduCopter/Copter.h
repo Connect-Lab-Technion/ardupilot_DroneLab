@@ -1049,6 +1049,8 @@ private:
     ModeTurtle mode_turtle;
 #endif
 #if MODE_LAB_ENABLED == ENABLED
+    #include <AC_ControlLab/AC_ControlLab.h>
+    AC_ControlLab* controlLab;
     ModeLab mode_lab;
 #endif
 
