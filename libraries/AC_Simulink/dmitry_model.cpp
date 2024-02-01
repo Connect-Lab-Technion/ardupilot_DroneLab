@@ -28,10 +28,11 @@ extern "C"
 #include "rt_nonfinite.h"
 
 }
-
 real32_T rt_atan2f_snf(real32_T u0, real32_T u1)
 {
   real32_T y;
+  const real32_T EPSILON = 1e-6F; // Define a small tolerance value
+
   if (std::isnan(u0) || std::isnan(u1)) {
     y = (rtNaNF);
   } else if (std::isinf(u0) && std::isinf(u1)) {
@@ -50,7 +51,7 @@ real32_T rt_atan2f_snf(real32_T u0, real32_T u1)
     }
 
     y = std::atan2(static_cast<real32_T>(tmp), static_cast<real32_T>(tmp_0));
-  } else if (u1 == 0.0F) {
+  } else if (std::abs(u1) < EPSILON) { // Use absolute difference instead of ==
     if (u0 > 0.0F) {
       y = RT_PIF / 2.0F;
     } else if (u0 < 0.0F) {
