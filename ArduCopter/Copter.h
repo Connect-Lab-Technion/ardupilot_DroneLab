@@ -73,6 +73,8 @@
 #include <AP_OpticalFlow/AP_OpticalFlow.h>
 #include <AP_Winch/AP_Winch_config.h>
 
+#include <AC_ControlLab/AC_ControlLab.h>    // Control lab library
+
 // Configuration
 #include "defines.h"
 #include "config.h"
@@ -1049,7 +1051,6 @@ private:
     ModeTurtle mode_turtle;
 #endif
 #if MODE_LAB_ENABLED == ENABLED
-    #include <AC_ControlLab/AC_ControlLab.h>
     AC_ControlLab* controlLab;
     ModeLab mode_lab;
 #endif
