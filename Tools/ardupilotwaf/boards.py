@@ -12,6 +12,8 @@ import json
 _board_classes = {}
 _board = None
 
+technion_controlLab_flag = True # set to True if building for lab
+
 class BoardMeta(type):
     def __init__(cls, name, bases, dct):
         super(BoardMeta, cls).__init__(name, bases, dct)
@@ -133,14 +135,15 @@ class Board:
 
         # allow enable of custom controller for any board
         # enabled on sitl by default
-        if (cfg.options.enable_custom_controller or self.get_name() == "sitl") and not cfg.options.no_gcs:
+           
+        if technion_controlLab_flag or ((cfg.options.enable_custom_controller or self.get_name() == "sitl") and not cfg.options.no_gcs):
             env.ENABLE_CUSTOM_CONTROLLER = True
             env.DEFINES.update(
                 AP_CUSTOMCONTROL_ENABLED=1,
             )
             env.AP_LIBRARIES += [
                 'AC_CustomControl',
-                'AC_ControlLab'
+                'AC_ControlLab',
                 'AC_Simulink'
             ]
             cfg.msg("Enabled custom controller", 'yes')
@@ -149,6 +152,23 @@ class Board:
                 AP_CUSTOMCONTROL_ENABLED=0,
             )
             cfg.msg("Enabled custom controller", 'no', color='YELLOW')
+        
+        if technion_controlLab_flag :
+            env.MODE_LAB_ENABLED = True
+            env.DEFINES.update(
+                MODE_LAB_ENABLED=1,
+            )
+            env.AP_LIBRARIES += [
+                'AC_ControlLab',
+                'AC_Simulink'
+            ]
+            cfg.msg("Enabled lab controller", 'yes')
+        else:
+            env.DEFINES.update(
+                MODE_LAB_ENABLED=0,
+            )
+            cfg.msg("Enabled lab controller", 'no', color='YELLOW')
+
 
         d = env.get_merged_dict()
         # Always prepend so that arguments passed in the command line get
