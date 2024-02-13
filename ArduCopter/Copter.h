@@ -1051,7 +1051,9 @@ private:
     ModeTurtle mode_turtle;
 #endif
 #if MODE_LAB_ENABLED == ENABLED
-    AC_ControlLab* controlLab;
+    AC_ControlLab controlLab{ahrs_view, inertial_nav, ins, motors};
+    void run_controlLab() { controlLab.update(); }
+
     ModeLab mode_lab;
 #endif
 

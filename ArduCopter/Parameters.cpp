@@ -713,6 +713,12 @@ const AP_Param::Info Copter::var_info[] = {
     GOBJECT(custom_control, "CC", AC_CustomControl),
 #endif
 
+#if MODE_LAB_ENABLED == ENABLED
+    // @Group: LAB
+    // @Path: ../libraries/AC_ControlLab/AC_ControlLab.coo
+    // GOBJECT(controlLab,"LAB", AC_ControlLab),
+#endif
+
     // @Group:
     // @Path: Parameters.cpp
     GOBJECT(g2, "",  ParametersG2),

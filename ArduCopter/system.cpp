@@ -470,6 +470,10 @@ void Copter::allocate_motors(void)
         AP_BoardConfig::allocation_error("PosControl");
     }
     AP_Param::load_object_from_eeprom(pos_control, pos_control->var_info);
+    
+    #if MODE_LAB_ENABLED == ENABLED
+        controlLab.init();
+    #endif
 
 #if AC_OAPATHPLANNER_ENABLED == ENABLED
     wp_nav = new AC_WPNav_OA(inertial_nav, *ahrs_view, *pos_control, *attitude_control);

@@ -23,7 +23,9 @@ Mode::Mode(void) :
     channel_throttle(copter.channel_throttle),
     channel_yaw(copter.channel_yaw),
     G_Dt(copter.G_Dt)
-{ };
+{ 
+
+};
 
 #if AC_PAYLOAD_PLACE_ENABLED
 PayloadPlace Mode::payload_place;

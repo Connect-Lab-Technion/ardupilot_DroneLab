@@ -140,6 +140,7 @@ class Board:
             )
             env.AP_LIBRARIES += [
                 'AC_CustomControl',
+                'AC_ControlLab'
                 'AC_Simulink'
             ]
             cfg.msg("Enabled custom controller", 'yes')

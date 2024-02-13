@@ -15,23 +15,34 @@
 
 class AC_ControlLab {
 public:
-    AC_ControlLab(AP_AHRS_View& ahrs, const AP_InertialNav& inav,
-                  const class AP_Motors& motors) :
-        _ahrs(ahrs),
-        _inav(inav),
-        _motors(motors)
-        {
-            _controller.initialize();
-        }
+    AC_ControlLab(
+        AP_AHRS_View*& ahrs, 
+        AP_InertialNav & inav,
+        AP_InertialSensor &ins,
+        AP_MotorsMulticopter *& motors);
+    // AC_ControlLab() = default;
+    std::array<float, 4> controlWrapper();
+     
+    // Empty destructor to suppress compiler warning
+    virtual ~AC_ControlLab() {}
+
+    CLASS_NO_COPY(AC_ControlLab);  /* Do not allow copies */
+
+    void init(void);
+    void update(void);
+
+    static const struct AP_Param::GroupInfo var_info[];
+
+
 
 
 protected:
-    // references to inertial nav and ahrs libraries
-
-    AP_AHRS_View&           _ahrs;
-    const AP_InertialNav&   _inav;
-    const class AP_Motors&  _motors;
-    static dmitry_model _controller;
+    AP_AHRS_View*&           _ahrs;
+    AP_InertialNav &   _inav;
+    AP_InertialSensor & _ins;
+    AP_MotorsMulticopter *&  _motors;
+    dmitry_model controller;
 private:
+    // AP_Enum<CustomControlType> _controller_type;
 
 };

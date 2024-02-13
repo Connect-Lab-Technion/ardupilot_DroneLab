@@ -26,16 +26,15 @@ bool ModeLab::init(bool ignore_checks)
 // should be called at 100hz or more
 void ModeLab::run()
 {
-    motor_out_1 = 1.0f;
-    motor_out_2 = 1.0f;
-    motor_out_3 = 1.0f;
-    motor_out_4 = 1.0f;
+
+    // AC_ControlLab lab;  // Initialize lab object using default constructor
+    std::array<float, 4> motors_out{0,0,0,0};//lab.controlWrapper();
+    motor_out_1 = motors_out[0];
+    motor_out_2 = motors_out[1];
+    motor_out_3 = motors_out[2];
+    motor_out_4 = motors_out[3];
 }
 
-bool ModeLab::allows_arming(AP_Arming::Method method) const
-{
-    return true;
-}
 
 void ModeLab::exit()
 {

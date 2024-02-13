@@ -250,6 +250,8 @@ protected:
     RC_Channel *&channel_yaw;
     float &G_Dt;
 
+    // AC_ControlLab *&contolLab;
+
     // note that we support two entirely different automatic takeoffs:
 
     // "user-takeoff", which is available in modes such as ALT_HOLD
@@ -391,7 +393,7 @@ public:
 
     bool requires_GPS() const override { return false; }
     bool has_manual_throttle() const override { return true; }
-    bool allows_arming(AP_Arming::Method method) const override;
+    bool allows_arming(AP_Arming::Method method) const override { return true; };
     bool is_autopilot() const override { return false; }
     void change_motor_direction(bool reverse);
     void output_to_motors() override;
