@@ -71,7 +71,7 @@ extern "C"
   }
 
 // Test if single-precision value is infinite
-boolean_T rtIsInfF(rea 32_T value)
+boolean_T rtIsInfF(real32_T value)
 {
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wfloat-equal"
