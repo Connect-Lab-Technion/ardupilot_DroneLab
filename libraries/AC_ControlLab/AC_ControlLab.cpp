@@ -36,7 +36,7 @@ AC_ControlLab::AC_ControlLab(AP_AHRS_View*& ahrs,
     _ins(ins),
     _motors(motors)
 {
-    AP_Param::setup_object_defaults(this, var_info);
+    // AP_Param::setup_object_defaults(this, var_info);
 }
 
 void AC_ControlLab::init(void)
@@ -44,7 +44,7 @@ void AC_ControlLab::init(void)
     controller.initialize(); 
 }
 
-Vector3f AC_ControlLab::update(void)
+void AC_ControlLab::update(void)
 {
     // reset controller based on spool state
     switch (_motors->get_spool_state()) {
@@ -71,10 +71,10 @@ std::array<float, 4> AC_ControlLab::controlWrapper()
     const Vector3f &curr_vel = _inav.get_velocity_neu_cms(); // TODO: convert to meters per second
 
     // // Get RC inputs
-    RC_Channel *rc6 = RC_Channels::rc_channel(5); // Channels are 0-indexed, so channel 6 is at index 5
-    RC_Channel *rc7 = RC_Channels::rc_channel(6);
-    RC_Channel *rc8 = RC_Channels::rc_channel(7);
-    RC_Channel *rc9 = RC_Channels::rc_channel(8);
+    // RC_Channel *rc6 = RC_Channels::rc_channel(5); // Channels are 0-indexed, so channel 6 is at index 5
+    // RC_Channel *rc7 = RC_Channels::rc_channel(6);
+    // RC_Channel *rc8 = RC_Channels::rc_channel(7);
+    // RC_Channel *rc9 = RC_Channels::rc_channel(8);
 
     // Get battery voltage
     // float battery_voltage = AP::battery().voltage();

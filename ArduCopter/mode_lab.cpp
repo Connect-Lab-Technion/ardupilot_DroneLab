@@ -27,7 +27,6 @@ bool ModeLab::init(bool ignore_checks)
 void ModeLab::run()
 {
 
-    // AC_ControlLab lab;  // Initialize lab object using default constructor
     std::array<float, 4> motors_out{0,0,0,0};//lab.controlWrapper();
     motor_out_1 = motors_out[0];
     motor_out_2 = motors_out[1];

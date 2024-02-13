@@ -472,7 +472,7 @@ void Copter::allocate_motors(void)
     AP_Param::load_object_from_eeprom(pos_control, pos_control->var_info);
     
     #if MODE_LAB_ENABLED == ENABLED
-        controlLab.init();
+        // controlLab.init();
     #endif
 
 #if AC_OAPATHPLANNER_ENABLED == ENABLED
