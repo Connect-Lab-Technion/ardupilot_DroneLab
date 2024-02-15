@@ -42,6 +42,8 @@ AC_ControlLab::AC_ControlLab(AP_AHRS_View*& ahrs,
 void AC_ControlLab::init(void)
 {
     controller.initialize(); 
+    GCS_SEND_TEXT(MAV_SEVERITY_INFO, "AC_ControlLab: INIT");
+
 }
 
 void AC_ControlLab::update(void)

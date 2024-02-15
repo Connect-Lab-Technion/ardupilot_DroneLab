@@ -1,6 +1,7 @@
 #include "Copter.h"
 #include <AC_ControlLab/AC_ControlLab.h>
-
+#include <AC_Simulink/dmitry_model.h>
+dmitry_model customcontroller;
 #include <array>
 
 #if MODE_LAB_ENABLED == ENABLED
@@ -12,6 +13,8 @@
 // lab_init - initialise lab controller
 bool ModeLab::init(bool ignore_checks)
 {
+    gcs().send_text(MAV_SEVERITY_INFO, "LAB: intitialised");
+
     // turn on notify leds
     AP_Notify::flags.esc_calibration = true;
     motor_out_1 = 0.0f;
@@ -21,11 +24,25 @@ bool ModeLab::init(bool ignore_checks)
     return true;
 }
 
+#include <sstream>
+#include <AP_Common/AP_Common.h>
 
 // lab_run - runs the lab controller
 // should be called at 100hz or more
 void ModeLab::run()
 {
+    // std::ostringstream oss;
+    Vector3f gyroresponse = ahrs.get_gyro();
+    // // const char * logmessage_gyro; // = gyroresponse.tofloat().tos;
+    // // oss << "LAB: GYRO (" << gyroresponse.x << "," << gyroresponse.y << "," << gyroresponse.z << ")";
+    // // std::string str = oss.str();
+    // // const char * logMessage_test = str.c_str();
+    // char logMessage_test[50];
+    // std::string str_log = //"LAB: GYRO (" + std::to_string(gyroresponse.x) + "," + std::to_string(gyroresponse.y) + "," + std::to_string(gyroresponse.z) + ") %d\n";
+    // std:strcpy(logMessage_test, str_log.c_str());
+
+    // const char *message_out = "asdfasdfasdfasdfasdfasdfasdfasdfasdfa";
+    gcs().send_text(MAV_SEVERITY_INFO, "%f,%f,%f", gyroresponse.x,gyroresponse.y,gyroresponse.x);
 
     std::array<float, 4> motors_out{0,0,0,0};//lab.controlWrapper();
     motor_out_1 = motors_out[0];

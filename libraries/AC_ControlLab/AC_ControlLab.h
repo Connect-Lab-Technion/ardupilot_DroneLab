@@ -11,6 +11,7 @@
 #include <array>
 #include <AP_Motors/AP_Motors.h>
 #include <AP_AHRS/AP_AHRS_View.h>
+#include <GCS_MAVLink/GCS.h>
 
 
 class AC_ControlLab {
