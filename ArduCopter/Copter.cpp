@@ -114,9 +114,6 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
     FAST_TASK_CLASS(AP_InertialSensor, &copter.ins, update),
     // run low level rate controllers that only require IMU data
     FAST_TASK(run_rate_controller),
-#if AC_CUSTOMCONTROL_MULTI_ENABLED == ENABLED
-    FAST_TASK(run_custom_controller),
-#endif
 #if FRAME_CONFIG == HELI_FRAME
     FAST_TASK(heli_update_autorotation),
 #endif //HELI_FRAME
@@ -669,9 +666,6 @@ void Copter::one_hz_loop()
     // slowly update the PID notches with the average loop rate
     attitude_control->set_notch_sample_rate(AP::scheduler().get_filtered_loop_rate_hz());
     pos_control->get_accel_z_pid().set_notch_sample_rate(AP::scheduler().get_filtered_loop_rate_hz());
-#if AC_CUSTOMCONTROL_MULTI_ENABLED == ENABLED
-    custom_control.set_notch_sample_rate(AP::scheduler().get_filtered_loop_rate_hz());
-#endif
 }
 
 void Copter::init_simple_bearing()
