@@ -1,8 +1,10 @@
 #pragma once
 
-#include "AP_VisualOdom_Backend.h"
+#include "AP_VisualOdom_config.h"
 
-#if HAL_VISUALODOM_ENABLED
+#if AP_VISUALODOM_INTELT265_ENABLED
+
+#include "AP_VisualOdom_Backend.h"
 
 class AP_VisualOdom_IntelT265 : public AP_VisualOdom_Backend
 {
@@ -11,8 +13,8 @@ public:
 
     using AP_VisualOdom_Backend::AP_VisualOdom_Backend;
 
-    // consume vision position estimate data and send to EKF. distances in meters
-    void handle_vision_position_estimate(uint64_t remote_time_us, uint32_t time_ms, float x, float y, float z, const Quaternion &attitude, float posErr, float angErr, uint8_t reset_counter) override;
+    // consume vision pose estimate data and send to EKF. distances in meters
+    void handle_pose_estimate(uint64_t remote_time_us, uint32_t time_ms, float x, float y, float z, const Quaternion &attitude, float posErr, float angErr, uint8_t reset_counter) override;
 
     // consume vision velocity estimate data and send to EKF, velocity in NED meters per second
     void handle_vision_speed_estimate(uint64_t remote_time_us, uint32_t time_ms, const Vector3f &vel, uint8_t reset_counter) override;
@@ -88,4 +90,4 @@ protected:
     Vector3f _voxl_position_last;               // last recorded position (post scaling, offset and orientation corrections)
 };
 
-#endif
+#endif  // AP_VISUALODOM_INTELT265_ENABLED

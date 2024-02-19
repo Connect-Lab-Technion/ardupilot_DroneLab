@@ -89,7 +89,7 @@ function run_autotest() {
     if [ "$NAME" == "Examples" ]; then
         w="$w --speedup=5 --timeout=14400 --debug --no-clean"
     fi
-    Tools/autotest/autotest.py --show-test-timings --waf-configure-args="$w" "$BVEHICLE" "$RVEHICLE"
+    Tools/autotest/autotest.py --show-test-timings --junit --waf-configure-args="$w" "$BVEHICLE" "$RVEHICLE"
     ccache -s && ccache -z
 }
 
@@ -144,6 +144,8 @@ for t in $CI_BUILD_TARGET; do
         continue
     fi
     if [ "$t" == "sitltest-rover" ]; then
+        sudo apt-get update || /bin/true
+        sudo apt-get install -y ppp || /bin/true
         run_autotest "Rover" "build.Rover" "test.Rover"
         continue
     fi
@@ -161,6 +163,10 @@ for t in $CI_BUILD_TARGET; do
     fi
     if [ "$t" == "sitltest-sub" ]; then
         run_autotest "Sub" "build.Sub" "test.Sub"
+        continue
+    fi
+    if [ "$t" == "sitltest-blimp" ]; then
+        run_autotest "Blimp" "build.Blimp" "test.Blimp"
         continue
     fi
 
@@ -252,6 +258,14 @@ for t in $CI_BUILD_TARGET; do
         continue
     fi
 
+    if [ "$t" == "CubeRedPrimary-bootloader" ]; then
+        echo "Building CubeRedPrimary bootloader"
+        $waf configure --board CubeRedPrimary --bootloader
+        $waf clean
+        $waf bootloader
+        continue
+    fi
+
     if [ "$t" == "fmuv3-bootloader" ]; then
         echo "Building fmuv3 bootloader"
         $waf configure --board fmuv3 --bootloader
@@ -259,7 +273,7 @@ for t in $CI_BUILD_TARGET; do
         $waf bootloader
         continue
     fi
-    
+
     if [ "$t" == "stm32f7" ]; then
         echo "Building mRoX21-777/"
         $waf configure --Werror --board mRoX21-777
@@ -285,6 +299,8 @@ for t in $CI_BUILD_TARGET; do
         $waf configure --board Durandal
         $waf clean
         $waf copter
+        echo "Building CPUInfo"
+        $waf --target=tool/CPUInfo
 
         # test external flash build
         echo "Building SPRacingH7"
@@ -310,7 +326,40 @@ for t in $CI_BUILD_TARGET; do
         $waf plane
         continue
     fi
+
+    if [ "$t" == "CubeOrange-PPP" ]; then
+        echo "Building CubeOrange-PPP"
+        $waf configure --board CubeOrange --enable-ppp
+        $waf clean
+        $waf copter
+        continue
+    fi
+
+    if [ "$t" == "CubeOrange-SOHW" ]; then
+        echo "Building CubeOrange-SOHW"
+        Tools/scripts/sitl-on-hardware/sitl-on-hw.py --vehicle plane --simclass Plane --board CubeOrange
+        continue
+    fi
     
+    if [ "$t" == "dds-stm32h7" ]; then
+        echo "Building with DDS support on a STM32H7"
+        $waf configure --board Durandal --enable-dds
+        $waf clean
+        $waf copter
+        $waf plane
+        continue
+    fi
+
+    if [ "$t" == "dds-sitl" ]; then
+        echo "Building with DDS support on SITL"
+        $waf configure --board sitl --enable-dds
+        $waf clean
+        $waf copter
+        $waf plane
+        $waf tests
+        continue
+    fi
+
     if [ "$t" == "fmuv2-plane" ]; then
         echo "Building fmuv2 plane"
         $waf configure --board fmuv2
@@ -338,9 +387,11 @@ for t in $CI_BUILD_TARGET; do
     if [ "$t" == "replay" ]; then
         echo "Building replay"
         $waf configure --board sitl --debug --disable-scripting
+
         $waf replay
         echo "Building AP_DAL standalone test"
         $waf configure --board sitl --debug --disable-scripting --no-gcs
+
         $waf --target tool/AP_DAL_Standalone
         $waf clean
         continue
@@ -376,10 +427,16 @@ for t in $CI_BUILD_TARGET; do
         ./Tools/scripts/build_bootloaders.py --signing-key testkey_public_key.dat MatekL431-DShot
         continue
     fi
-    
+
     if [ "$t" == "python-cleanliness" ]; then
         echo "Checking Python code cleanliness"
         ./Tools/scripts/run_flake8.py
+        continue
+    fi
+
+    if [ "$t" == "astyle-cleanliness" ]; then
+        echo "Checking AStyle code cleanliness"
+        ./Tools/scripts/run_astyle.py --dry-run
         continue
     fi
 
@@ -410,7 +467,7 @@ for t in $CI_BUILD_TARGET; do
     fi
 
     if [ "$t" == "param_parse" ]; then
-        for v in Rover AntennaTracker ArduCopter ArduPlane ArduSub Blimp; do
+        for v in Rover AntennaTracker ArduCopter ArduPlane ArduSub Blimp AP_Periph; do
             python Tools/autotest/param_metadata/param_parse.py --vehicle $v
         done
         continue

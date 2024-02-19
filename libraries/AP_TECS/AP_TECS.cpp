@@ -116,7 +116,7 @@ const AP_Param::GroupInfo AP_TECS::var_info[] = {
 
     // @Param: LAND_ARSPD
     // @DisplayName: Airspeed during landing approach (m/s)
-    // @Description: When performing an autonomus landing, this value is used as the goal airspeed during approach.  Max airspeed allowed is Trim Airspeed or ARSPD_FBW_MAX as defined by LAND_OPTIONS bitmask.  Note that this parameter is not useful if your platform does not have an airspeed sensor (use TECS_LAND_THR instead).  If negative then this value is not used during landing.
+    // @Description: When performing an autonomus landing, this value is used as the goal airspeed during approach.  Max airspeed allowed is Trim Airspeed or ARSPD_FBW_MAX as defined by LAND_OPTIONS bitmask.  Note that this parameter is not useful if your platform does not have an airspeed sensor (use TECS_LAND_THR instead).  If negative then this value is halfway between ARSPD_FBW_MIN and TRIM_CRUISE_CM speed for fixed wing autolandings.
     // @Range: -1 127
     // @Increment: 1
     // @User: Standard
@@ -238,7 +238,7 @@ const AP_Param::GroupInfo AP_TECS::var_info[] = {
 
     // @Param: SYNAIRSPEED
     // @DisplayName: Enable the use of synthetic airspeed
-    // @Description: This enable the use of synthetic airspeed for aircraft that don't have a real airspeed sensor. This is useful for development testing where the user is aware of the considerable limitations of the synthetic airspeed system, such as very poor estimates when a wind estimate is not accurate. Do not enable this option unless you fully understand the limitations of a synthetic airspeed estimate.
+    // @Description: This enables the use of synthetic airspeed in TECS for aircraft that don't have a real airspeed sensor. This is useful for development testing where the user is aware of the considerable limitations of the synthetic airspeed system, such as very poor estimates when a wind estimate is not accurate. Do not enable this option unless you fully understand the limitations of a synthetic airspeed estimate. This option has no effect if a healthy airspeed sensor is being used for airspeed measurements.
     // @Values: 0:Disable,1:Enable
     // @User: Advanced
     AP_GROUPINFO("SYNAIRSPEED", 27, AP_TECS, _use_synthetic_airspeed, 0),
@@ -268,10 +268,9 @@ const AP_Param::GroupInfo AP_TECS::var_info[] = {
 
     // @Param: FLARE_HGT
     // @DisplayName: Flare holdoff height
-    // @Description: When height above ground is below this, the sink rate will be held at TECS_LAND_SINK. Use this to perform a hold-of manoeuvre when combined with small values for TECS_LAND_SINK.
-    // @Range: -10 15
-    // @Units: deg
-    // @Increment: 1
+    // @Description: When height above ground is below this, the sink rate will be held at TECS_LAND_SINK. Use this to perform a hold-off manoeuvre when combined with small values for TECS_LAND_SINK.
+    // @Range: 0 15
+    // @Units: m
     // @User: Advanced
     AP_GROUPINFO("FLARE_HGT", 32, AP_TECS, _flare_holdoff_hgt, 1.0f),
 
@@ -391,7 +390,7 @@ void AP_TECS::_update_speed(float DT)
         _vel_dot_lpf = _vel_dot_lpf * (1.0f - alpha) + _vel_dot * alpha;
     }
 
-    bool use_airspeed = _use_synthetic_airspeed_once || _use_synthetic_airspeed.get() || _ahrs.airspeed_sensor_enabled();
+    bool use_airspeed = _use_synthetic_airspeed_once || _use_synthetic_airspeed.get() || _ahrs.using_airspeed_sensor();
 
     // Convert equivalent airspeeds to true airspeeds and harmonise limits
 
@@ -471,11 +470,19 @@ void AP_TECS::_update_speed_demand(void)
     // Constrain speed demand, taking into account the load factor
     _TAS_dem = constrain_float(_TAS_dem, _TASmin, _TASmax);
 
+    // Determine the true cruising airspeed (m/s)
+    const float TAScruise = 0.01f * (float)aparm.airspeed_cruise_cm * _ahrs.get_EAS2TAS();
+
     // calculate velocity rate limits based on physical performance limits
     // provision to use a different rate limit if bad descent or underspeed condition exists
-    // Use 50% of maximum energy rate to allow margin for total energy contgroller
+    // Use 50% of maximum energy rate on gain, 90% on dissipation to allow margin for total energy controller
     const float velRateMax = 0.5f * _STEdot_max / _TAS_state;
-    const float velRateMin = 0.5f * _STEdot_min / _TAS_state;
+    // Maximum permissible rate of deceleration value at max airspeed
+    const float velRateNegMax = 0.9f * _STEdot_neg_max / _TASmax;
+    // Maximum permissible rate of deceleration value at cruise speed
+    const float velRateNegCruise = 0.9f * _STEdot_min / TAScruise;
+    // Linear interpolation between velocity rate at cruise and max speeds, capped at those speeds
+    const float velRateMin = linear_interpolate(velRateNegMax, velRateNegCruise, _TAS_state, _TASmax, TAScruise);
     const float TAS_dem_previous = _TAS_dem_adj;
 
     // Apply rate limit
@@ -924,7 +931,7 @@ void AP_TECS::_update_pitch(void)
     // A SKE_weighting of 2 provides 100% priority to speed control. This is used when an underspeed condition is detected. In this instance, if airspeed
     // rises above the demanded value, the pitch angle will be increased by the TECS controller.
     _SKE_weighting = constrain_float(_spdWeight, 0.0f, 2.0f);
-    if (!(_ahrs.airspeed_sensor_enabled() || _use_synthetic_airspeed)) {
+    if (!(_ahrs.using_airspeed_sensor() || _use_synthetic_airspeed)) {
         _SKE_weighting = 0.0f;
     } else if (_flight_stage == AP_FixedWing::FlightStage::VTOL) {
         // if we are in VTOL mode then control pitch without regard to
@@ -1051,10 +1058,30 @@ void AP_TECS::_update_pitch(void)
     _last_pitch_dem = _pitch_dem;
 
     if (AP::logger().should_log(_log_bitmask)){
-        AP::logger().WriteStreaming("TEC2","TimeUS,PEW,EBD,EBE,EBDD,EBDE,EBDDT,Imin,Imax,I,KI,pmin,pmax",
-                                    "Qffffffffffff",
+        // log to AP_Logger
+        // @LoggerMessage: TEC2
+        // @Vehicles: Plane
+        // @Description: Additional information about the Total Energy Control System
+        // @URL: http://ardupilot.org/plane/docs/tecs-total-energy-control-system-for-speed-height-tuning-guide.html
+        // @Field: TimeUS: Time since system startup
+        // @Field: PEW: Potential energy weighting
+        // @Field: KEW: Kinetic energy weighting
+        // @Field: EBD: Energy balance demand
+        // @Field: EBE: Energy balance error
+        // @Field: EBDD: Energy balance rate demand
+        // @Field: EBDE: Energy balance rate error
+        // @Field: EBDDT: Energy balance rate demand + Energy balance rate error*pitch_damping
+        // @Field: Imin: Minimum integrator value
+        // @Field: Imax: Maximum integrator value
+        // @Field: I: Energy balance error integral
+        // @Field: KI: Pitch demand kinetic energy integral
+        // @Field: pmin: Pitch min
+        // @Field: pmax: Pitch max
+        AP::logger().WriteStreaming("TEC2","TimeUS,PEW,KEW,EBD,EBE,EBDD,EBDE,EBDDT,Imin,Imax,I,KI,pmin,pmax",
+                                    "Qfffffffffffff",
                                     AP_HAL::micros64(),
                                     (double)SPE_weighting,
+                                    (double)_SKE_weighting,
                                     (double)SEB_dem,
                                     (double)SEB_est,
                                     (double)SEBdot_dem,
@@ -1144,10 +1171,12 @@ void AP_TECS::_initialise_states(int32_t ptchMinCO_cd, float hgt_afe)
 
 void AP_TECS::_update_STE_rate_lim(void)
 {
-    // Calculate Specific Total Energy Rate Limits
+    // Calculate Specific Total Energy Rate Limits & deceleration rate bounds
+	// Keep the 50% energy margin from the original velRate calculation for now
     // This is a trivial calculation at the moment but will get bigger once we start adding altitude effects
     _STEdot_max = _climb_rate_limit * GRAVITY_MSS;
     _STEdot_min = - _minSinkRate * GRAVITY_MSS;
+    _STEdot_neg_max = - _maxSinkRate * GRAVITY_MSS;
 }
 
 
@@ -1327,7 +1356,7 @@ void AP_TECS::update_pitch_throttle(int32_t hgt_dem_cm,
     // Note that caller can demand the use of
     // synthetic airspeed for one loop if needed. This is required
     // during QuadPlane transition when pitch is constrained
-    if (_ahrs.airspeed_sensor_enabled() || _use_synthetic_airspeed || _use_synthetic_airspeed_once) {
+    if (_ahrs.using_airspeed_sensor() || _use_synthetic_airspeed || _use_synthetic_airspeed_once) {
         _update_throttle_with_airspeed();
         _use_synthetic_airspeed_once = false;
         _using_airspeed_for_throttle = true;

@@ -6,21 +6,21 @@
 #include <AP_Common/AP_Common.h>
 #include <AP_Param/AP_Param.h>
 #include <AP_AHRS/AP_AHRS_View.h>
-#include <AC_AttitudeControl/AC_AttitudeControl_Multi.h>
+#include <AC_AttitudeControl/AC_AttitudeControl.h>
 #include <AP_Motors/AP_MotorsMulticopter.h>
 #include <AP_Logger/AP_Logger.h>
 
 #if AP_CUSTOMCONTROL_ENABLED
 
 #ifndef CUSTOMCONTROL_MAX_TYPES
-#define CUSTOMCONTROL_MAX_TYPES 2
+#define CUSTOMCONTROL_MAX_TYPES 3
 #endif
 
 class AC_CustomControl_Backend;
 
 class AC_CustomControl {
 public:
-    AC_CustomControl(AP_AHRS_View*& ahrs, AC_AttitudeControl_Multi*& _att_control, AP_MotorsMulticopter*& motors, float dt);
+    AC_CustomControl(AP_AHRS_View*& ahrs, AC_AttitudeControl*& _att_control, AP_MotorsMulticopter*& motors, float dt);
 
     CLASS_NO_COPY(AC_CustomControl);  /* Do not allow copies */
 
@@ -32,7 +32,10 @@ public:
     bool is_safe_to_run(void);
     void log_switch(void);
 
-    // zero index controller type param, only use it to acces _backend or _backend_var_info array
+    // set the PID notch sample rates
+    void set_notch_sample_rate(float sample_rate);
+
+    // zero index controller type param, only use it to access _backend or _backend_var_info array
     uint8_t get_type() { return _controller_type > 0 ? (_controller_type - 1) : 0; };
 
     // User settable parameters
@@ -45,6 +48,7 @@ protected:
         CONT_NONE            = 0,
         CONT_EMPTY           = 1,
         CONT_PID             = 2,
+        CONT_Simulink        = 3,
     };            // controller that should be used     
 
     enum class  CustomControlOption {
@@ -59,7 +63,7 @@ protected:
 
     // References to external libraries
     AP_AHRS_View*& _ahrs;
-    AC_AttitudeControl_Multi*& _att_control;
+    AC_AttitudeControl*& _att_control;
     AP_MotorsMulticopter*& _motors;
 
     AP_Enum<CustomControlType> _controller_type;

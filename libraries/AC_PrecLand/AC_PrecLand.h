@@ -1,7 +1,11 @@
 #pragma once
 
-#include <AP_Math/AP_Math.h>
+#include "AC_PrecLand_config.h"
+
+#if AC_PRECLAND_ENABLED
+
 #include <GCS_MAVLink/GCS_MAVLink.h>
+#include <AP_Math/AP_Math.h>
 #include <stdint.h>
 #include "PosVelEKF.h"
 #include <AP_HAL/utility/RingBuffer.h>
@@ -110,6 +114,7 @@ public:
     AC_PrecLand_StateMachine::RetryAction get_retry_behaviour() const { return static_cast<AC_PrecLand_StateMachine::RetryAction>(_retry_behave.get()); }
 
     bool allow_precland_after_reposition() const { return _options & PLND_OPTION_PRECLAND_AFTER_REPOSITION; }
+    bool do_fast_descend() const { return _options & PLND_OPTION_FAST_DESCEND; }
 
     // parameter var table
     static const struct AP_Param::GroupInfo var_info[];
@@ -123,16 +128,25 @@ private:
     // types of precision landing (used for PRECLAND_TYPE parameter)
     enum class Type : uint8_t {
         NONE = 0,
+#if AC_PRECLAND_COMPANION_ENABLED
         COMPANION = 1,
+#endif
+#if AC_PRECLAND_IRLOCK_ENABLED
         IRLOCK = 2,
+#endif
+#if AC_PRECLAND_SITL_GAZEBO_ENABLED
         SITL_GAZEBO = 3,
+#endif
+#if AC_PRECLAND_SITL_ENABLED
         SITL = 4,
+#endif
     };
 
     enum PLndOptions {
         PLND_OPTION_DISABLED = 0,
         PLND_OPTION_MOVING_TARGET = (1 << 0),
         PLND_OPTION_PRECLAND_AFTER_REPOSITION = (1 << 1),
+        PLND_OPTION_FAST_DESCEND = (1 << 2),
     };
 
     // check the status of the target
@@ -174,7 +188,7 @@ private:
     AP_Float                    _xy_max_dist_desc;  // Vehicle doing prec land will only descent vertically when horizontal error (in m) is below this limit
     AP_Int8                     _strict;            // PrecLand strictness
     AP_Int8                     _retry_max;         // PrecLand Maximum number of retires to a failed landing
-    AP_Float                    _retry_timeout_sec; // Time for which vehicle continues descend even if target is lost. After this time period, vehicle will attemp a landing retry depending on PLND_STRICT param.
+    AP_Float                    _retry_timeout_sec; // Time for which vehicle continues descend even if target is lost. After this time period, vehicle will attempt a landing retry depending on PLND_STRICT param.
     AP_Int8                     _retry_behave;      // Action to do when trying a landing retry
     AP_Float                    _sensor_min_alt;     // PrecLand minimum height required for detecting target
     AP_Float                    _sensor_max_alt;     // PrecLand maximum height the sensor can detect target
@@ -231,3 +245,5 @@ private:
 namespace AP {
     AC_PrecLand *ac_precland();
 };
+
+#endif // AC_PRECLAND_ENABLED

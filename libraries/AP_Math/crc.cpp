@@ -19,6 +19,8 @@
 #include <stdint.h>
 #include "crc.h"
 
+#include <AP_HAL/AP_HAL_Boards.h>
+
 /**
  * crc4 method from datasheet for 16 bytes (8 short values)
  * 
@@ -88,6 +90,16 @@ uint8_t crc_crc8(const uint8_t *p, uint8_t len)
 	}
 
 	return crc & 0xFF;
+}
+
+// CRC8 that does not use a lookup table: for generic polynomials
+uint8_t crc8_generic(const uint8_t *buf, const uint16_t buf_len, const uint8_t polynomial)
+{
+    uint8_t crc = 0;
+    for (uint16_t i = 0; i < buf_len; i++) {
+        crc = crc8_dvb(buf[i], crc, polynomial);
+    }
+    return crc;
 }
 
 // crc8 from betaflight
@@ -372,6 +384,26 @@ uint16_t crc16_ccitt(const uint8_t *buf, uint32_t len, uint16_t crc)
     return crc;
 }
 
+// CRC16_CCITT algorithm using right shift
+uint16_t crc16_ccitt_r(const uint8_t *buf, uint32_t len, uint16_t crc, uint16_t out)
+{
+	for (uint32_t i = 0; i < len; i++) {
+		crc ^= *buf++;                      // XOR byte into least sig. byte of crc
+		for (uint8_t j = 0; j < 8; j++) {   // loop over each bit
+            if ((crc & 0x0001) != 0) {      // if the LSB is set
+                crc >>= 1;                  // shift right and XOR 0x8408
+                crc ^= 0x8408;
+            } else {
+                crc >>= 1;                  // just shift right
+            }
+		}
+	}
+
+    // output xor
+    crc = crc ^ out;
+	return crc;
+}
+
 uint16_t crc16_ccitt_GDL90(const uint8_t *buf, uint32_t len, uint16_t crc)
 {
     for (uint32_t i = 0; i < len; i++) {
@@ -387,7 +419,7 @@ uint16_t crc16_ccitt_GDL90(const uint8_t *buf, uint32_t len, uint16_t crc)
  * @param [in] len size of buffer
  * @return CRC value
  */
-uint16_t calc_crc_modbus(uint8_t *buf, uint16_t len)
+uint16_t calc_crc_modbus(const uint8_t *buf, uint16_t len)
 {
     uint16_t crc = 0xFFFF;
     for (uint16_t pos = 0; pos < len; pos++) {
@@ -403,6 +435,18 @@ uint16_t calc_crc_modbus(uint8_t *buf, uint16_t len)
         }
     }
     return crc;
+}
+
+// fletcher 16 implementation
+uint16_t crc_fletcher16(const uint8_t *buffer, uint32_t len) {
+    uint16_t c0 = 0;
+    uint16_t c1 = 0;
+    for (uint32_t i = 0; i < len; i++) {
+        c0 = (c0 + buffer[i]) % 255;
+        c1 = (c1 + c0) % 255;
+    }
+
+    return (c1 << 8) | c0;
 }
 
 // FNV-1a implementation
@@ -437,7 +481,7 @@ uint32_t crc_crc24(const uint8_t *bytes, uint16_t len)
 }
 
 // simple 8 bit checksum used by FPort
-uint8_t crc_sum8(const uint8_t *p, uint8_t len)
+uint8_t crc_sum8_with_carry(const uint8_t *p, uint8_t len)
 {
     uint16_t sum = 0;
     for (uint8_t i=0; i<len; i++) {
@@ -526,4 +570,48 @@ uint64_t crc_crc64(const uint32_t *data, uint16_t num_words)
     crc ^= ~(0ULL);
 
     return crc;
+}
+
+// return the parity of byte - "1" if there is an odd number of bits
+// set, "0" if there is an even number of bits set note that
+// __builtin_parity causes hardfaults on Pixracer-periph - and is
+// slower on 1 byte than this:
+uint8_t parity(uint8_t byte)
+{
+    uint8_t p = 0;
+
+    p ^= byte & 0x1;
+    byte >>= 1;
+    p ^= byte & 0x1;
+    byte >>= 1;
+    p ^= byte & 0x1;
+    byte >>= 1;
+    p ^= byte & 0x1;
+    byte >>= 1;
+    p ^= byte & 0x1;
+    byte >>= 1;
+    p ^= byte & 0x1;
+    byte >>= 1;
+    p ^= byte & 0x1;
+    byte >>= 1;
+    p ^= byte & 0x1;
+
+    return p;
+}
+
+// sums the bytes in the supplied buffer, returns that sum mod 0xFFFF
+uint16_t crc_sum_of_bytes_16(const uint8_t *data, uint16_t count)
+{
+    uint16_t ret = 0;
+    for (uint32_t i=0; i<count; i++) {
+        ret += data[i];
+    }
+    return ret;
+}
+
+// sums the bytes in the supplied buffer, returns that sum mod 256
+// (i.e. shoved into a uint8_t)
+uint8_t crc_sum_of_bytes(const uint8_t *data, uint16_t count)
+{
+    return crc_sum_of_bytes_16(data, count) & 0xFF;
 }

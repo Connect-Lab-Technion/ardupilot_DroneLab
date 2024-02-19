@@ -94,7 +94,7 @@ const AP_Param::GroupInfo AC_WPNav::var_info[] = {
 
     // @Param: ACCEL_C
     // @DisplayName: Waypoint Cornering Acceleration
-    // @Description: Defines the maximum cornering acceleration in cm/s/s used during missions, zero uses max lean angle.
+    // @Description: Defines the maximum cornering acceleration in cm/s/s used during missions.  If zero uses 2x accel value.
     // @Units: cm/s/s
     // @Range: 0 500
     // @Increment: 10
@@ -350,6 +350,7 @@ bool AC_WPNav::set_wp_destination(const Vector3f& destination, bool terrain_alt)
 
     _this_leg_is_spline = false;
     _scurve_next_leg.init();
+    _next_destination.zero();       // clear next destination
     _flags.fast_waypoint = false;   // default waypoint back to slow
     _flags.reached_destination = false;
 
@@ -379,6 +380,9 @@ bool AC_WPNav::set_wp_destination_next(const Vector3f& destination, bool terrain
 
     // next destination provided so fast waypoint
     _flags.fast_waypoint = true;
+
+    // record next destination
+    _next_destination = destination;
 
     return true;
 }
@@ -482,7 +486,7 @@ bool AC_WPNav::advance_wp_target_along_track(float dt)
     }
 
     // Use vel_scaler_dt to slow down the trajectory time
-    // vel_scaler_dt scales the velocity and acceleration to be kinematically constent
+    // vel_scaler_dt scales the velocity and acceleration to be kinematically consistent
     float vel_scaler_dt = 1.0;
     if (is_positive(_wp_desired_speed_xy_cms)) {
         update_vel_accel(_offset_vel, _offset_accel, dt, 0.0, 0.0);
@@ -587,8 +591,6 @@ int32_t AC_WPNav::get_wp_bearing_to_destination() const
 /// update_wpnav - run the wp controller - should be called at 100hz or higher
 bool AC_WPNav::update_wpnav()
 {
-    bool ret = true;
-
     // check for changes in speed parameter values
     if (_check_wp_speed_change) {
         if (!is_equal(_wp_speed_cms.get(), _last_wp_speed_cms)) {
@@ -606,6 +608,7 @@ bool AC_WPNav::update_wpnav()
     }
 
     // advance the target if necessary
+    bool ret = true;
     if (!advance_wp_target_along_track(_pos_control.get_dt())) {
         // To-Do: handle inability to advance along track (probably because of missing terrain data)
         ret = false;
@@ -622,6 +625,29 @@ bool AC_WPNav::update_wpnav()
 bool AC_WPNav::is_active() const
 {
     return (AP_HAL::millis() - _wp_last_update) < 200;
+}
+
+// force stopping at next waypoint.  Used by Dijkstra's object avoidance when path from destination to next destination is not clear
+// only affects regular (e.g. non-spline) waypoints
+// returns true if this had any affect on the path
+bool AC_WPNav::force_stop_at_next_wp()
+{
+    // exit immediately if vehicle was going to stop anyway
+    if (!_flags.fast_waypoint) {
+        return false;
+    }
+
+    _flags.fast_waypoint = false;
+
+    // update this_leg's final velocity and next leg's initial velocity to zero
+    if (!_this_leg_is_spline) {
+        _scurve_this_leg.set_destination_speed_max(0);
+    }
+    if (!_next_leg_is_spline) {
+        _scurve_next_leg.init();
+    }
+
+    return true;
 }
 
 // get terrain's altitude (in cm above the ekf origin) at the current position (+ve means terrain below vehicle is above ekf origin's altitude)

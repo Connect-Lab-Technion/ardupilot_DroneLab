@@ -1,3 +1,17 @@
+# ArduPilot Project - Controls Lab Extension 
+This repo was forked from the ardupilt source code for a simulink based controls lab. 
+
+Students should use the `./Simulink/` directory for their projects. The project folder, simulink head, and matlab head should follow the example naming patterns: `project/project_model.slx` and `project/project_variables.m` 
+
+Development is underway for a wrapper following the instructor's controller design.
+
+## Environment setup: 
+Follow the instructions in [this link](https://ardupilot.org/dev/docs/building-the-code.html), but use this git repo instead on the default ardupilot one. 
+``` bash
+git clone --recurse-submodules https://github.com/Connect-Lab-Technion/ardupilot_DroneLab/
+```
+
+Now starts the Ardupilot source code README:
 # ArduPilot Project
 
 <a href="https://ardupilot.org/discord"><img src="https://img.shields.io/discord/674039678562861068.svg" alt="Discord">
@@ -77,7 +91,7 @@ It is continually being expanded to provide support for new emerging vehicle typ
 The ArduPilot project is licensed under the GNU General Public
 License, version 3.
 
-- [Overview of license](https://dev.ardupilot.com/wiki/license-gplv3)
+- [Overview of license](https://ardupilot.org/dev/docs/license-gplv3.html)
 
 - [Full Text](https://github.com/ArduPilot/ardupilot/blob/master/COPYING.txt)
 
