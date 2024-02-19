@@ -12,6 +12,8 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <GCS_MAVLink/GCS.h>
+GCS &gcs();
 
 #include "AP_OpticalFlow_MAV.h"
 
@@ -44,6 +46,7 @@ void AP_OpticalFlow_MAV::update(void)
 
     // return without updating state if no readings
     if (count == 0) {
+        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "NO READINGS");
         return;
     }
 
@@ -77,6 +80,7 @@ void AP_OpticalFlow_MAV::update(void)
     }
 
     _update_frontend(state);
+    GCS_SEND_TEXT(MAV_SEVERITY_INFO, "%f , %f", state.flowRate.x, state.flowRate.y);
 
     // reset local buffers
     flow_sum.zero();

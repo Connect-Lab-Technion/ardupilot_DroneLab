@@ -151,6 +151,8 @@ void AP_OpticalFlow::init(uint32_t log_bit)
     case Type::MAVLINK:
 #if AP_OPTICALFLOW_MAV_ENABLED
         backend = AP_OpticalFlow_MAV::detect(*this);
+        gcs().send_text(MAV_SEVERITY_INFO, "AP_OPTICALFLOW_MAV_ENABLED");
+
 #endif
         break;
     case Type::UAVCAN:
@@ -215,10 +217,12 @@ void AP_OpticalFlow::handle_msg(const mavlink_message_t &msg)
 {
     // exit immediately if not enabled
     if (!enabled()) {
+        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "HANDLE_MSG CALLED BUT NOT ENABLED");
         return;
     }
 
     if (backend != nullptr) {
+        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "HANDLE_MSG CALLED");
         backend->handle_msg(msg);
     }
 }
@@ -282,6 +286,7 @@ void AP_OpticalFlow::update_state(const OpticalFlow_state &state)
 #if HAL_LOGGING_ENABLED
 void AP_OpticalFlow::Log_Write_Optflow()
 {
+    gcs().send_text(MAV_SEVERITY_INFO, "Opticalflow WITHIN LOGGER");
     AP_Logger *logger = AP_Logger::get_singleton();
     if (logger == nullptr) {
         return;
