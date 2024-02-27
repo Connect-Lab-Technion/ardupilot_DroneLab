@@ -225,6 +225,7 @@ public:
     friend class ModeZigZag;
     friend class ModeAutorotate;
     friend class ModeTurtle;
+    friend class ModeLab;   // custom mode for lab course 
 
     Copter(void);
 

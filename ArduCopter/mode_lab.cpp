@@ -23,7 +23,6 @@ bool ModeLab::init(bool ignore_checks)
     return true;
 }
 
-#include <sstream>
 #include <AP_Common/AP_Common.h>
 
 // lab_run - runs the lab controller
