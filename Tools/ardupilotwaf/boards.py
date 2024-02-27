@@ -147,7 +147,6 @@ class Board:
                 MODE_LAB_ENABLED=1,
             )
             env.AP_LIBRARIES += [
-                'AC_ControlLab',
                 'AC_Simulink'
             ]
             cfg.msg("Enabled lab controller", 'yes')
