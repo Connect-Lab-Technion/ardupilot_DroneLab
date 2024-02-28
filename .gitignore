@@ -153,4 +153,4 @@ build.tmp.binaries/
 tasklist.json
 modules/esp_idf
 
-/libraries/AC_Simulink*
+/libraries/AC_Simulink_*
