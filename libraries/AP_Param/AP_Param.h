@@ -27,6 +27,7 @@
 #include <AP_HAL/AP_HAL.h>
 #include <AP_HAL/utility/RingBuffer.h>
 #include <StorageManager/StorageManager.h>
+#include <AP_Scripting/AP_Scripting_config.h>
 
 #include "float.h"
 
@@ -53,7 +54,9 @@
 #endif
 
 // allow for dynamically added tables when scripting enabled
+#ifndef AP_PARAM_DYNAMIC_ENABLED
 #define AP_PARAM_DYNAMIC_ENABLED AP_SCRIPTING_ENABLED
+#endif
 
 // maximum number of dynamically created tables (from scripts)
 #ifndef AP_PARAM_MAX_DYNAMIC

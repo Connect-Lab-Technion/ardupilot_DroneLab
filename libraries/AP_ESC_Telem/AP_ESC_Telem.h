@@ -32,6 +32,11 @@ public:
     // get an individual ESC's raw rpm if available
     bool get_raw_rpm(uint8_t esc_index, float& rpm) const;
 
+    // get raw telemetry data, used by IOMCU
+    const volatile AP_ESC_Telem_Backend::TelemetryData& get_telem_data(uint8_t esc_index) const {
+        return _telem_data[esc_index];
+    }
+
     // return the average motor RPM
     float get_average_motor_rpm(uint32_t servo_channel_mask) const;
 
@@ -39,7 +44,7 @@ public:
     float get_average_motor_rpm() const { return get_average_motor_rpm(0xFFFFFFFF); }
 
     // determine whether all the motors in servo_channel_mask are running
-    bool are_motors_running(uint32_t servo_channel_mask, float min_rpm) const;
+    bool are_motors_running(uint32_t servo_channel_mask, float min_rpm, float max_rpm) const;
 
     // get an individual ESC's temperature in centi-degrees if available, returns true on success
     bool get_temperature(uint8_t esc_index, int16_t& temp) const;
@@ -87,7 +92,7 @@ public:
     // send telemetry data to mavlink
     void send_esc_telemetry_mavlink(uint8_t mav_chan);
 
-    // udpate at 10Hz to log telemetry
+    // update at 10Hz to log telemetry
     void update();
 
     // is rpm telemetry configured for the provided channel mask
@@ -108,6 +113,10 @@ public:
 #endif
 
 private:
+
+    // helper that validates RPM data
+    static bool rpm_data_within_timeout (const volatile AP_ESC_Telem_Backend::RpmData &instance, const uint32_t now_us, const uint32_t timeout_us);
+    static bool was_rpm_data_ever_reported (const volatile AP_ESC_Telem_Backend::RpmData &instance);
 
     // rpm data
     volatile AP_ESC_Telem_Backend::RpmData _rpm_data[ESC_TELEM_MAX_ESCS];
@@ -136,4 +145,3 @@ namespace AP {
 };
 
 #endif // HAL_WITH_ESC_TELEM
-

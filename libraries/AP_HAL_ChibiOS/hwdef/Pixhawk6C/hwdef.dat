@@ -36,9 +36,6 @@ env OPTIMIZE -O2
 # order of UARTs (and USB)
 SERIAL_ORDER OTG1 UART7 UART5 USART1 UART8 USART2 USART3 OTG2
 
-# default the 2nd interface to MAVLink2
-define HAL_OTG2_PROTOCOL SerialProtocol_MAVLink2
-
 # USB
 PA11 OTG_FS_DM OTG1
 PA12 OTG_FS_DP OTG1
@@ -153,8 +150,6 @@ define HAL_I2C_INTERNAL_MASK 1
 # this board is tight on DMA channels. To allow for more UART DMA we
 # disable DMA on I2C. This also prevents a problem with DMA on I2C
 # interfering with IMUs
-NODMA I2C*
-define STM32_I2C_USE_DMA FALSE
 
 # heater
 PB9 HEATER_EN OUTPUT LOW GPIO(80)
@@ -244,6 +239,9 @@ SPIDEV ramtron  SPI2 DEVID1  FRAM_CS      MODE3  8*MHZ  8*MHZ
 # 2 IMUs
 IMU Invensensev3 SPI:icm42688 ROTATION_PITCH_180_YAW_90
 IMU BMI055 SPI:bmi055_a SPI:bmi055_g ROTATION_PITCH_180
+# BMI055 is replaced by BMI088 on the lastest hardware revision
+# They use the same CPU signal pins
+IMU BMI088 SPI:bmi055_a SPI:bmi055_g ROTATION_PITCH_180
 
 define HAL_DEFAULT_INS_FAST_SAMPLE 3
 
@@ -259,7 +257,7 @@ DMA_PRIORITY SDMMC* USART6* ADC* UART* USART* SPI* TIM*
 # enable FAT filesystem support (needs a microSD defined via SDMMC)
 define HAL_OS_FATFS_IO 1
 
-define HAL_BOARD_LOG_DIRECTORY "/APM/LOGS"
-define HAL_BOARD_TERRAIN_DIRECTORY "/APM/TERRAIN"
-
-ROMFS io_firmware.bin Tools/IO_Firmware/iofirmware_lowpolh.bin
+ROMFS io_firmware.bin Tools/IO_Firmware/iofirmware_f103_lowpolh.bin
+# enable support for dshot on iomcu
+ROMFS io_firmware_dshot.bin Tools/IO_Firmware/iofirmware_f103_dshot_lowpolh.bin
+define HAL_WITH_IO_MCU_BIDIR_DSHOT 1

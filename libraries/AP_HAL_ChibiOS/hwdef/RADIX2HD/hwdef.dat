@@ -12,9 +12,6 @@ OSCILLATOR_HZ 16000000
 
 MCU_CLOCKRATE_MHZ 480
 
-# Use custom divider so we get 80 MHz clock for FDCAN
-define STM32_PLL1_DIVQ_VALUE 12
-
 env OPTIMIZE -O2
 
 define HAL_WITH_EKF_DOUBLE 0
@@ -172,8 +169,6 @@ define HAL_I2C_INTERNAL_MASK 0
 
 # filesystem setup on sdcard
 define HAL_OS_FATFS_IO 1
-define HAL_BOARD_LOG_DIRECTORY "/APM/LOGS"
-define HAL_BOARD_TERRAIN_DIRECTORY "/APM/TERRAIN"
 
 define STM32_PWM_USE_ADVANCED TRUE
 

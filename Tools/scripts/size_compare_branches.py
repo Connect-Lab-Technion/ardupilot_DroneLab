@@ -152,7 +152,9 @@ class SizeCompareBranches(object):
             'fmuv2',
             'fmuv3-bdshot',
             'iomcu',
-            'iomcu',
+            'iomcu-dshot',
+            'iomcu-f103',
+            'iomcu-f103-dshot',
             'iomcu_f103_8MHz',
             'luminousbee4',
             'skyviper-v2450',
@@ -162,6 +164,7 @@ class SizeCompareBranches(object):
             'Pixhawk1-bdshot',
             'SITL_arm_linux_gnueabihf',
             'RADIX2HD',
+            'canzero',
         ])
 
         # blacklist all linux boards for bootloader build:
@@ -195,6 +198,7 @@ class SizeCompareBranches(object):
             'rst_zynq',
             'obal',
             'SITL_x86_64_linux_gnu',
+            'canzero',
         ]
 
     def esp32_board_names(self):
@@ -204,6 +208,7 @@ class SizeCompareBranches(object):
             'esp32tomte76',
             'esp32nick',
             'esp32s3devkit',
+            'esp32s3empty',
             'esp32icarous',
             'esp32diy',
         ]

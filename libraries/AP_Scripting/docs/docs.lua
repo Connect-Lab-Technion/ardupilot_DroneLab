@@ -9,6 +9,7 @@
 
 -- set and get for field types share function names
 ---@diagnostic disable: duplicate-set-field
+---@diagnostic disable: missing-return
 
 -- manual bindings
 
@@ -44,6 +45,11 @@ function micros() end
 ---@return number|nil -- command param 4
 function mission_receive() end
 
+-- Print text, if MAVLink is available the value will be sent with debug severity
+-- If no MAVLink the value will be sent over can
+-- equivalent to gcs:send_text(7, text) or periph:can_printf(text)
+---@param text string|number|integer
+function print(text) end
 
 -- data flash logging to SD card
 ---@class logger
@@ -81,41 +87,85 @@ local EFI_State_ud = {}
 ---@return EFI_State_ud
 function EFI_State() end
 
+-- get field
+---@return number
+function EFI_State_ud:pt_compensation() end
+
 -- set field
 ---@param value number
 function EFI_State_ud:pt_compensation(value) end
+
+-- get field
+---@return number
+function EFI_State_ud:throttle_out() end
 
 -- set field
 ---@param value number
 function EFI_State_ud:throttle_out(value) end
 
+-- get field
+---@return number
+function EFI_State_ud:ignition_voltage() end
+
 -- set field
 ---@param value number
 function EFI_State_ud:ignition_voltage(value) end
+
+-- get field
+---@return Cylinder_Status_ud
+function EFI_State_ud:cylinder_status() end
 
 -- set field
 ---@param value Cylinder_Status_ud
 function EFI_State_ud:cylinder_status(value) end
 
+-- get field
+---@return integer
+function EFI_State_ud:ecu_index() end
+
 -- set field
 ---@param value integer
 function EFI_State_ud:ecu_index(value) end
+
+-- get field
+---@return integer
+function EFI_State_ud:throttle_position_percent() end
 
 -- set field
 ---@param value integer
 function EFI_State_ud:throttle_position_percent(value) end
 
+-- get field
+---@return number
+function EFI_State_ud:estimated_consumed_fuel_volume_cm3() end
+
 -- set field
 ---@param value number
 function EFI_State_ud:estimated_consumed_fuel_volume_cm3(value) end
+
+-- get field
+---@return number
+function EFI_State_ud:fuel_consumption_rate_cm3pm() end
 
 -- set field
 ---@param value number
 function EFI_State_ud:fuel_consumption_rate_cm3pm(value) end
 
+-- get field
+---@return number
+function EFI_State_ud:fuel_pressure() end
+
 -- set field
 ---@param value number
 function EFI_State_ud:fuel_pressure(value) end
+
+-- get field
+---@return integer
+---| '0' # Not supported
+---| '1' # Ok
+---| '2' # Below nominal
+---| '3' # Above nominal
+function EFI_State_ud:fuel_pressure_status() end
 
 -- set field
 ---@param status integer
@@ -125,45 +175,89 @@ function EFI_State_ud:fuel_pressure(value) end
 ---| '3' # Above nominal
 function EFI_State_ud:fuel_pressure_status(status) end
 
+-- get field
+---@return number
+function EFI_State_ud:oil_temperature() end
+
 -- set field
 ---@param value number
 function EFI_State_ud:oil_temperature(value) end
+
+-- get field
+---@return number
+function EFI_State_ud:oil_pressure() end
 
 -- set field
 ---@param value number
 function EFI_State_ud:oil_pressure(value) end
 
+-- get field
+---@return number
+function EFI_State_ud:coolant_temperature() end
+
 -- set field
 ---@param value number
 function EFI_State_ud:coolant_temperature(value) end
+
+-- get field
+---@return number
+function EFI_State_ud:intake_manifold_temperature() end
 
 -- set field
 ---@param value number
 function EFI_State_ud:intake_manifold_temperature(value) end
 
+-- get field
+---@return number
+function EFI_State_ud:intake_manifold_pressure_kpa() end
+
 -- set field
 ---@param value number
 function EFI_State_ud:intake_manifold_pressure_kpa(value) end
+
+-- get field
+---@return number
+function EFI_State_ud:atmospheric_pressure_kpa() end
 
 -- set field
 ---@param value number
 function EFI_State_ud:atmospheric_pressure_kpa(value) end
 
+-- get field
+---@return number
+function EFI_State_ud:spark_dwell_time_ms() end
+
 -- set field
 ---@param value number
 function EFI_State_ud:spark_dwell_time_ms(value) end
+
+-- get field
+---@return uint32_t_ud
+function EFI_State_ud:engine_speed_rpm() end
 
 -- set field
 ---@param value uint32_t_ud
 function EFI_State_ud:engine_speed_rpm(value) end
 
+-- get field
+---@return integer
+function EFI_State_ud:engine_load_percent() end
+
 -- set field
 ---@param value integer
 function EFI_State_ud:engine_load_percent(value) end
 
+-- get field
+---@return boolean
+function EFI_State_ud:general_error() end
+
 -- set field
 ---@param value boolean
 function EFI_State_ud:general_error(value) end
+
+-- get field
+---@return uint32_t_ud
+function EFI_State_ud:last_updated_ms() end
 
 -- set field
 ---@param value uint32_t_ud
@@ -177,21 +271,57 @@ local Cylinder_Status_ud = {}
 ---@return Cylinder_Status_ud
 function Cylinder_Status() end
 
+-- get field
+---@return number
+function Cylinder_Status_ud:lambda_coefficient() end
+
 -- set field
 ---@param value number
 function Cylinder_Status_ud:lambda_coefficient(value) end
+
+-- get field
+---@return number
+function Cylinder_Status_ud:exhaust_gas_temperature() end
 
 -- set field
 ---@param value number
 function Cylinder_Status_ud:exhaust_gas_temperature(value) end
 
+-- get field
+---@return number
+function Cylinder_Status_ud:exhaust_gas_temperature2() end
+
+-- set field
+---@param value number
+function Cylinder_Status_ud:exhaust_gas_temperature2(value) end
+
+-- get field
+---@return number
+function Cylinder_Status_ud:cylinder_head_temperature() end
+
 -- set field
 ---@param value number
 function Cylinder_Status_ud:cylinder_head_temperature(value) end
 
+-- get field
+---@return number
+function Cylinder_Status_ud:cylinder_head_temperature2() end
+
+-- set field
+---@param value number
+function Cylinder_Status_ud:cylinder_head_temperature2(value) end
+
+-- get field
+---@return number
+function Cylinder_Status_ud:injection_time_ms() end
+
 -- set field
 ---@param value number
 function Cylinder_Status_ud:injection_time_ms(value) end
+
+-- get field
+---@return number
+function Cylinder_Status_ud:ignition_timing_deg() end
 
 -- set field
 ---@param value number
@@ -200,6 +330,10 @@ function Cylinder_Status_ud:ignition_timing_deg(value) end
 -- desc
 ---@class efi
 efi = {}
+
+-- desc
+---@return EFI_State_ud
+function efi:get_state() end
 
 -- desc
 ---@param instance integer
@@ -318,6 +452,82 @@ function motor_factor_table_ud:roll(index) end
 ---@param value number
 function motor_factor_table_ud:roll(index, value) end
 
+-- network socket class
+---@class SocketAPM_ud
+local SocketAPM_ud = {}
+
+-- desc
+function Socket(param1) end
+
+-- return true if a socket is connected
+---@return boolean
+function SocketAPM_ud:is_connected() end
+
+-- set blocking state of socket
+---@param blocking boolean
+---@return boolean
+function SocketAPM_ud:set_blocking(blocking) end
+
+-- setup a socket to listen
+---@param backlog integer
+---@return boolean
+function SocketAPM_ud:listen(backlog) end
+
+-- send a lua string. May contain binary data
+---@param str string
+---@param len uint32_t_ud
+---@return integer
+function SocketAPM_ud:send(str, len) end
+
+-- bind to an address. Use "0.0.0.0" for wildcard bind
+---@param IP_address string
+---@param port integer
+---@return boolean
+function SocketAPM_ud:bind(IP_address, port) end
+
+-- connect a socket to an endpoint
+---@param IP_address string
+---@param port integer
+---@return boolean
+function SocketAPM_ud:connect(IP_address, port) end
+
+--[[ accept new incoming sockets, returning a new socket.
+     Must be used on a stream socket in listen state
+--]]
+function SocketAPM_ud:accept(param1) end
+
+-- receive data from a socket
+---@param length
+---@return data
+function SocketAPM_ud:recv(length) end
+
+-- check for available input
+---@param timeout_ms uint32_t_ud
+---@return boolean
+function SocketAPM_ud:pollin(timeout_ms) end
+
+-- check for availability of space to write to socket
+---@param timeout_ms uint32_t_ud
+---@return boolean
+function SocketAPM_ud:pollout(timeout_ms) end
+
+--[[
+   close a socket. Note that there is no automatic garbage
+   collection of sockets so you must close a socket when you are
+   finished with it or you will run out of sockets
+--]]
+function SocketAPM_ud:close() end
+
+--[[
+   setup to send all remaining data from a filehandle to the socket
+   this also "closes" the socket and the file from the point of view of lua
+   the underlying socket and file are both closed on end of file
+--]]
+function SocketAPM_ud:sendfile(filehandle) end
+
+-- enable SO_REUSEADDR on a socket
+---@return boolean
+function SocketAPM_ud:reuseaddress() end
 
 -- desc
 ---@class AP_HAL__PWMSource_ud
@@ -847,6 +1057,14 @@ local ScriptingCANBuffer_ud = {}
 ---@return CANFrame_ud|nil
 function ScriptingCANBuffer_ud:read_frame() end
 
+-- Add a filter to the CAN buffer, mask is bitwise ANDed with the frame id and compared to value if not match frame is not buffered
+-- By default no filters are added and all frames are buffered, write is not affected by filters
+-- Maximum number of filters is 8
+---@param mask uint32_t_ud
+---@param value uint32_t_ud
+---@return boolean -- returns true if the filler was added successfully
+function ScriptingCANBuffer_ud:add_filter(mask, value) end
+
 -- desc
 ---@param frame CANFrame_ud
 ---@param timeout_us uint32_t_ud
@@ -930,6 +1148,14 @@ function AP_HAL__UARTDriver_ud:read() end
 ---@param baud_rate uint32_t_ud
 function AP_HAL__UARTDriver_ud:begin(baud_rate) end
 
+--[[
+  read count bytes from a uart and return as a lua string. Note
+  that the returned string can be shorter than the requested length
+--]]
+---@param count integer
+---@return string|nil
+function AP_HAL__UARTDriver_ud:readstring(count) end
+
 
 -- desc
 ---@class RC_Channel_ud
@@ -979,17 +1205,93 @@ function winch:relax() end
 function winch:healthy() end
 
 -- desc
----@class mount
-mount = {}
+---@class iomcu
+iomcu = {}
+
+-- Check if the IO is healthy
+---@return boolean
+function iomcu:healthy() end
 
 -- desc
----@param param1 integer
----@return integer|nil  -- pic_count
----@return boolean|nil  -- record_video
----@return integer|nil  -- zoom_step
----@return integer|nil  -- focus_step
----@return boolean|nil  -- auto_focus
-function mount:get_camera_state(param1) end
+---@class compass
+compass = {}
+
+-- Check if the compass is healthy
+---@param instance integer -- the 0-based index of the compass instance to return.
+---@return boolean
+function compass:healthy(instance) end
+
+
+-- desc
+---@class camera
+camera = {}
+
+-- desc
+---@param instance integer
+---@param distance_m number
+function camera:set_trigger_distance(instance, distance_m) end
+
+-- desc
+---@param instance integer
+---@param start_recording boolean
+---@return boolean
+function camera:record_video(instance, start_recording) end
+
+-- desc
+---@param instance integer
+function camera:take_picture(instance) end
+
+-- desc
+---@class AP_Camera__camera_state_t_ud
+local AP_Camera__camera_state_t_ud = {}
+
+---@return AP_Camera__camera_state_t_ud
+function AP_Camera__camera_state_t() end
+
+-- get field
+---@return Vector2f_ud
+function AP_Camera__camera_state_t_ud:tracking_p1() end
+
+-- get field
+---@return Vector2f_ud
+function AP_Camera__camera_state_t_ud:tracking_p2() end
+
+-- get field
+---@return integer
+function AP_Camera__camera_state_t_ud:tracking_type() end
+
+-- get field
+---@return number
+function AP_Camera__camera_state_t_ud:focus_value() end
+
+-- get field
+---@return integer
+function AP_Camera__camera_state_t_ud:focus_type() end
+
+-- get field
+---@return number
+function AP_Camera__camera_state_t_ud:zoom_value() end
+
+-- get field
+---@return integer
+function AP_Camera__camera_state_t_ud:zoom_type() end
+
+-- get field
+---@return boolean
+function AP_Camera__camera_state_t_ud:recording_video() end
+
+-- get field
+---@return integer
+function AP_Camera__camera_state_t_ud:take_pic_incr() end
+
+-- desc
+---@param instance integer
+---@return AP_Camera__camera_state_t_ud|nil
+function camera:get_state(instance) end
+
+-- desc
+---@class mount
+mount = {}
 
 -- desc
 ---@param instance integer
@@ -1190,6 +1492,15 @@ ins = {}
 ---@return number
 function ins:get_temperature(instance) end
 
+-- Check if a specific gyrometer sensor is healthy
+---@param instance integer -- the 0-based index of the gyrometer instance to return.
+---@return boolean
+function ins:get_gyro_health(instance) end
+
+-- Check if a specific accelerometer sensor is healthy
+---@param instance integer -- the 0-based index of the accelerometer instance to return.
+---@return boolean
+function ins:get_accel_health(instance) end
 
 -- desc
 ---@class Motors_dynamic
@@ -1338,6 +1649,22 @@ function MotorsMatrix:get_lost_motor() end
 ---@return boolean
 function MotorsMatrix:get_thrust_boost() end
 
+
+-- Sub singleton
+---@class sub
+sub = {}
+
+-- Return true if joystick button is currently pressed
+---@param index integer
+---@return boolean
+function sub:is_button_pressed(index) end
+
+-- Get count of joystick button presses, then clear count
+---@param index integer
+---@return integer
+function sub:get_and_clear_button_count(index) end
+
+
 -- desc
 ---@class quadplane
 quadplane = {}
@@ -1472,6 +1799,14 @@ function mission:get_index_of_jump_tag(tag) end
 function mission:get_last_jump_tag() end
 
 
+-- Jump the mission to the start of the closest landing sequence. Returns true if one was found
+---@return boolean
+function mission:jump_to_landing_sequence() end
+
+-- Jump to the landing abort sequence
+-- @return boolean
+function mission:jump_to_abort_landing_sequence() end
+
 -- desc
 ---@class param
 param = {}
@@ -1521,23 +1856,23 @@ local ESCTelemetryData_ud = {}
 ---@return ESCTelemetryData_ud
 function ESCTelemetryData() end
 
--- set field
+-- set motor temperature
 ---@param value integer
 function ESCTelemetryData_ud:motor_temp_cdeg(value) end
 
--- set field
+-- set consumption
 ---@param value number
 function ESCTelemetryData_ud:consumption_mah(value) end
 
--- set field
+-- set current
 ---@param value number
 function ESCTelemetryData_ud:current(value) end
 
--- set field
+-- set voltage
 ---@param value number
 function ESCTelemetryData_ud:voltage(value) end
 
--- set field
+-- set temperature
 ---@param value integer
 function ESCTelemetryData_ud:temperature_cdeg(value) end
 
@@ -1546,9 +1881,9 @@ function ESCTelemetryData_ud:temperature_cdeg(value) end
 esc_telem = {}
 
 -- update telemetry data for an ESC instance
----@param instance integer
+---@param instance integer -- 0 is first motor
 ---@param telemdata ESCTelemetryData_ud
----@param data_mask integer
+---@param data_mask integer -- bit mask of what fields are filled in
 function esc_telem:update_telem_data(instance, telemdata, data_mask) end
 
 -- desc
@@ -1634,6 +1969,11 @@ function baro:get_pressure() end
 -- of the last calibrate() call, typically at boot
 ---@return number
 function baro:get_altitude() end
+
+-- Check if a baro sensor is healthy
+---@param instance integer -- the 0-based index of the BARO instance to return.
+---@return boolean
+function baro:healthy(instance) end
 
 
 -- desc
@@ -1784,6 +2124,11 @@ function serialLED:set_num_profiled(chan, num_leds) end
 ---@return boolean
 function serialLED:set_num_neopixel(chan, num_leds) end
 
+-- desc
+---@param chan integer
+---@param num_leds integer
+---@return boolean
+function serialLED:set_num_neopixel_rgb(chan, num_leds) end
 
 -- desc
 ---@class vehicle
@@ -1989,6 +2334,18 @@ function vehicle:nav_script_time_done(param1) end
 function vehicle:nav_script_time() end
 
 -- desc
+---@param hold_in_bootloader boolean
+function vehicle:reboot(hold_in_bootloader) end
+
+-- desc
+---@return boolean
+function vehicle:is_taking_off() end
+
+-- desc
+---@return boolean
+function vehicle:is_landing() end
+
+-- desc
 ---@class onvif
 onvif = {}
 
@@ -2087,7 +2444,6 @@ function gcs:get_hud_throttle() end
 
 -- set high latency control state. Analogous to MAV_CMD_CONTROL_HIGH_LATENCY
 ---@param enabled boolean -- true to enable or false to disable
----@return void
 function gcs:enable_high_latency_connections(enabled) end
 
 -- get the the current state of high latency control
@@ -2106,6 +2462,10 @@ function gcs:get_high_latency_status() end
 ---| '7' # Debug: Useful non-operational messages that can assist in debugging. These should not occur during normal operation.
 ---@param text string
 function gcs:send_text(severity, text) end
+
+-- Return the system time when a gcs with id of SYSID_MYGCS was last seen
+---@return uint32_t_ud -- system time in milliseconds
+function gcs:last_seen() end
 
 -- desc
 ---@class relay
@@ -2165,14 +2525,71 @@ function terrain:status() end
 ---@return boolean
 function terrain:enabled() end
 
+
+-- RangeFinder state structure
+---@class RangeFinder_State_ud
+local RangeFinder_State_ud = {}
+
+---@return RangeFinder_State_ud
+function RangeFinder_State() end
+
+-- get system time (ms) of last successful update from sensor
+---@return number
+function RangeFinder_State_ud:last_reading() end
+
+-- set system time (ms) of last successful update from sensor
+---@param value number
+function RangeFinder_State_ud:last_reading(value) end
+
+-- get sensor status
+---@return number
+function RangeFinder_State_ud:status() end
+
+-- set sensor status
+---@param value number
+function RangeFinder_State_ud:status(value) end
+
+-- get number of consecutive valid readings (max out at 10)
+---@return number
+function RangeFinder_State_ud:range_valid_count() end
+
+-- set number of consecutive valid readings (max out at 10)
+---@param value number
+function RangeFinder_State_ud:range_valid_count(value) end
+
+-- get distance in meters
+---@return number
+function RangeFinder_State_ud:distance() end
+
+-- set distance in meters
+---@param value number
+function RangeFinder_State_ud:distance(value) end
+
+-- get measurement quality in percent 0-100, -1 -> quality is unknown
+---@return number
+function RangeFinder_State_ud:signal_quality() end
+
+-- set measurement quality in percent 0-100, -1 -> quality is unknown
+---@param value number
+function RangeFinder_State_ud:signal_quality(value) end
+
+-- get voltage in millivolts, if applicable, otherwise 0
+---@return number
+function RangeFinder_State_ud:voltage() end
+
+-- set voltage in millivolts, if applicable, otherwise 0
+---@param value number
+function RangeFinder_State_ud:voltage(value) end
+
+
 -- RangeFinder backend
 ---@class AP_RangeFinder_Backend_ud
 local AP_RangeFinder_Backend_ud = {}
 
--- Send distance to lua rangefinder backend. Returns false if failed
----@param distance number
+-- Send range finder measurement to lua rangefinder backend. Returns false if failed
+---@param state RangeFinder_State_ud|number
 ---@return boolean
-function AP_RangeFinder_Backend_ud:handle_script_msg(distance) end
+function AP_RangeFinder_Backend_ud:handle_script_msg(state) end
 
 -- Status of this rangefinder instance
 ---@return integer
@@ -2189,6 +2606,15 @@ function AP_RangeFinder_Backend_ud:orientation() end
 -- Current distance of the sensor instance
 ---@return number
 function AP_RangeFinder_Backend_ud:distance() end
+
+-- Current distance measurement signal_quality of the sensor instance
+---@return number
+function AP_RangeFinder_Backend_ud:signal_quality() end
+
+-- State of most recent range finder measurment
+---@return RangeFinder_State_ud
+function AP_RangeFinder_Backend_ud:get_state() end
+
 
 -- desc
 ---@class rangefinder
@@ -2234,6 +2660,11 @@ function rangefinder:max_distance_cm_orient(orientation) end
 ---@return integer
 function rangefinder:distance_cm_orient(orientation) end
 
+-- Current distance measurement signal quality for range finder at this orientation
+---@param orientation integer
+---@return integer
+function rangefinder:signal_quality_pct_orient(orientation) end
+
 -- desc
 ---@param orientation integer
 ---@return boolean
@@ -2243,10 +2674,46 @@ function rangefinder:has_orientation(orientation) end
 ---@return integer
 function rangefinder:num_sensors() end
 
+-- Proximity backend methods
+---@class AP_Proximity_Backend_ud
+local AP_Proximity_Backend_ud = {}
+
+-- Push virtual proximity boundary into actual boundary
+---@return boolean
+function AP_Proximity_Backend_ud:update_virtual_boundary() end
+
+-- Set sensor min and max. Only need to do it once
+---@param min number
+---@param max number
+---@return boolean
+function AP_Proximity_Backend_ud:set_distance_min_max(min, max) end
+
+-- type of backend
+---@return integer
+function AP_Proximity_Backend_ud:type() end
+
+-- send 3d object as 3d vector
+---@param vector_3d Vector3f_ud
+---@param update_boundary boolean
+---@return boolean
+function AP_Proximity_Backend_ud:handle_script_3d_msg(vector_3d, update_boundary) end
+
+-- send 3d object as angles
+---@param dist_m number
+---@param yaw_deg number
+---@param pitch_deg number
+---@param update_boundary boolean
+---@return boolean
+function AP_Proximity_Backend_ud:handle_script_distance_msg(dist_m, yaw_deg, pitch_deg, update_boundary) end
 
 -- desc
 ---@class proximity
 proximity = {}
+
+-- get backend based on proximity instance provided
+---@param instance integer
+---@return AP_Proximity_Backend_ud
+function proximity:get_backend(instance) end
 
 -- desc
 ---@param object_number integer
@@ -2403,10 +2870,63 @@ function gps:primary_sensor() end
 ---@return integer
 function gps:num_sensors() end
 
+-- desc
+---@class BattMonitorScript_State_ud
+local BattMonitorScript_State_ud = {}
+
+---@return BattMonitorScript_State_ud
+function BattMonitorScript_State() end
+
+-- set field
+---@param value number
+function BattMonitorScript_State_ud:temperature(value) end
+
+-- set field
+---@param value number
+function BattMonitorScript_State_ud:consumed_wh(value) end
+
+-- set field
+---@param value number
+function BattMonitorScript_State_ud:consumed_mah(value) end
+
+-- set field
+---@param value number
+function BattMonitorScript_State_ud:current_amps(value) end
+
+-- set field
+---@param value integer
+function BattMonitorScript_State_ud:cycle_count(value) end
+
+-- set array field
+---@param index integer
+---@param value integer
+function BattMonitorScript_State_ud:cell_voltages(index, value) end
+
+-- set field
+---@param value integer
+function BattMonitorScript_State_ud:capacity_remaining_pct(value) end
+
+-- set field
+---@param value integer
+function BattMonitorScript_State_ud:cell_count(value) end
+
+-- set field
+---@param value number
+function BattMonitorScript_State_ud:voltage(value) end
+
+-- set field
+---@param value boolean
+function BattMonitorScript_State_ud:healthy(value) end
 
 -- desc
 ---@class battery
 battery = {}
+
+-- desc
+---@param idx integer
+---@param state BattMonitorScript_State_ud
+---@return boolean
+function battery:handle_scripting(idx, state) end
 
 -- desc
 ---@param instance integer
@@ -2476,6 +2996,12 @@ function battery:healthy(instance) end
 -- desc
 ---@return integer
 function battery:num_instances() end
+
+-- get individual cell voltage
+---@param instance integer
+---@param cell integer
+---@return number|nil
+function battery:get_cell_voltage(instance, cell) end
 
 
 -- desc
@@ -2614,6 +3140,18 @@ function ahrs:groundspeed_vector() end
 ---@return Vector3f_ud
 function ahrs:wind_estimate() end
 
+-- Determine how aligned heading_deg is with the wind. Return result
+-- is 1.0 when perfectly aligned heading into wind, -1 when perfectly
+-- aligned with-wind, and zero when perfect cross-wind. There is no
+-- distinction between a left or right cross-wind. Wind speed is ignored
+---@param heading_deg number
+---@return number
+function ahrs:wind_alignment(heading_deg) end
+
+-- Forward head-wind component in m/s. Negative means tail-wind
+---@return number
+function ahrs:head_wind() end
+
 -- desc
 ---@return number|nil
 function ahrs:get_hagl() end
@@ -2711,10 +3249,121 @@ scripting = {}
 function scripting:restart_all() end
 
 -- desc
---@param directoryname
---@return list of filenames
+---@param directoryname string
+---@return table -- table of filenames
 function dirlist(directoryname) end
 
 --desc
---@param filename
+---@param filename string
 function remove(filename) end
+
+-- desc
+---@class mavlink
+mavlink = {}
+
+-- initializes mavlink
+---@param num_rx_msgid uint32_t_ud|integer
+---@param msg_queue_length uint32_t_ud|integer
+function mavlink:init(num_rx_msgid, msg_queue_length) end
+
+-- marks mavlink message for receive, message id can be get using mavlink_msgs.get_msgid("MSG_NAME")
+---@param msg_id number
+function mavlink:register_rx_msgid(msg_id) end
+
+-- receives mavlink message marked for receive using mavlink:register_rx_msgid
+---@return string -- bytes
+---@return number -- mavlink channel
+---@return uint32_t_ud -- receive_timestamp
+function mavlink:receive_chan() end
+
+-- sends mavlink message, to use this function the call should be like this:
+-- mavlink:send(chan, mavlink_msgs.encode("MSG_NAME", {param1 = value1, param2 = value2, ...}})
+---@param chan integer
+---@param msgid integer
+---@param message string
+function mavlink:send_chan(chan, msgid, message) end
+
+-- Block a given MAV_CMD from being procceced by ArduPilot
+---@param comand_id integer
+function mavlink:block_command(comand_id) end
+
+-- Geofence library
+---@class fence
+fence = {}
+
+-- Returns the time at which the current breach started
+---@return uint32_t_ud system_time milliseconds
+function fence:get_breach_time() end
+
+-- Returns the type bitmask of any breached fences
+---@return integer fence_type bitmask
+---| 1 # Maximim altitude
+---| 2 # Circle
+---| 4 # Polygon
+---| 8 # Minimum altitude
+function fence:get_breaches() end
+
+-- desc
+---@class stat_t_ud
+local stat_t_ud = {}
+
+---@return stat_t_ud
+function stat_t() end
+
+-- get creation time in seconds
+---@return uint32_t_ud
+function stat_t_ud:ctime() end
+
+-- get last access time in seconds
+---@return uint32_t_ud
+function stat_t_ud:atime() end
+
+-- get last modification time in seconds
+---@return uint32_t_ud
+function stat_t_ud:mtime() end
+
+-- get file mode
+---@return integer
+function stat_t_ud:mode() end
+
+-- get file size in bytes
+---@return uint32_t_ud
+function stat_t_ud:size() end
+
+-- return true if this is a directory
+---@return boolean
+function stat_t_ud:is_directory() end
+
+-- desc
+---@class rtc
+rtc = {}
+
+-- return a time since 1970 in seconds from GMT date elements
+---@param year integer -- 20xx
+---@param month integer -- 0-11
+---@param day  integer -- 1-31
+---@param hour  integer -- 0-23
+---@param min integer -- 0-60
+---@param sec integer -- 0-60
+---@return uint32_t_ud
+function rtc:date_fields_to_clock_s(year, month, day, hour, min, sec) end
+
+-- break a time in seconds since 1970 to GMT date elements
+---@param param1 uint32_t_ud
+---@return integer|nil -- year 20xx
+---@return integer|nil -- month 0-11
+---@return integer|nil -- day 1-31
+---@return integer|nil -- hour 0-23
+---@return integer|nil -- min 0-60
+---@return integer|nil -- sec 0-60
+---@return integer|nil -- weekday 0-6, sunday is 0
+function rtc:clock_s_to_date_fields(param1) end
+
+-- desc
+---@class fs
+fs = {}
+
+-- desc
+---@param param1 string
+---@return stat_t_ud|nil
+function fs:stat(param1) end

@@ -88,7 +88,7 @@ bool NavEKF3_core::getHeightControlLimit(float &height) const
 // return the Euler roll, pitch and yaw angle in radians
 void NavEKF3_core::getEulerAngles(Vector3f &euler) const
 {
-    outputDataNew.quat.to_euler(euler.x, euler.y, euler.z);
+    outputDataNew.quat.to_euler(euler);
     euler = euler - dal.get_trim();
 }
 
@@ -236,10 +236,10 @@ bool NavEKF3_core::getPosNE(Vector2f &posNE) const
                 posNE = public_origin.get_distance_NE_ftype(gpsloc).tofloat();
                 return false;
 #if EK3_FEATURE_BEACON_FUSION
-            } else if (rngBcnAlignmentStarted) {
+            } else if (rngBcn.alignmentStarted) {
                 // If we are attempting alignment using range beacon data, then report the position
-                posNE.x = receiverPos.x;
-                posNE.y = receiverPos.y;
+                posNE.x = rngBcn.receiverPos.x;
+                posNE.y = rngBcn.receiverPos.y;
                 return false;
 #endif
             } else {
@@ -621,7 +621,7 @@ void NavEKF3_core::send_status_report(GCS_MAVLINK &link) const
         velVar,
         posVar,
         hgtVar,
-        fmaxF(fmaxF(magVar.x,magVar.y),magVar.z),
+        fmaxf(fmaxf(magVar.x,magVar.y),magVar.z),
         temp,
         flags,
         tasVar

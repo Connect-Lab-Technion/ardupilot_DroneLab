@@ -85,7 +85,7 @@
 #error "Unsupported MCU for FDCAN"
 #endif
 
-extern AP_HAL::HAL& hal;
+extern const AP_HAL::HAL& hal;
 
 #define STR(x) #x
 #define XSTR(x) STR(x)
@@ -397,7 +397,10 @@ int16_t CANIface::send(const AP_HAL::CANFrame& frame, uint64_t tx_deadline,
         pending_tx_[index].pushed         = false;
     }
 
-    return AP_HAL::CANIface::send(frame, tx_deadline, flags);
+    // also send on MAVCAN, but don't consider it an error if we can't get the MAVCAN out
+    AP_HAL::CANIface::send(frame, tx_deadline, flags);
+
+    return 1;
 }
 
 int16_t CANIface::receive(AP_HAL::CANFrame& out_frame, uint64_t& out_timestamp_us, CanIOFlags& out_flags)
@@ -565,7 +568,7 @@ bool CANIface::init(const uint32_t bitrate, const uint32_t fdbitrate, const Oper
     if (can_ifaces[self_index_] == nullptr) {
         can_ifaces[self_index_] = this;
 #if !defined(HAL_BOOTLOADER_BUILD)
-        hal.can[self_index_] = this;
+        AP_HAL::get_HAL_mutable().can[self_index_] = this;
 #endif
     }
 
@@ -718,7 +721,9 @@ bool CANIface::init(const uint32_t bitrate, const uint32_t fdbitrate, const Oper
 #endif
     can_->ILE = 0x3;
 
+#if HAL_CANFD_SUPPORTED
     can_->CCCR |= FDCAN_CCCR_FDOE | FDCAN_CCCR_BRSE; // enable sending CAN FD frames, and Bitrate switching
+#endif
 
     // If mode is Filtered then we finish the initialisation in configureFilter method
     // otherwise we finish here
@@ -791,6 +796,7 @@ void CANIface::handleTxCompleteInterrupt(const uint64_t timestamp_us)
 
             if (!pending_tx_[i].pushed) {
                 stats.tx_success++;
+                stats.last_transmit_us = timestamp_us;
                 if (pending_tx_[i].canfd_frame) {
                     stats.fdf_tx_success++;
                 }
@@ -806,11 +812,9 @@ void CANIface::handleTxCompleteInterrupt(const uint64_t timestamp_us)
                 rx_item.flags = AP_HAL::CANIface::Loopback;
                 add_to_rx_queue(rx_item);
             }
-            if (event_handle_ != nullptr) {
-                stats.num_events++;
-#if CH_CFG_USE_EVENTS == TRUE
-                evt_src_.signalI(1 << self_index_);
-#endif
+            stats.num_events++;
+            if (sem_handle != nullptr) {
+                sem_handle->signal_ISR();
             }
         }
     }
@@ -919,11 +923,9 @@ void CANIface::handleRxInterrupt(uint8_t fifo_index)
     while (readRxFIFO(fifo_index)) {
         had_activity_ = true;
     }
-    if (event_handle_ != nullptr) {
-        stats.num_events++;
-#if CH_CFG_USE_EVENTS == TRUE
-        evt_src_.signalI(1 << self_index_);
-#endif
+    stats.num_events++;
+    if (sem_handle != nullptr) {
+        sem_handle->signal_ISR();
     }
 }
 
@@ -989,16 +991,11 @@ uint32_t CANIface::getErrorCount() const
            stats.tx_timedout;
 }
 
-#if CH_CFG_USE_EVENTS == TRUE
-ChibiOS::EventSource CANIface::evt_src_;
-bool CANIface::set_event_handle(AP_HAL::EventHandle* handle)
+bool CANIface::set_event_handle(AP_HAL::BinarySemaphore *handle)
 {
-    CriticalSectionLocker lock;
-    event_handle_ = handle;
-    event_handle_->set_source(&evt_src_);
-    return event_handle_->register_event(1 << self_index_);
+    sem_handle = handle;
+    return true;
 }
-#endif
 
 bool CANIface::isRxBufferEmpty() const
 {
@@ -1069,10 +1066,10 @@ bool CANIface::select(bool &read, bool &write,
         return true;
     }
     while (time < blocking_deadline) {
-        if (event_handle_ == nullptr) {
+        if (sem_handle == nullptr) {
             break;
         }
-        event_handle_->wait(blocking_deadline - time); // Block until timeout expires or any iface updates
+        IGNORE_RETURN(sem_handle->wait(blocking_deadline - time)); // Block until timeout expires or any iface updates
         checkAvailable(read, write, pending_tx);  // Check what we got
         if ((read && in_read) || (write && in_write)) {
             return true;

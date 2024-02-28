@@ -18,6 +18,7 @@ class EnumDocco(object):
         "Copter": "ArduCopter",
         "Plane": "ArduPlane",
         "Tracker": "AntennaTracker",
+        "Blimp": "Blimp",
     }
 
     def __init__(self, vehicle):
@@ -71,6 +72,11 @@ class EnumDocco(object):
         with:'''
         # Match:  "            FRED  = 17,  // optional comment"
         m = re.match("\s*([A-Z0-9_a-z]+) *= *(\w+) *,?(?: *// *(.*) *)?$",
+                     line)
+        if m is not None:
+            return (None, None, None)
+        # Match:  "            FRED  = FOO(17),  // optional comment"
+        m = re.match("\s*([A-Z0-9_a-z]+) *= *(\w+) *\\( *(\w+) *\\) *,?(?: *// *(.*) *)?$",
                      line)
         if m is not None:
             return (None, None, None)

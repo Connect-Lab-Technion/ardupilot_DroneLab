@@ -91,8 +91,6 @@ public:
 
     // helper functions
     bool restart_landing_sequence(void);
-    float wind_alignment(const float heading_deg);
-    float head_wind(void);
     int32_t get_target_airspeed_cm(void);
 
     // accessor functions for the params and states
@@ -110,7 +108,7 @@ public:
     void set_initial_slope(void) { initial_slope = slope; }
     bool is_expecting_impact(void) const;
     void Log(void) const;
-    const AP_PIDInfo * get_pid_info(void) const;
+    const class AP_PIDInfo * get_pid_info(void) const;
 
     // landing altitude offset (meters)
     float alt_offset;
