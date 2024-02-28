@@ -5,11 +5,11 @@
 //
 // File: rtGetInf.h
 //
-// Code generated for Simulink model 'dmitry_model'.
+// Code generated for Simulink model 'FCS_model'.
 //
 // Model version                  : 1.12
 // Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Thu Feb  1 15:09:29 2024
+// C/C++ source code generated on : Tue Feb 27 17:32:46 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M

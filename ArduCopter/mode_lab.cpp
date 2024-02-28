@@ -1,6 +1,6 @@
 #include "Copter.h"
-#include <AC_Simulink/dmitry_model.h>  
-dmitry_model customcontroller;
+#include <AC_Simulink/FCS_model.h>  
+FCS_model customcontroller;
 #include <array>
 
 #if MODE_LAB_ENABLED == ENABLED

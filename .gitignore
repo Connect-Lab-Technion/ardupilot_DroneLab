@@ -152,3 +152,5 @@ dumpstack_*out
 build.tmp.binaries/
 tasklist.json
 modules/esp_idf
+
+/libraries/AC_Simulink*
