@@ -1,7 +1,10 @@
 #include "Copter.h"
 #include <AC_Simulink/FCS_model.h>  
-FCS_model customcontroller;
+FCS_model labController;
 #include <array>
+#include <SRV_Channel/SRV_Channel.h>
+#include <AP_Common/AP_Common.h>
+
 
 #if MODE_LAB_ENABLED == ENABLED
 
@@ -12,41 +15,70 @@ FCS_model customcontroller;
 // lab_init - initialise lab controller
 bool ModeLab::init(bool ignore_checks)
 {
-    gcs().send_text(MAV_SEVERITY_INFO, "LAB: intitialised");
+    labController.initialize();
 
     // turn on notify leds
     AP_Notify::flags.esc_calibration = true;
+    
     motor_out_1 = 0.0f;
     motor_out_2 = 0.0f;
     motor_out_3 = 0.0f;
     motor_out_4 = 0.0f;
+    
+    gcs().send_text(MAV_SEVERITY_INFO, "LAB: intitialised");
     return true;
 }
-
-#include <AP_Common/AP_Common.h>
 
 // lab_run - runs the lab controller
 // should be called at 100hz or more
 void ModeLab::run()
 {
     // std::ostringstream oss;
-    Vector3f gyroresponse = ahrs.get_gyro();
-    // // const char * logmessage_gyro; // = gyroresponse.tofloat().tos;
-    // // oss << "LAB: GYRO (" << gyroresponse.x << "," << gyroresponse.y << "," << gyroresponse.z << ")";
-    // // std::string str = oss.str();
-    // // const char * logMessage_test = str.c_str();
-    // char logMessage_test[50];
-    // std::string str_log = //"LAB: GYRO (" + std::to_string(gyroresponse.x) + "," + std::to_string(gyroresponse.y) + "," + std::to_string(gyroresponse.z) + ") %d\n";
-    // std:strcpy(logMessage_test, str_log.c_str());
+    // gcs().send_text(MAV_SEVERITY_INFO, "GYRO:: %f,%f,%f", gyro_vals.x,gyro_vals.y,gyro_vals.z);
 
-    // const char *message_out = "asdfasdfasdfasdfasdfasdfasdfasdfasdfa";
-    gcs().send_text(MAV_SEVERITY_INFO, "%f,%f,%f", gyroresponse.x,gyroresponse.y,gyroresponse.x);
 
-    std::array<float, 4> motors_out{0,0,0,0};//lab.controlWrapper();
-    motor_out_1 = motors_out[0];
-    motor_out_2 = motors_out[1];
-    motor_out_3 = motors_out[2];
-    motor_out_4 = motors_out[3];
+
+    // '<Root>/accel'
+    Vector3f accel_vals = ahrs.get_accel();
+    float arg_accel[3]{ accel_vals.x, accel_vals.y, accel_vals.z };
+
+    // '<Root>/gyro'
+    Vector3f gyro_vals = ahrs.get_gyro();
+    float arg_gyro[3]{ gyro_vals.x, gyro_vals.y, gyro_vals.z };
+
+    // '<Root>/bat_V'
+    float arg_bat_V{ 0.0F };
+
+    // '<Root>/pos_est'
+    
+    float arg_pos_est[3]{ 0.0F, 0.0F, 0.0F };
+
+    // '<Root>/vel_est'
+    float arg_vel_est[3]{ 0.0F, 0.0F, 0.0F };
+
+    // '<Root>/yaw_opticalfow'
+    float arg_yaw_opticalfow{ 0.0F };
+
+    // '<Root>/pos_ref'
+    float arg_pos_ref[3]{ 0.0F, 0.0F, 0.0F };
+
+    // '<Root>/orient_ref'
+    float arg_orient_ref[3]{ 0.0F, 0.0F, 0.0F };
+
+    // '<Root>/motors_refout'
+    float motors_out[4];
+
+    labController.step(arg_accel, arg_gyro, &arg_bat_V, arg_pos_est, arg_vel_est,
+                     &arg_yaw_opticalfow, arg_pos_ref, arg_orient_ref, motors_out);
+
+    motor_out_1 = 1000.0F;
+    motor_out_2 = 1250.0F;
+    motor_out_3 = 1750.0F;
+    motor_out_4 = 2000.0F;
+    // motor_out_1 = motors_out[0];
+    // motor_out_2 = motors_out[1];
+    // motor_out_3 = motors_out[2];
+    // motor_out_4 = motors_out[3];
 }
 
 
@@ -123,43 +155,38 @@ void ModeLab::arm_motors()
     hal.util->set_soft_armed(true);
 }
 
+
 // actually write values to the motors
 void ModeLab::output_to_motors()
 {
-    // throttle needs to be raised
-    if (is_zero(channel_throttle->norm_input_dz())) {
-        const uint32_t now = AP_HAL::millis();
-        if (now - last_throttle_warning_output_ms > 5000) {
-            gcs().send_text(MAV_SEVERITY_WARNING, "LAB: raise throttle to arm");
-            last_throttle_warning_output_ms = now;
-        }
+    // // throttle needs to be raised
+    // if (is_zero(channel_throttle->norm_input_dz())) {
+    //     const uint32_t now = AP_HAL::millis();
+    //     if (now - last_throttle_warning_output_ms > 5000) {
+    //         gcs().send_text(MAV_SEVERITY_WARNING, "LAB: raise throttle to arm");
+    //         last_throttle_warning_output_ms = now;
+    //     }
 
-        disarm_motors();
-        return;
-    }
+    //     disarm_motors();
+    //     return;
+    // }
 
     arm_motors();
 
     // check if motor are allowed to spin
     const bool allow_output = motors->armed() && motors->get_interlock();
-
-    float motor_outputs[] = {motor_out_1, motor_out_2, motor_out_3, motor_out_4};
-    for (uint8_t i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; ++i) {
-        if (!motors->is_motor_enabled(i)) {
-            continue;
-        }
-
-        const Vector2f output{motors->get_roll_factor(i), motors->get_pitch_factor(i)};
+    if (allow_output) {
         
-        // if output aligns with input then use this motor
-        if (!allow_output ) { // || (motors_input - output).length() > 0.5) {
-            motors->rc_write(i, motors->get_pwm_output_min());
-            continue;
+        float motor_outputs[] = {motor_out_1, motor_out_2, motor_out_3, motor_out_4};
+        // gcs().send_text(MAV_SEVERITY_INFO, "PWM:: %f,%f,%f,%f", motor_out_1, motor_out_2, motor_out_3, motor_out_4);
+
+        // convert output to PWM and send to each motor
+        int8_t i;   
+        for (i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++) {
+            if (motors->is_motor_enabled(i)) {
+                motors->rc_write(i, motor_outputs[i]);
+            }
         }
-
-        int16_t pwm = motors->get_pwm_output_min() + (motors->get_pwm_output_max() - motors->get_pwm_output_min()) * motor_outputs[i];
-
-        motors->rc_write(i, pwm);
     }
 }
 

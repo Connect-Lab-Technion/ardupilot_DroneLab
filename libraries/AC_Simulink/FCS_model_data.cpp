@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'FCS_model'.
 //
-// Model version                  : 1.12
+// Model version                  : 1.13
 // Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Tue Feb 27 17:32:46 2024
+// C/C++ source code generated on : Wed Feb 28 09:56:40 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -429,7 +429,7 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
   // Computed Parameter: MotorDirections_Gain
   //  Referenced by: '<S10>/MotorDirections'
 
-  { 1.0F, -1.0F, 1.0F, -1.0F },
+  { 1.0F, 1.0F, 1.0F, 1.0F },
 
   // Computed Parameter: Gain1_Gain
   //  Referenced by: '<S37>/Gain1'
