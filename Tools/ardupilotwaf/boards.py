@@ -356,6 +356,7 @@ class Board:
             '-Werror=unused-variable',
             '-Werror=delete-non-virtual-dtor',
             '-Wfatal-errors',
+            '-Wno-float-equal', # for controllab compilation error 
             '-Wno-trigraphs',
             '-Werror=parentheses',
             '-DARDUPILOT_BUILD',
@@ -935,6 +936,7 @@ class chibios(Board):
             '-Wno-unused-parameter',
             '-Werror=array-bounds',
             '-Wfatal-errors',
+            '-Wno-float-equal', # for controllab compilation error 
             '-Werror=uninitialized',
             '-Werror=init-self',
             '-Werror=unused-but-set-variable',

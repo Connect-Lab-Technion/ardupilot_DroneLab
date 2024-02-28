@@ -1,0 +1,1 @@
+./waf clean && ./waf configure --board BETAFPV-F405 && ./waf copter
