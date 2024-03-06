@@ -1,3 +1,6 @@
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal"
+
 //
 // Academic License - for use in teaching, academic research, and meeting
 // course requirements at degree granting institutions only.  Not for
@@ -589,3 +592,4 @@ FCS_model::RT_MODEL_FCS_model_T * FCS_model::getRTM()
 //
 // [EOF]
 //
+#pragma GCC diagnostic pop
