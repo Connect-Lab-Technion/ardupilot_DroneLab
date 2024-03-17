@@ -35,7 +35,15 @@ bool ModeLab::init(bool ignore_checks)
     ref_orient_roll     = 0.0f; 
     
     // set the initial logging values - to be updated by the controller
-    logging1            = 0.0f;
+    logging01 = 69;
+    logging02 = 69;
+    logging03 = 69;
+    logging04 = 69;
+    logging05 = 69;
+    logging06 = 69;
+    logging07 = 69;
+    logging08 = 69;
+    logging09 = 69;
 
     gcs().send_text(MAV_SEVERITY_INFO, "LAB: intitialised");
     return true;
@@ -51,35 +59,62 @@ void ModeLab::run()
     gcs().send_message(MSG_LAB_TO_DASHBOARD);
 
 
-    // '<Root>/accel'
+    // '<Root>/accel' -------------------------------------
     Vector3f accel_vals = ahrs.get_accel();
     float arg_accel[3]{ accel_vals.x, accel_vals.y, accel_vals.z };
 
-    // '<Root>/gyro'
+    // '<Root>/gyro' --------------------------------------
     Vector3f gyro_vals = ahrs.get_gyro();
     float arg_gyro[3]{ gyro_vals.x, gyro_vals.y, gyro_vals.z };
 
-    // '<Root>/bat_V'
+    // '<Root>/bat_V' -------------------------------------
     float arg_bat_V{ 0.0F };
 
-    // '<Root>/pos_est'
-    
-    float arg_pos_est[3]{ 0.0F, 0.0F, 0.0F };
+    // '<Root>/pos_est' -----------------------------------
+    Vector3f position;
+    float arg_pos_est[3];
+    if (ahrs.get_relative_position_NED_home(position)) {
+        arg_pos_est[0] = position.x;
+        arg_pos_est[1] = position.y;
+        arg_pos_est[2] = position.z;
+    } else {
+        // This should instead return the previous value
+        // Assign the previous values to arg_pos_est
+        arg_pos_est[0] = 0.0F;
+        arg_pos_est[1] = 0.0F;
+        arg_pos_est[2] = 0.0F;
+    }
 
-    // '<Root>/vel_est'
-    float arg_vel_est[3]{ 0.0F, 0.0F, 0.0F };
+    // '<Root>/vel_est' -----------------------------------
+    Vector3f velocity;
+    float arg_vel_est[3];
+    if (ahrs.get_velocity_NED(velocity)) {
+        arg_vel_est[0] = velocity.x;
+        arg_vel_est[1] = velocity.y;
+        arg_vel_est[2] = velocity.z;
+    } else {
+        // This should instead return the previous value
+        // Assign the previous values to arg_vel_est
+        arg_vel_est[0] = 0.0F;
+        arg_vel_est[1] = 0.0F;
+        arg_vel_est[2] = 0.0F;
+    }
 
-    // '<Root>/yaw_opticalfow'
-    float arg_yaw_opticalfow{ 0.0F };
+    // '<Root>/yaw_opticalfow' ----------------------------
+    const AP_OpticalFlow *optflow = AP::opticalflow();
+    const Vector2f &flowRate = optflow->flowRate();
+    float arg_yaw_opticalfow{ atan2f(flowRate.y, flowRate.x) };
 
-    // '<Root>/pos_ref'
+    // '<Root>/pos_ref' -----------------------------------
     float arg_pos_ref[3]{ 0.0F, 0.0F, 0.0F };
 
-    // '<Root>/orient_ref'
+    // '<Root>/orient_ref' --------------------------------
     float arg_orient_ref[3]{ 0.0F, 0.0F, 0.0F };
 
-    // '<Root>/motors_refout'
+    // Return variables from the controller ---------------
+    // '<Root>/motors_refout' 
     float motors_out[4];
+    // float logging[9]; // TODO add to the simulink model 
 
     labController.step(arg_accel, arg_gyro, &arg_bat_V, arg_pos_est, arg_vel_est,
                      &arg_yaw_opticalfow, arg_pos_ref, arg_orient_ref, motors_out);
@@ -92,6 +127,26 @@ void ModeLab::run()
     // motor_out_2 = motors_out[1];
     // motor_out_3 = motors_out[2];
     // motor_out_4 = motors_out[3];
+
+    logging01 = 69;
+    logging02 = 69;
+    logging03 = 69;
+    logging04 = 69;
+    logging05 = 69;
+    logging06 = 69;
+    logging07 = 69;
+    logging08 = 69;
+    logging09 = 69;
+    mavlink_channel_t chan = MAVLINK_COMM_0;
+    mavlink_msg_lab_to_dashboard_send(chan, logging01, 
+                                            logging02, 
+                                            logging03,
+                                            logging04,
+                                            logging05,
+                                            logging06,
+                                            logging07,
+                                            logging08,
+                                            logging09);
 }
 
 
@@ -217,8 +272,8 @@ void ModeLab::handle_message(const mavlink_message_t &msg)
     ref_pos_y           = m.ref_y;
     ref_pos_z           = m.ref_z;
     ref_orient_yaw      = m.ref_yaw;
-    ref_orient_pitch    = m.ref_pitch;
-    ref_orient_roll     = m.ref_roll; 
+    ref_orient_pitch    = m.ref_pit;
+    ref_orient_roll     = m.ref_rol; 
 
 }
 

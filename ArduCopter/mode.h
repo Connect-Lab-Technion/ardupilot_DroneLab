@@ -412,7 +412,16 @@ private:
     float ref_pos_x,ref_pos_y,ref_pos_z;
     float ref_orient_yaw, ref_orient_pitch, ref_orient_roll; 
 
-    float logging1;
+    float logging01;
+    float logging02;
+    float logging03;
+    float logging04;
+    float logging05;
+    float logging06;
+    float logging07;
+    float logging08;
+    float logging09;
+
 };
 #endif
 
