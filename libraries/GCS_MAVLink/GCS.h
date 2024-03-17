@@ -364,6 +364,9 @@ public:
 #endif
     void send_opticalflow();
     virtual void send_attitude() const;
+#if MODE_LAB_ENABLED 
+    void send_lab_to_dashboard() const;
+#endif
     virtual void send_attitude_quaternion() const;
     void send_autopilot_version() const;
     void send_extended_sys_state() const;

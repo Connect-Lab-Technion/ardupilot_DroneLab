@@ -1504,7 +1504,11 @@ void GCS_MAVLINK_Copter::handleMessage(const mavlink_message_t &msg)
         copter.g2.toy_mode.handle_message(msg);
         break;
 #endif
-        
+#if MODE_LAB_ENABLED == ENABLED
+    case MAVLINK_MSG_ID_LAB_FROM_DASHBOARD:
+        copter.mode_lab.handle_message(msg);
+        break;
+#endif
     default:
         handle_common_message(msg);
         break;

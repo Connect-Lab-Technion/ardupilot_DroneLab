@@ -396,6 +396,8 @@ public:
     void change_motor_direction(bool reverse);
     void output_to_motors() override;
 
+    void handle_message(const mavlink_message_t &msg);
+
 protected:
     const char *name() const override { return "LAB"; }
     const char *name4() const override { return "LAB"; }
@@ -406,7 +408,11 @@ private:
 
     float motor_out_1,motor_out_2,motor_out_3,motor_out_4;
     uint32_t last_throttle_warning_output_ms;
+    
+    float ref_pos_x,ref_pos_y,ref_pos_z;
+    float ref_orient_yaw, ref_orient_pitch, ref_orient_roll; 
 
+    float logging1;
 };
 #endif
 

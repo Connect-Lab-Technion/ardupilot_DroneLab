@@ -20,11 +20,23 @@ bool ModeLab::init(bool ignore_checks)
     // turn on notify leds
     AP_Notify::flags.esc_calibration = true;
     
-    motor_out_1 = 0.0f;
-    motor_out_2 = 0.0f;
-    motor_out_3 = 0.0f;
-    motor_out_4 = 0.0f;
+    // set the initial motor out values
+    motor_out_1         = 0.0f;
+    motor_out_2         = 0.0f;
+    motor_out_3         = 0.0f;
+    motor_out_4         = 0.0f;
     
+    // set the initial reference values - to be updated by the dashboard
+    ref_pos_x           = 0.0f;
+    ref_pos_y           = 0.0f;
+    ref_pos_z           = 0.0f;
+    ref_orient_yaw      = 0.0f;
+    ref_orient_pitch    = 0.0f;
+    ref_orient_roll     = 0.0f; 
+    
+    // set the initial logging values - to be updated by the controller
+    logging1            = 0.0f;
+
     gcs().send_text(MAV_SEVERITY_INFO, "LAB: intitialised");
     return true;
 }
@@ -36,6 +48,7 @@ void ModeLab::run()
     // std::ostringstream oss;
     // gcs().send_text(MAV_SEVERITY_INFO, "GYRO:: %f,%f,%f", gyro_vals.x,gyro_vals.y,gyro_vals.z);
 
+    gcs().send_message(MSG_LAB_TO_DASHBOARD);
 
 
     // '<Root>/accel'
@@ -190,5 +203,23 @@ void ModeLab::output_to_motors()
     }
 }
 
+
+// handle a mavlink message coming in from the dashboard 
+void ModeLab::handle_message(const mavlink_message_t &msg)
+{
+    if (msg.msgid != MAVLINK_MSG_ID_LAB_FROM_DASHBOARD) {
+        return;
+    }
+    mavlink_lab_from_dashboard_t m;
+    mavlink_msg_lab_from_dashboard_decode(&msg, &m);
+
+    ref_pos_x           = m.ref_x;
+    ref_pos_y           = m.ref_y;
+    ref_pos_z           = m.ref_z;
+    ref_orient_yaw      = m.ref_yaw;
+    ref_orient_pitch    = m.ref_pitch;
+    ref_orient_roll     = m.ref_roll; 
+
+}
 
 #endif
