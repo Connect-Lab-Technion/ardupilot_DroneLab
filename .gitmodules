@@ -6,8 +6,7 @@
 	url = https://github.com/google/benchmark.git
 [submodule "modules/mavlink"]# This is now a fork for the lab
 	path = modules/mavlink
-	url = https://github.com/Connect-Lab-Technion/mavlink  
-	branch = droneLab
+	url = https://github.com/Connect-Lab-Technion/mavlink
 [submodule "gtest"]
 	path = modules/gtest
 	url = https://github.com/ArduPilot/googletest
