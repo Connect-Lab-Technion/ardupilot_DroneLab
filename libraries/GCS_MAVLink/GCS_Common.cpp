@@ -5440,9 +5440,25 @@ void GCS_MAVLINK::send_extended_sys_state() const
 
 void GCS_MAVLINK::send_lab_to_dashboard() const
 {
-    gcs().send_text(MAV_SEVERITY_INFO, "GCS_MAVLINK::send_lab_to_dashboard");
-    float logging1 = 69;
-    mavlink_msg_lab_to_dashboard_send(chan, logging1);
+    // gcs().send_text(MAV_SEVERITY_INFO, "GCS_MAVLINK::send_lab_to_dashboard");
+    // float logging1 = 69;
+    // float logging2 = 69;
+    // float logging3 = 69;
+    // float logging4 = 69;
+    // float logging5 = 69;
+    // float logging6 = 69;
+    // float logging7 = 69;
+    // float logging8 = 69;
+    // float logging9 = 69;
+    // mavlink_msg_lab_to_dashboard_send(chan, logging1, 
+    //                                         logging2, 
+    //                                         logging3,
+    //                                         logging4,
+    //                                         logging5,
+    //                                         logging6,
+    //                                         logging7,
+    //                                         logging8,
+    //                                         logging9);
 }
 
 void GCS_MAVLINK::send_attitude() const

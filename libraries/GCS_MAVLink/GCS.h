@@ -819,11 +819,12 @@ private:
         const ap_message id;
         uint16_t interval_ms;
         uint16_t last_sent_ms; // from AP_HAL::millis16()
-    } deferred_message[3] = {
+    } deferred_message[4] = {
         { MSG_HEARTBEAT, },
         { MSG_NEXT_PARAM, },
 #if HAL_HIGH_LATENCY2_ENABLED
         { MSG_HIGH_LATENCY2, },
+        { MSG_LAB_TO_DASHBOARD, },
 #endif
     };
     // returns index of id in deferred_message[] or -1 if not present
