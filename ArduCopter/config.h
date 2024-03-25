@@ -153,6 +153,12 @@
 #endif
 
 //////////////////////////////////////////////////////////////////////////////
+// Lab - fly vehicle in custom advanced control lab mode 
+#ifndef MODE_LAB_ENABLED
+# define MODE_LAB_ENABLED ENABLED
+#endif
+
+//////////////////////////////////////////////////////////////////////////////
 // Acro - fly vehicle in acrobatic mode
 #ifndef MODE_ACRO_ENABLED
 # define MODE_ACRO_ENABLED ENABLED

@@ -95,6 +95,7 @@ public:
         AUTOROTATE =   26,  // Autonomous autorotation
         AUTO_RTL =     27,  // Auto RTL, this is not a true mode, AUTO will report as this mode if entered to perform a DO_LAND_START Landing sequence
         TURTLE =       28,  // Flip over after crash
+        LAB =          99,  // Custom mode for Advanced control lab
 
         // Mode number 127 reserved for the "drone show mode" in the Skybrush
         // fork at https://github.com/skybrush-io/ardupilot
@@ -376,6 +377,57 @@ public:
     // end pass-through functions
 };
 
+#if MODE_LAB_ENABLED == ENABLED
+class ModeLab : public Mode {
+
+public:
+    // inherit constructor
+    using Mode::Mode;    
+    Number mode_number() const override { return Number::LAB; }
+
+    bool init(bool ignore_checks) override;
+    void run() override;
+    void exit() override;
+
+    bool requires_GPS() const override { return false; }
+    bool has_manual_throttle() const override { return true; }
+    bool allows_arming(AP_Arming::Method method) const override { return true; };
+    bool is_autopilot() const override { return false; }
+    void change_motor_direction(bool reverse);
+    void output_to_motors() override;
+
+    void handle_message(const mavlink_message_t &msg);
+
+protected:
+    const char *name() const override { return "LAB"; }
+    const char *name4() const override { return "LAB"; }
+
+private: 
+    void arm_motors();
+    void disarm_motors();
+
+    float motor_out_1,motor_out_2,motor_out_3,motor_out_4;
+    uint32_t last_throttle_warning_output_ms;
+    
+    float ref_pos_x,ref_pos_y,ref_pos_z;
+    float ref_orient_yaw, ref_orient_pitch, ref_orient_roll; 
+    float ref_power_gain; 
+    
+    uint32_t last_dashboard_msg_ms;
+
+    float logging01;
+    float logging02;
+    float logging03;
+    float logging04;
+    float logging05;
+    float logging06;
+    float logging07;
+    float logging08;
+    float logging09;
+
+
+};
+#endif
 
 #if MODE_ACRO_ENABLED == ENABLED
 class ModeAcro : public Mode {

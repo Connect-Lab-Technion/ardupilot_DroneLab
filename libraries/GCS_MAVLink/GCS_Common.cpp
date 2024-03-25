@@ -955,6 +955,8 @@ ap_message GCS_MAVLINK::mavlink_id_to_ap_message_id(const uint32_t mavlink_id) c
         uint32_t mavlink_id;
         ap_message msg_id;
     } map[] {
+        { MAVLINK_MSG_ID_LAB_FROM_DASHBOARD,    MSG_LAB_FROM_DASHBOARD},
+        { MAVLINK_MSG_ID_LAB_TO_DASHBOARD,      MSG_LAB_TO_DASHBOARD},
         { MAVLINK_MSG_ID_HEARTBEAT,             MSG_HEARTBEAT},
         { MAVLINK_MSG_ID_ATTITUDE,              MSG_ATTITUDE},
         { MAVLINK_MSG_ID_ATTITUDE_QUATERNION,   MSG_ATTITUDE_QUATERNION},
@@ -5436,8 +5438,32 @@ void GCS_MAVLINK::send_extended_sys_state() const
     mavlink_msg_extended_sys_state_send(chan, vtol_state(), landed_state());
 }
 
+void GCS_MAVLINK::send_lab_to_dashboard() const
+{
+    // gcs().send_text(MAV_SEVERITY_INFO, "GCS_MAVLINK::send_lab_to_dashboard");
+    // float logging1 = 69;
+    // float logging2 = 69;
+    // float logging3 = 69;
+    // float logging4 = 69;
+    // float logging5 = 69;
+    // float logging6 = 69;
+    // float logging7 = 69;
+    // float logging8 = 69;
+    // float logging9 = 69;
+    // mavlink_msg_lab_to_dashboard_send(chan, logging1, 
+    //                                         logging2, 
+    //                                         logging3,
+    //                                         logging4,
+    //                                         logging5,
+    //                                         logging6,
+    //                                         logging7,
+    //                                         logging8,
+    //                                         logging9);
+}
+
 void GCS_MAVLINK::send_attitude() const
 {
+    gcs().send_text(MAV_SEVERITY_INFO, "GCS_MAVLINK::send_attitude");
     const AP_AHRS &ahrs = AP::ahrs();
     const Vector3f omega = ahrs.get_gyro();
     mavlink_msg_attitude_send(
@@ -5722,6 +5748,10 @@ bool GCS_MAVLINK::try_send_message(const enum ap_message id)
 
     switch(id) {
 
+    case MSG_LAB_TO_DASHBOARD:
+        send_lab_to_dashboard();
+        break;
+        
     case MSG_ATTITUDE:
         CHECK_PAYLOAD_SIZE(ATTITUDE);
         send_attitude();

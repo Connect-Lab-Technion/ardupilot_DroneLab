@@ -12,6 +12,8 @@ import json
 _board_classes = {}
 _board = None
 
+technion_controlLab_flag = True # set to True if building for lab
+
 class BoardMeta(type):
     def __init__(cls, name, bases, dct):
         super(BoardMeta, cls).__init__(name, bases, dct)
@@ -130,6 +132,21 @@ class Board:
             cfg.msg("GPS Debug Logging", 'yes')
         else:
             cfg.msg("GPS Debug Logging", 'no', color='YELLOW')
+        
+        if technion_controlLab_flag :
+            env.MODE_LAB_ENABLED = True
+            env.DEFINES.update(
+                MODE_LAB_ENABLED=1,
+            )
+            env.AP_LIBRARIES += [
+                'AC_Simulink'
+            ]
+            cfg.msg("Enabled lab controller", 'yes')
+        else:
+            env.DEFINES.update(
+                MODE_LAB_ENABLED=0,
+            )
+            cfg.msg("Enabled lab controller", 'no', color='YELLOW')
 
         if cfg.options.enable_ppp:
             env.CXXFLAGS += ['-DAP_NETWORKING_BACKEND_PPP=1']
@@ -344,6 +361,7 @@ class Board:
             '-Werror=unused-variable',
             '-Werror=delete-non-virtual-dtor',
             '-Wfatal-errors',
+            '-Wno-float-equal', # for controllab compilation error 
             '-Wno-trigraphs',
             '-Werror=parentheses',
             '-DARDUPILOT_BUILD',
@@ -1018,6 +1036,7 @@ class chibios(Board):
             '-Wno-unused-parameter',
             '-Werror=array-bounds',
             '-Wfatal-errors',
+            '-Wno-float-equal', # for controllab compilation error 
             '-Werror=uninitialized',
             '-Werror=init-self',
             '-Werror=unused-but-set-variable',

@@ -4,11 +4,9 @@
 [submodule "modules/gbenchmark"]
 	path = modules/gbenchmark
 	url = https://github.com/google/benchmark.git
-[submodule "modules/mavlink"]
+[submodule "modules/mavlink"]# This is now a fork for the lab
 	path = modules/mavlink
-	url = https://github.com/Connect-Lab-Technion/mavlink/
-	tree = master
-	branch = master
+	url = https://github.com/Connect-Lab-Technion/mavlink
 [submodule "gtest"]
 	path = modules/gtest
 	url = https://github.com/ArduPilot/googletest

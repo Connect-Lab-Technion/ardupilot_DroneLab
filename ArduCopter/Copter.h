@@ -223,6 +223,7 @@ public:
     friend class ModeZigZag;
     friend class ModeAutorotate;
     friend class ModeTurtle;
+    friend class ModeLab;   // custom mode for lab course 
 
     friend class _AutoTakeoff;
 
@@ -1028,6 +1029,9 @@ private:
 #endif
 #if MODE_TURTLE_ENABLED == ENABLED
     ModeTurtle mode_turtle;
+#endif
+#if MODE_LAB_ENABLED == ENABLED
+    ModeLab mode_lab;
 #endif
 
     // mode.cpp
