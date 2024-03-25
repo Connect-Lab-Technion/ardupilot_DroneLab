@@ -6,7 +6,7 @@
 	url = https://github.com/google/benchmark.git
 [submodule "modules/mavlink"]
 	path = modules/mavlink
-	url = https://github.com/Connect-Lab-Technion/mavlink/tree/master
+	url = https://github.com/Connect-Lab-Technion/mavlink/
 	tree = master
 	branch = master
 [submodule "gtest"]
