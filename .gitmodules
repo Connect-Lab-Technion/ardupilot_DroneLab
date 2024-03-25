@@ -6,8 +6,9 @@
 	url = https://github.com/google/benchmark.git
 [submodule "modules/mavlink"]
 	path = modules/mavlink
-	url = https://github.com/Connect-Lab-Technion/mavlink
+	url = https://github.com/Connect-Lab-Technion/mavlink/tree/master
 	tree = master
+	branch = master
 [submodule "gtest"]
 	path = modules/gtest
 	url = https://github.com/ArduPilot/googletest
