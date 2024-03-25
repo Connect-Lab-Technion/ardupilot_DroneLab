@@ -411,6 +411,9 @@ private:
     
     float ref_pos_x,ref_pos_y,ref_pos_z;
     float ref_orient_yaw, ref_orient_pitch, ref_orient_roll; 
+    float ref_power_gain; 
+    
+    uint32_t last_dashboard_msg_ms;
 
     float logging01;
     float logging02;
@@ -421,6 +424,7 @@ private:
     float logging07;
     float logging08;
     float logging09;
+
 
 };
 #endif

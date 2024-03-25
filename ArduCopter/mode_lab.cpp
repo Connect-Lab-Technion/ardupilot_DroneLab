@@ -15,7 +15,11 @@ FCS_model labController;
 // lab_init - initialise lab controller
 bool ModeLab::init(bool ignore_checks)
 {
+    // initialise the lab controller
     labController.initialize();
+
+    // arm motors
+    arm_motors();
 
     // turn on notify leds
     AP_Notify::flags.esc_calibration = true;
@@ -56,7 +60,14 @@ void ModeLab::run()
     // std::ostringstream oss;
     // gcs().send_text(MAV_SEVERITY_INFO, "GYRO:: %f,%f,%f", gyro_vals.x,gyro_vals.y,gyro_vals.z);
 
-    gcs().send_message(MSG_LAB_TO_DASHBOARD);
+    uint32_t now = AP_HAL::millis();
+    if (now - last_dashboard_msg_ms > 1000) {
+        // exit mode if we haven't received a message from the dashboard in the last second
+        gcs().send_text(MAV_SEVERITY_WARNING, "LAB: no message from dashboard");
+        exit();
+        // switch back to the default mode 
+        set_mode(Mode::Number::STABILIZE, ModeReason::GCS_COMMAND);
+    }
 
 
     // '<Root>/accel' -------------------------------------
@@ -101,8 +112,8 @@ void ModeLab::run()
     }
 
     // '<Root>/yaw_opticalfow' ----------------------------
-    const AP_OpticalFlow *optflow = AP::opticalflow();
-    const Vector2f &flowRate = optflow->flowRate();
+    // const AP_OpticalFlow *optflow = AP::opticalflow();
+    const Vector2f &flowRate = Vector2f(0.0F, 0.0F); //optflow->flowRate();
     float arg_yaw_opticalfow{ atan2f(flowRate.y, flowRate.x) };
 
     // '<Root>/pos_ref' -----------------------------------
@@ -138,15 +149,17 @@ void ModeLab::run()
     logging08 = 69;
     logging09 = 69;
     mavlink_channel_t chan = MAVLINK_COMM_0;
-    mavlink_msg_lab_to_dashboard_send(chan, logging01, 
-                                            logging02, 
-                                            logging03,
-                                            logging04,
-                                            logging05,
-                                            logging06,
-                                            logging07,
+    mavlink_msg_lab_to_dashboard_send(chan, ref_pos_x, 
+                                            ref_pos_y,        
+                                            ref_pos_z,       
+                                            ref_orient_yaw,  
+                                            ref_orient_pitch,
+                                            ref_orient_roll , 
+                                            logging07, 
                                             logging08,
-                                            logging09);
+                                            logging09
+                                            );
+    gcs().send_message(MSG_LAB_TO_DASHBOARD);
 }
 
 
@@ -239,8 +252,6 @@ void ModeLab::output_to_motors()
     //     return;
     // }
 
-    arm_motors();
-
     // check if motor are allowed to spin
     const bool allow_output = motors->armed() && motors->get_interlock();
     if (allow_output) {
@@ -262,6 +273,9 @@ void ModeLab::output_to_motors()
 // handle a mavlink message coming in from the dashboard 
 void ModeLab::handle_message(const mavlink_message_t &msg)
 {
+    // keep track of the last time we received a message from the dashboard
+    last_dashboard_msg_ms = AP_HAL::millis();
+
     if (msg.msgid != MAVLINK_MSG_ID_LAB_FROM_DASHBOARD) {
         return;
     }
@@ -272,8 +286,9 @@ void ModeLab::handle_message(const mavlink_message_t &msg)
     ref_pos_y           = m.ref_y;
     ref_pos_z           = m.ref_z;
     ref_orient_yaw      = m.ref_yaw;
-    ref_orient_pitch    = m.ref_pit;
-    ref_orient_roll     = m.ref_rol; 
+    ref_orient_pitch    = m.ref_pitch;
+    ref_orient_roll     = m.ref_roll; 
+    ref_power_gain      = m.power;
 
 }
 
