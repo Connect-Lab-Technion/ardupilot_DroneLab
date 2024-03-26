@@ -125,36 +125,39 @@ void ModeLab::run()
     // Return variables from the controller ---------------
     // '<Root>/motors_refout' 
     float motors_out[4];
-    // float logging[9]; // TODO add to the simulink model 
+
+    // '<Root>/logging_refout' 
+    float logging_out[9];
 
     labController.step(arg_accel, arg_gyro, &arg_bat_V, arg_pos_est, arg_vel_est,
-                     &arg_yaw_opticalfow, arg_pos_ref, arg_orient_ref, motors_out);
+                     &arg_yaw_opticalfow, arg_pos_ref, arg_orient_ref, motors_out, logging_out);
 
     motor_out_1 = 1000.0F;
-    motor_out_2 = 1250.0F;
-    motor_out_3 = 1750.0F;
-    motor_out_4 = 2000.0F;
+    motor_out_2 = 1000.0F;
+    motor_out_3 = 1000.0F;
+    motor_out_4 = 1000.0F;
     // motor_out_1 = motors_out[0];
     // motor_out_2 = motors_out[1];
     // motor_out_3 = motors_out[2];
     // motor_out_4 = motors_out[3];
 
-    logging01 = 69;
-    logging02 = 69;
-    logging03 = 69;
-    logging04 = 69;
-    logging05 = 69;
-    logging06 = 69;
-    logging07 = 69;
-    logging08 = 69;
-    logging09 = 69;
+    logging01 = logging_out[0];
+    logging02 = logging_out[1];
+    logging03 = logging_out[2];
+    logging04 = logging_out[3];
+    logging05 = logging_out[4];
+    logging06 = logging_out[5];
+    logging07 = logging_out[6];
+    logging08 = logging_out[7];
+    logging09 = logging_out[8];
+
     mavlink_channel_t chan = MAVLINK_COMM_0;
-    mavlink_msg_lab_to_dashboard_send(chan, ref_pos_x, 
-                                            ref_pos_y,        
-                                            ref_pos_z,       
-                                            ref_orient_yaw,  
-                                            ref_orient_pitch,
-                                            ref_orient_roll , 
+    mavlink_msg_lab_to_dashboard_send(chan, logging01, 
+                                            logging02,        
+                                            logging03,       
+                                            logging04,  
+                                            logging05,
+                                            logging06, 
                                             logging07, 
                                             logging08,
                                             logging09
