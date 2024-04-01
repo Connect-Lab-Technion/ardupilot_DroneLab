@@ -31,23 +31,14 @@ bool ModeLab::init(bool ignore_checks)
     motor_out_4         = 0.0f;
     
     // set the initial reference values - to be updated by the dashboard
+    master_switch       = 0;
+    ref_power_gain      = 0.0f;
     ref_pos_x           = 0.0f;
     ref_pos_y           = 0.0f;
     ref_pos_z           = 0.0f;
     ref_orient_yaw      = 0.0f;
     ref_orient_pitch    = 0.0f;
     ref_orient_roll     = 0.0f; 
-    
-    // set the initial logging values - to be updated by the controller
-    logging01 = 69;
-    logging02 = 69;
-    logging03 = 69;
-    logging04 = 69;
-    logging05 = 69;
-    logging06 = 69;
-    logging07 = 69;
-    logging08 = 69;
-    logging09 = 69;
 
     gcs().send_text(MAV_SEVERITY_INFO, "LAB: intitialised");
     return true;
@@ -60,14 +51,16 @@ void ModeLab::run()
     // std::ostringstream oss;
     // gcs().send_text(MAV_SEVERITY_INFO, "GYRO:: %f,%f,%f", gyro_vals.x,gyro_vals.y,gyro_vals.z);
 
-    uint32_t now = AP_HAL::millis();
-    if (now - last_dashboard_msg_ms > 1000) {
-        // exit mode if we haven't received a message from the dashboard in the last second
-        gcs().send_text(MAV_SEVERITY_WARNING, "LAB: no message from dashboard");
-        exit();
-        // switch back to the default mode 
-        set_mode(Mode::Number::STABILIZE, ModeReason::GCS_COMMAND);
-    }
+    // TODO: This has been causing the mode to bounce between lab and stabilize for the first few seconds
+    // // check if we have received a message from the dashboard in the last second, otherwise exit
+    // uint32_t now = AP_HAL::millis();
+    // if (now - last_dashboard_msg_ms > 1000) {
+    //     // exit mode if we haven't received a message from the dashboard in the last second
+    //     gcs().send_text(MAV_SEVERITY_WARNING, "LAB: no message from dashboard");
+    //     exit();
+    //     // switch back to the default mode 
+    //     set_mode(Mode::Number::STABILIZE, ModeReason::GCS_COMMAND);
+    // }
 
 
     // '<Root>/accel' -------------------------------------
@@ -127,41 +120,33 @@ void ModeLab::run()
     float motors_out[4];
 
     // '<Root>/logging_refout' 
-    float logging_out[9];
+    float logging_out[10];
 
     labController.step(arg_accel, arg_gyro, &arg_bat_V, arg_pos_est, arg_vel_est,
-                     &arg_yaw_opticalfow, arg_pos_ref, arg_orient_ref, motors_out, logging_out);
+        &arg_yaw_opticalfow, arg_pos_ref, arg_orient_ref, motors_out, logging_out);
 
-    motor_out_1 = 1000.0F;
-    motor_out_2 = 1000.0F;
-    motor_out_3 = 1000.0F;
-    motor_out_4 = 1000.0F;
-    // motor_out_1 = motors_out[0];
-    // motor_out_2 = motors_out[1];
-    // motor_out_3 = motors_out[2];
-    // motor_out_4 = motors_out[3];
+    // update the motor output, if the master switch is off, set all motors to 0
+    // otherwise set the motors to the output from the controller times the power gain
+    if (master_switch == 0) {
+        motor_out_1 = 0.0F;
+        motor_out_2 = 0.0F;
+        motor_out_3 = 0.0F;
+        motor_out_4 = 0.0F;
+    }
+    else if (master_switch == 1) {  
+        if (ref_power_gain > 1.0f || ref_power_gain < 0.0f) {
+            ref_power_gain = 0.0f;
+            gcs().send_text(MAV_SEVERITY_WARNING, "LAB: power gain out of (0-1) range: %f", ref_power_gain);
+        }  
+        motor_out_1 = motors_out[0] * ref_power_gain;
+        motor_out_2 = motors_out[1] * ref_power_gain;
+        motor_out_3 = motors_out[2] * ref_power_gain;
+        motor_out_4 = motors_out[3] * ref_power_gain;
+    }
 
-    logging01 = logging_out[0];
-    logging02 = logging_out[1];
-    logging03 = logging_out[2];
-    logging04 = logging_out[3];
-    logging05 = logging_out[4];
-    logging06 = logging_out[5];
-    logging07 = logging_out[6];
-    logging08 = logging_out[7];
-    logging09 = logging_out[8];
-
+    // send logging data to the dashboard
     mavlink_channel_t chan = MAVLINK_COMM_0;
-    mavlink_msg_lab_to_dashboard_send(chan, logging01, 
-                                            logging02,        
-                                            logging03,       
-                                            logging04,  
-                                            logging05,
-                                            logging06, 
-                                            logging07, 
-                                            logging08,
-                                            logging09
-                                            );
+    mavlink_msg_lab_to_dashboard_send(chan, logging_out);
     gcs().send_message(MSG_LAB_TO_DASHBOARD);
 }
 
@@ -243,28 +228,17 @@ void ModeLab::arm_motors()
 // actually write values to the motors
 void ModeLab::output_to_motors()
 {
-    // // throttle needs to be raised
-    // if (is_zero(channel_throttle->norm_input_dz())) {
-    //     const uint32_t now = AP_HAL::millis();
-    //     if (now - last_throttle_warning_output_ms > 5000) {
-    //         gcs().send_text(MAV_SEVERITY_WARNING, "LAB: raise throttle to arm");
-    //         last_throttle_warning_output_ms = now;
-    //     }
-
-    //     disarm_motors();
-    //     return;
-    // }
 
     // check if motor are allowed to spin
     const bool allow_output = motors->armed() && motors->get_interlock();
     if (allow_output) {
         
         float motor_outputs[] = {motor_out_1, motor_out_2, motor_out_3, motor_out_4};
-        // gcs().send_text(MAV_SEVERITY_INFO, "PWM:: %f,%f,%f,%f", motor_out_1, motor_out_2, motor_out_3, motor_out_4);
+        gcs().send_text(MAV_SEVERITY_INFO, "PWM:: %f,%f,%f,%f", motor_out_1, motor_out_2, motor_out_3, motor_out_4);
 
         // convert output to PWM and send to each motor
         int8_t i;   
-        for (i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++) {
+        for (i = 0; i <= 3; i++) {
             if (motors->is_motor_enabled(i)) {
                 motors->rc_write(i, motor_outputs[i]);
             }
@@ -285,6 +259,7 @@ void ModeLab::handle_message(const mavlink_message_t &msg)
     mavlink_lab_from_dashboard_t m;
     mavlink_msg_lab_from_dashboard_decode(&msg, &m);
 
+    master_switch       = m.master_switch;
     ref_pos_x           = m.ref_x;
     ref_pos_y           = m.ref_y;
     ref_pos_z           = m.ref_z;
