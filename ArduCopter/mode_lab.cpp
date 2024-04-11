@@ -21,6 +21,12 @@ bool ModeLab::init(bool ignore_checks)
     // arm motors
     arm_motors();
 
+    // Start timer for lab message
+    last_dashboard_msg_ms = AP_HAL::millis();
+
+    // set the home for the ahrs
+    copter.set_home_to_current_location_inflight();
+
     // turn on notify leds
     AP_Notify::flags.esc_calibration = true;
     
@@ -48,19 +54,16 @@ bool ModeLab::init(bool ignore_checks)
 // should be called at 100hz or more
 void ModeLab::run()
 {
-    // std::ostringstream oss;
-    // gcs().send_text(MAV_SEVERITY_INFO, "GYRO:: %f,%f,%f", gyro_vals.x,gyro_vals.y,gyro_vals.z);
-
-    // TODO: This has been causing the mode to bounce between lab and stabilize for the first few seconds
-    // // check if we have received a message from the dashboard in the last second, otherwise exit
-    // uint32_t now = AP_HAL::millis();
-    // if (now - last_dashboard_msg_ms > 1000) {
-    //     // exit mode if we haven't received a message from the dashboard in the last second
-    //     gcs().send_text(MAV_SEVERITY_WARNING, "LAB: no message from dashboard");
-    //     exit();
-    //     // switch back to the default mode 
-    //     set_mode(Mode::Number::STABILIZE, ModeReason::GCS_COMMAND);
-    // }
+    // check if we have received a message from the dashboard in the last second, otherwise exit
+    uint32_t now = AP_HAL::millis();
+    uint32_t dashboard_msg_time = now - last_dashboard_msg_ms;
+    if (dashboard_msg_time > 2000) {
+        // exit mode if we haven't received a message from the dashboard in the last second
+        gcs().send_text(MAV_SEVERITY_WARNING, "LAB: no message from dashboard: %f" , double(dashboard_msg_time));
+        exit();
+        // switch back to the default mode 
+        set_mode(Mode::Number::STABILIZE, ModeReason::GCS_COMMAND);
+    }
 
 
     // '<Root>/accel' -------------------------------------
@@ -77,7 +80,7 @@ void ModeLab::run()
     // '<Root>/pos_est' -----------------------------------
     Vector3f position;
     float arg_pos_est[3];
-    if (ahrs.get_relative_position_NED_home(position)) {
+    if (ahrs.get_relative_position_NED_origin(position)) {        
         arg_pos_est[0] = position.x;
         arg_pos_est[1] = position.y;
         arg_pos_est[2] = position.z;
@@ -117,36 +120,36 @@ void ModeLab::run()
 
     // Return variables from the controller ---------------
     // '<Root>/motors_refout' 
-    float motors_out[4];
+    float arg_motors_refout[4];
 
     // '<Root>/logging_refout' 
-    float logging_out[10];
+    float arg_logging_refout[20];
 
     labController.step(arg_accel, arg_gyro, &arg_bat_V, arg_pos_est, arg_vel_est,
-        &arg_yaw_opticalfow, arg_pos_ref, arg_orient_ref, motors_out, logging_out);
+        &arg_yaw_opticalfow, arg_pos_ref, arg_orient_ref, arg_motors_refout, arg_logging_refout);
 
     // update the motor output, if the master switch is off, set all motors to 0
     // otherwise set the motors to the output from the controller times the power gain
-    if (master_switch == 0) {
-        motor_out_1 = 0.0F;
-        motor_out_2 = 0.0F;
-        motor_out_3 = 0.0F;
-        motor_out_4 = 0.0F;
-    }
-    else if (master_switch == 1) {  
+    if (master_switch != 0) {
         if (ref_power_gain > 1.0f || ref_power_gain < 0.0f) {
             ref_power_gain = 0.0f;
             gcs().send_text(MAV_SEVERITY_WARNING, "LAB: power gain out of (0-1) range: %f", ref_power_gain);
         }  
-        motor_out_1 = motors_out[0] * ref_power_gain;
-        motor_out_2 = motors_out[1] * ref_power_gain;
-        motor_out_3 = motors_out[2] * ref_power_gain;
-        motor_out_4 = motors_out[3] * ref_power_gain;
+            motor_out_1 = arg_motors_refout[0] * ref_power_gain * 100 + 1000;
+            motor_out_2 = arg_motors_refout[1] * ref_power_gain * 100 + 1000;
+            motor_out_3 = arg_motors_refout[2] * ref_power_gain * 100 + 1000;
+            motor_out_4 = arg_motors_refout[3] * ref_power_gain * 100 + 1000;
+    }
+    else {
+        motor_out_1 = 1100.0F;
+        motor_out_2 = 1100.0F;
+        motor_out_3 = 1100.0F;
+        motor_out_4 = 1100.0F;
     }
 
     // send logging data to the dashboard
     mavlink_channel_t chan = MAVLINK_COMM_0;
-    mavlink_msg_lab_to_dashboard_send(chan, logging_out);
+    mavlink_msg_lab_to_dashboard_send(chan, arg_logging_refout);
     gcs().send_message(MSG_LAB_TO_DASHBOARD);
 }
 
@@ -260,13 +263,13 @@ void ModeLab::handle_message(const mavlink_message_t &msg)
     mavlink_msg_lab_from_dashboard_decode(&msg, &m);
 
     master_switch       = m.master_switch;
+    ref_power_gain      = m.power;
     ref_pos_x           = m.ref_x;
     ref_pos_y           = m.ref_y;
     ref_pos_z           = m.ref_z;
     ref_orient_yaw      = m.ref_yaw;
     ref_orient_pitch    = m.ref_pitch;
     ref_orient_roll     = m.ref_roll; 
-    ref_power_gain      = m.power;
 
 }
 

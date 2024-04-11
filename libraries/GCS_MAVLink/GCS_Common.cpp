@@ -5463,7 +5463,6 @@ void GCS_MAVLINK::send_lab_to_dashboard() const
 
 void GCS_MAVLINK::send_attitude() const
 {
-    gcs().send_text(MAV_SEVERITY_INFO, "GCS_MAVLINK::send_attitude");
     const AP_AHRS &ahrs = AP::ahrs();
     const Vector3f omega = ahrs.get_gyro();
     mavlink_msg_attitude_send(

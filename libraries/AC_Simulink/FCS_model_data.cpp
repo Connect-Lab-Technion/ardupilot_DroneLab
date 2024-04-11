@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'FCS_model'.
 //
-// Model version                  : 3.4
+// Model version                  : 5.13
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Mon Mar 25 17:55:09 2024
+// C/C++ source code generated on : Thu Apr 11 20:20:02 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -21,7 +21,7 @@
 // Block parameters (default storage)
 FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
   // Variable: Vehicle
-  //  Referenced by: '<S6>/Constant'
+  //  Referenced by: '<S6>/Constant1'
 
   {
     {
@@ -75,8 +75,8 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
     },
 
     {
-      500.0,
-      10.0,
+      2000.0,
+      1000.0,
       13840.8,
       1530.72683064892
     }
@@ -110,7 +110,7 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
   // Variable: g
   //  Referenced by:
   //    '<S38>/Constant'
-  //    '<S6>/Constant'
+  //    '<S6>/Constant1'
 
   9.81,
 
@@ -203,11 +203,6 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
   //  Referenced by: '<S37>/Discrete Transfer Fcn'
 
   0.0,
-
-  // Expression: 1
-  //  Referenced by: '<S3>/Constant'
-
-  1.0,
 
   // Computed Parameter: Internal_A
   //  Referenced by: '<S12>/Internal'
@@ -412,49 +407,49 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
   // Expression: Controller.Q2Ts
   //  Referenced by: '<S7>/TorqueTotalThrustToThrustPerMotor'
 
-  { 0.25F, 0.25F, 0.25F, 0.25F, 103.573624F, -103.573624F, 103.573624F,
-    -103.573624F, -5.66592F, -5.66592F, 5.66592F, 5.66592F, -5.66592F, 5.66592F,
-    5.66592F, -5.66592F },
+  { 0.25F, 0.25F, 0.25F, 0.25F, 103.573624F, -103.573624F, -103.573624F,
+    103.573624F, -5.66592F, 5.66592F, -5.66592F, 5.66592F, 5.66592F, 5.66592F,
+    -5.66592F, -5.66592F },
 
   // Computed Parameter: SaturationThrust_UpperSat
   //  Referenced by: '<S6>/SaturationThrust'
 
-  1.20204329F,
+  4.80817318F,
 
   // Computed Parameter: SaturationThrust_LowerSat
   //  Referenced by: '<S6>/SaturationThrust'
 
-  -1.20204329F,
+  -4.80817318F,
 
   // Computed Parameter: On1Off0forthrust_Gain
   //  Referenced by: '<S5>/On=1//Off=0 for thrust'
 
   0.0F,
 
-  // Computed Parameter: uThrustoff_Gain
-  //  Referenced by: '<S5>/0 = Thrust off'
+  // Computed Parameter: Gain_Gain_n
+  //  Referenced by: '<S11>/Gain'
+
+  101.936798F,
+
+  // Computed Parameter: uDLookupTable_tableData
+  //  Referenced by: '<S11>/1-D Lookup Table'
+
+  { 0.0F, 0.1F, 0.2F, 0.3F, 0.4F, 0.5F, 0.6F, 0.7F, 0.8F },
+
+  // Computed Parameter: uDLookupTable_bp01Data
+  //  Referenced by: '<S11>/1-D Lookup Table'
+
+  { 0.0F, 36.6F, 50.3F, 62.5F, 74.6F, 83.5F, 93.2F, 102.0F, 112.7F },
+
+  // Computed Parameter: Saturation_UpperSat
+  //  Referenced by: '<S11>/Saturation'
 
   1.0F,
 
-  // Computed Parameter: ThrustToMotorCommand_Gain
-  //  Referenced by: '<S11>/ThrustToMotorCommand'
+  // Computed Parameter: Saturation_LowerSat
+  //  Referenced by: '<S11>/Saturation'
 
-  -1530.72681F,
-
-  // Expression: Vehicle.Motor.maxLimit
-  //  Referenced by: '<S11>/Saturation5'
-
-  500.0F,
-
-  // Expression: Vehicle.Motor.minLimit
-  //  Referenced by: '<S11>/Saturation5'
-
-  10.0F,
-
-  // Computed Parameter: MotorDirections_Gain
-  //  Referenced by: '<S11>/MotorDirections'
-
-  { 1.0F, -1.0F, 1.0F, -1.0F }
+  0.0F
 };
 
 //

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'FCS_model'.
 //
-// Model version                  : 3.4
+// Model version                  : 5.13
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Mon Mar 25 17:55:09 2024
+// C/C++ source code generated on : Thu Apr 11 20:20:02 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -29,6 +29,64 @@ extern "C"
 }
 
 #include "rt_defines.h"
+
+real32_T look1_iflf_binlx(real32_T u0, const real32_T bp0[], const real32_T
+  table[], uint32_T maxIndex)
+{
+  real32_T frac;
+  real32_T yL_0d0;
+  uint32_T iLeft;
+
+  // Column-major Lookup 1-D
+  // Search method: 'binary'
+  // Use previous index: 'off'
+  // Interpolation method: 'Linear point-slope'
+  // Extrapolation method: 'Linear'
+  // Use last breakpoint for index at or above upper limit: 'off'
+  // Remove protection against out-of-range input in generated code: 'off'
+
+  // Prelookup - Index and Fraction
+  // Index Search method: 'binary'
+  // Extrapolation method: 'Linear'
+  // Use previous index: 'off'
+  // Use last breakpoint for index at or above upper limit: 'off'
+  // Remove protection against out-of-range input in generated code: 'off'
+
+  if (u0 <= bp0[0U]) {
+    iLeft = 0U;
+    frac = (u0 - bp0[0U]) / (bp0[1U] - bp0[0U]);
+  } else if (u0 < bp0[maxIndex]) {
+    uint32_T bpIdx;
+    uint32_T iRght;
+
+    // Binary Search
+    bpIdx = maxIndex >> 1U;
+    iLeft = 0U;
+    iRght = maxIndex;
+    while (iRght - iLeft > 1U) {
+      if (u0 < bp0[bpIdx]) {
+        iRght = bpIdx;
+      } else {
+        iLeft = bpIdx;
+      }
+
+      bpIdx = (iRght + iLeft) >> 1U;
+    }
+
+    frac = (u0 - bp0[iLeft]) / (bp0[iLeft + 1U] - bp0[iLeft]);
+  } else {
+    iLeft = maxIndex - 1U;
+    frac = (u0 - bp0[maxIndex - 1U]) / (bp0[maxIndex] - bp0[maxIndex - 1U]);
+  }
+
+  // Column-major Interpolation 1-D
+  // Interpolation method: 'Linear point-slope'
+  // Use last breakpoint for index at or above upper limit: 'off'
+  // Overflow mode: 'wrapping'
+
+  yL_0d0 = table[iLeft];
+  return (table[iLeft + 1U] - yL_0d0) * frac + yL_0d0;
+}
 
 real_T rt_atan2d_snf(real_T u0, real_T u1)
 {
@@ -71,7 +129,7 @@ void FCS_model::step(real32_T arg_accel[3], real32_T arg_gyro[3], real32_T
                      *arg_bat_V, real32_T arg_pos_est[3], real32_T arg_vel_est[3],
                      real32_T *arg_yaw_opticalfow, real32_T arg_pos_ref[3],
                      real32_T arg_orient_ref[3], real32_T arg_motors_refout[4],
-                     real32_T arg_logging_refout[9])
+                     real32_T arg_logging_refout[20])
 {
   // local block i/o variables
   real_T rtb_Sum1_j;
@@ -83,10 +141,10 @@ void FCS_model::step(real32_T arg_accel[3], real32_T arg_gyro[3], real32_T
   real_T rtb_Product3;
   real_T rtb_roll;
   real_T rtb_rollrate;
-  int32_T i;
+  int32_T iU;
   real32_T rtb_DataTypeConversion2_i;
   real32_T rtb_DataTypeConversion6_b;
-  real32_T rtb_uThrustoff;
+  real32_T rtb_On1Off0forthrust;
   real32_T u0;
   UNUSED_PARAMETER(arg_bat_V);
 
@@ -138,29 +196,12 @@ void FCS_model::step(real32_T arg_accel[3], real32_T arg_gyro[3], real32_T
   // End of If: '<S40>/If1'
 
   // DiscreteTransferFcn: '<S36>/Discrete Transfer Fcn'
-  rtb_rollrate = FCS_model_P.DiscreteTransferFcn_NumCoef_n[1] *
+  rtb_roll = FCS_model_P.DiscreteTransferFcn_NumCoef_n[1] *
     FCS_model_DW.DiscreteTransferFcn_states;
 
   // DiscreteTransferFcn: '<S37>/Discrete Transfer Fcn'
-  rtb_roll = FCS_model_P.DiscreteTransferFcn_NumCoef_a[1] *
+  rtb_rollrate = FCS_model_P.DiscreteTransferFcn_NumCoef_a[1] *
     FCS_model_DW.DiscreteTransferFcn_states_e;
-
-  // Outport: '<Root>/logging_out' incorporates:
-  //   Constant: '<S3>/Constant'
-  //   DataTypeConversion: '<S3>/Data Type Conversion6'
-  //   DiscreteTransferFcn: '<S36>/Discrete Transfer Fcn'
-  //   DiscreteTransferFcn: '<S37>/Discrete Transfer Fcn'
-
-  arg_logging_refout[0] = static_cast<real32_T>
-    (FCS_model_DW.Memory_PreviousInput);
-  arg_logging_refout[1] = static_cast<real32_T>(rtb_rollrate);
-  arg_logging_refout[2] = static_cast<real32_T>(rtb_roll);
-  arg_logging_refout[3] = static_cast<real32_T>(FCS_model_P.Constant_Value_i);
-  arg_logging_refout[4] = static_cast<real32_T>(FCS_model_P.Constant_Value_i);
-  arg_logging_refout[5] = static_cast<real32_T>(FCS_model_P.Constant_Value_i);
-  arg_logging_refout[6] = static_cast<real32_T>(FCS_model_P.Constant_Value_i);
-  arg_logging_refout[7] = static_cast<real32_T>(FCS_model_P.Constant_Value_i);
-  arg_logging_refout[8] = static_cast<real32_T>(FCS_model_P.Constant_Value_i);
 
   // DiscreteStateSpace: '<S12>/Internal'
   {
@@ -170,7 +211,7 @@ void FCS_model::step(real32_T arg_accel[3], real32_T arg_gyro[3], real32_T
   }
 
   // Trigonometry: '<S39>/Trigonometric Function4' incorporates:
-  //   Constant: '<S6>/Constant'
+  //   Constant: '<S6>/Constant1'
   //   DataTypeConversion: '<S4>/Data Type Conversion4'
   //   DataTypeConversion: '<S4>/Data Type Conversion5'
   //   Gain: '<S6>/KDz'
@@ -197,12 +238,11 @@ void FCS_model::step(real32_T arg_accel[3], real32_T arg_gyro[3], real32_T
     rtb_Product3 = rtb_TrigonometricFunction4;
   }
 
-  // Gain: '<S5>/0 = Thrust off' incorporates:
-  //   Gain: '<S5>/On=1//Off=0 for thrust'
+  // Gain: '<S5>/On=1//Off=0 for thrust' incorporates:
   //   Saturate: '<S6>/SaturationThrust'
 
-  rtb_uThrustoff = FCS_model_P.On1Off0forthrust_Gain * static_cast<real32_T>
-    (rtb_Product3) * FCS_model_P.uThrustoff_Gain;
+  rtb_On1Off0forthrust = FCS_model_P.On1Off0forthrust_Gain *
+    static_cast<real32_T>(rtb_Product3);
 
   // DiscreteStateSpace: '<S32>/Internal'
   {
@@ -243,7 +283,7 @@ void FCS_model::step(real32_T arg_accel[3], real32_T arg_gyro[3], real32_T
   // Sum: '<S8>/Sum1' incorporates:
   //   DiscreteTransferFcn: '<S36>/Discrete Transfer Fcn'
 
-  rtb_Sum1_j = rtb_TrigonometricFunction4 - rtb_rollrate;
+  rtb_Sum1_j = rtb_TrigonometricFunction4 - rtb_roll;
 
   // DiscreteStateSpace: '<S17>/Internal'
   {
@@ -282,7 +322,7 @@ void FCS_model::step(real32_T arg_accel[3], real32_T arg_gyro[3], real32_T
   // Sum: '<S9>/Sum1' incorporates:
   //   DiscreteTransferFcn: '<S37>/Discrete Transfer Fcn'
 
-  rtb_Sum1_jt = rtb_TrigonometricFunction4 - rtb_roll;
+  rtb_Sum1_jt = rtb_TrigonometricFunction4 - rtb_rollrate;
 
   // DiscreteStateSpace: '<S25>/Internal'
   {
@@ -307,64 +347,74 @@ void FCS_model::step(real32_T arg_accel[3], real32_T arg_gyro[3], real32_T
   rtb_TrigonometricFunction4 = (FCS_model_P.KDphi * 1.4 *
     rtb_TrigonometricFunction4 * FCS_model_P.ChangingofJxx_Gain +
     FCS_model_P.rollequilibrium_Value) * FCS_model_P.On1Off1forroll_Gain;
-  for (i = 0; i < 4; i++) {
-    // Saturate: '<S11>/Saturation5' incorporates:
+  for (iU = 0; iU < 4; iU++) {
+    // Gain: '<S11>/Gain' incorporates:
     //   Constant: '<S7>/TorqueTotalThrustToThrustPerMotor'
     //   DataTypeConversion: '<S5>/Data Type Conversion1'
-    //   Gain: '<S11>/ThrustToMotorCommand'
     //   Product: '<S7>/Product'
     //   SignalConversion generated from: '<S7>/Product'
 
-    u0 = (((FCS_model_P.TorqueTotalThrustToThrustPerMot[i + 4] *
-            rtb_DataTypeConversion2_i +
-            FCS_model_P.TorqueTotalThrustToThrustPerMot[i] * rtb_uThrustoff) +
-           FCS_model_P.TorqueTotalThrustToThrustPerMot[i + 8] *
-           rtb_DataTypeConversion6_b) +
-          FCS_model_P.TorqueTotalThrustToThrustPerMot[i + 12] *
-          static_cast<real32_T>(rtb_TrigonometricFunction4)) *
-      FCS_model_P.ThrustToMotorCommand_Gain;
-    if (u0 > FCS_model_P.Saturation5_UpperSat) {
-      u0 = FCS_model_P.Saturation5_UpperSat;
-    } else if (u0 < FCS_model_P.Saturation5_LowerSat) {
-      u0 = FCS_model_P.Saturation5_LowerSat;
+    arg_motors_refout[iU] = (((FCS_model_P.TorqueTotalThrustToThrustPerMot[iU +
+      4] * rtb_DataTypeConversion2_i +
+      FCS_model_P.TorqueTotalThrustToThrustPerMot[iU] * rtb_On1Off0forthrust) +
+      FCS_model_P.TorqueTotalThrustToThrustPerMot[iU + 8] *
+      rtb_DataTypeConversion6_b) +
+      FCS_model_P.TorqueTotalThrustToThrustPerMot[iU + 12] *
+      static_cast<real32_T>(rtb_TrigonometricFunction4)) *
+      FCS_model_P.Gain_Gain_n;
+
+    // Lookup_n-D: '<S11>/1-D Lookup Table'
+    arg_motors_refout[iU] = look1_iflf_binlx(arg_motors_refout[iU],
+      FCS_model_P.uDLookupTable_bp01Data, FCS_model_P.uDLookupTable_tableData,
+      8U);
+
+    // Saturate: '<S11>/Saturation'
+    u0 = arg_motors_refout[iU];
+    if (u0 > FCS_model_P.Saturation_UpperSat) {
+      arg_motors_refout[iU] = FCS_model_P.Saturation_UpperSat;
+    } else if (u0 < FCS_model_P.Saturation_LowerSat) {
+      arg_motors_refout[iU] = FCS_model_P.Saturation_LowerSat;
     }
 
-    // Outport: '<Root>/motors_refout' incorporates:
-    //   Gain: '<S11>/MotorDirections'
-    //   Saturate: '<S11>/Saturation5'
-
-    arg_motors_refout[i] = FCS_model_P.MotorDirections_Gain[i] * u0;
+    // End of Saturate: '<S11>/Saturation'
   }
 
-  // DataTypeConversion: '<S4>/Data Type Conversion6' incorporates:
-  //   Inport: '<Root>/pos_ref'
+  // Outport: '<Root>/logging_out' incorporates:
+  //   DataTypeConversion: '<S3>/Data Type Conversion13'
+  //   DataTypeConversion: '<S3>/Data Type Conversion6'
+  //   DataTypeConversion: '<S4>/Data Type Conversion'
+  //   DataTypeConversion: '<S4>/Data Type Conversion1'
+  //   DataTypeConversion: '<S4>/Data Type Conversion4'
+  //   DataTypeConversion: '<S4>/Data Type Conversion5'
+  //   DiscreteTransferFcn: '<S36>/Discrete Transfer Fcn'
+  //   DiscreteTransferFcn: '<S37>/Discrete Transfer Fcn'
+  //   Inport: '<Root>/accel'
+  //   Inport: '<Root>/gyro'
+  //   Inport: '<Root>/pos_est'
+  //   Inport: '<Root>/vel_est'
+  //   Inport: '<Root>/yaw_opticalfow'
 
-  rtb_DataTypeConversion6[0] = arg_pos_ref[0];
-
-  // DataTypeConversion: '<S4>/Data Type Conversion7' incorporates:
-  //   Inport: '<Root>/orient_ref'
-
-  rtb_DataTypeConversion7[0] = arg_orient_ref[0];
-
-  // DataTypeConversion: '<S4>/Data Type Conversion6' incorporates:
-  //   Inport: '<Root>/pos_ref'
-
-  rtb_DataTypeConversion6[1] = arg_pos_ref[1];
-
-  // DataTypeConversion: '<S4>/Data Type Conversion7' incorporates:
-  //   Inport: '<Root>/orient_ref'
-
-  rtb_DataTypeConversion7[1] = arg_orient_ref[1];
-
-  // DataTypeConversion: '<S4>/Data Type Conversion6' incorporates:
-  //   Inport: '<Root>/pos_ref'
-
-  rtb_DataTypeConversion6[2] = arg_pos_ref[2];
-
-  // DataTypeConversion: '<S4>/Data Type Conversion7' incorporates:
-  //   Inport: '<Root>/orient_ref'
-
-  rtb_DataTypeConversion7[2] = arg_orient_ref[2];
+  arg_logging_refout[0] = static_cast<real32_T>
+    (FCS_model_DW.Memory_PreviousInput);
+  arg_logging_refout[1] = static_cast<real32_T>(rtb_roll);
+  arg_logging_refout[2] = static_cast<real32_T>(rtb_rollrate);
+  arg_logging_refout[9] = *arg_yaw_opticalfow;
+  arg_logging_refout[3] = arg_accel[0];
+  arg_logging_refout[6] = arg_gyro[0];
+  arg_logging_refout[10] = arg_pos_est[0];
+  arg_logging_refout[13] = arg_vel_est[0];
+  arg_logging_refout[4] = arg_accel[1];
+  arg_logging_refout[7] = arg_gyro[1];
+  arg_logging_refout[11] = arg_pos_est[1];
+  arg_logging_refout[14] = arg_vel_est[1];
+  arg_logging_refout[5] = arg_accel[2];
+  arg_logging_refout[8] = arg_gyro[2];
+  arg_logging_refout[12] = arg_pos_est[2];
+  arg_logging_refout[15] = arg_vel_est[2];
+  arg_logging_refout[16] = arg_motors_refout[0];
+  arg_logging_refout[17] = arg_motors_refout[1];
+  arg_logging_refout[18] = arg_motors_refout[2];
+  arg_logging_refout[19] = arg_motors_refout[3];
 
   // Trigonometry: '<S39>/Trigonometric Function4' incorporates:
   //   DataTypeConversion: '<S4>/Data Type Conversion'
@@ -418,6 +468,36 @@ void FCS_model::step(real32_T arg_accel[3], real32_T arg_gyro[3], real32_T
 
   // Trigonometry: '<S39>/Trigonometric Function4'
   rtb_TrigonometricFunction4 = std::tan(rtb_TrigonometricFunction4);
+
+  // DataTypeConversion: '<S4>/Data Type Conversion6' incorporates:
+  //   Inport: '<Root>/pos_ref'
+
+  rtb_DataTypeConversion6[0] = arg_pos_ref[0];
+
+  // DataTypeConversion: '<S4>/Data Type Conversion7' incorporates:
+  //   Inport: '<Root>/orient_ref'
+
+  rtb_DataTypeConversion7[0] = arg_orient_ref[0];
+
+  // DataTypeConversion: '<S4>/Data Type Conversion6' incorporates:
+  //   Inport: '<Root>/pos_ref'
+
+  rtb_DataTypeConversion6[1] = arg_pos_ref[1];
+
+  // DataTypeConversion: '<S4>/Data Type Conversion7' incorporates:
+  //   Inport: '<Root>/orient_ref'
+
+  rtb_DataTypeConversion7[1] = arg_orient_ref[1];
+
+  // DataTypeConversion: '<S4>/Data Type Conversion6' incorporates:
+  //   Inport: '<Root>/pos_ref'
+
+  rtb_DataTypeConversion6[2] = arg_pos_ref[2];
+
+  // DataTypeConversion: '<S4>/Data Type Conversion7' incorporates:
+  //   Inport: '<Root>/orient_ref'
+
+  rtb_DataTypeConversion7[2] = arg_orient_ref[2];
 
   // Update for DiscreteTransferFcn: '<S36>/Discrete Transfer Fcn'
   FCS_model_DW.DiscreteTransferFcn_states = (Sum -

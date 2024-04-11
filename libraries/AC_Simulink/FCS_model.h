@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'FCS_model'.
 //
-// Model version                  : 3.4
+// Model version                  : 5.13
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Mon Mar 25 17:55:09 2024
+// C/C++ source code generated on : Thu Apr 11 20:20:02 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -69,7 +69,7 @@ class FCS_model final
   // Parameters (default storage)
   struct P_FCS_model_T {
     struct_OSJpyIZcrpXqReVWwh9iuG Vehicle;// Variable: Vehicle
-                                             //  Referenced by: '<S6>/Constant'
+                                             //  Referenced by: '<S6>/Constant1'
 
     real_T KDphi;                      // Variable: KDphi
                                           //  Referenced by: '<S9>/KDphi'
@@ -89,7 +89,7 @@ class FCS_model final
     real_T g;                          // Variable: g
                                           //  Referenced by:
                                           //    '<S38>/Constant'
-                                          //    '<S6>/Constant'
+                                          //    '<S6>/Constant1'
 
     real_T w_c_pitch;                  // Variable: w_c_pitch
                                           //  Referenced by: '<S36>/Gain'
@@ -144,9 +144,6 @@ class FCS_model final
 
     real_T DiscreteTransferFcn_InitialSt_g;// Expression: 0
                                               //  Referenced by: '<S37>/Discrete Transfer Fcn'
-
-    real_T Constant_Value_i;           // Expression: 1
-                                          //  Referenced by: '<S3>/Constant'
 
     real_T Internal_A[3];              // Computed Parameter: Internal_A
                                           //  Referenced by: '<S12>/Internal'
@@ -282,21 +279,22 @@ class FCS_model final
     real32_T On1Off0forthrust_Gain; // Computed Parameter: On1Off0forthrust_Gain
                                        //  Referenced by: '<S5>/On=1//Off=0 for thrust'
 
-    real32_T uThrustoff_Gain;          // Computed Parameter: uThrustoff_Gain
-                                          //  Referenced by: '<S5>/0 = Thrust off'
+    real32_T Gain_Gain_n;              // Computed Parameter: Gain_Gain_n
+                                          //  Referenced by: '<S11>/Gain'
 
-    real32_T ThrustToMotorCommand_Gain;
-                                // Computed Parameter: ThrustToMotorCommand_Gain
-                                   //  Referenced by: '<S11>/ThrustToMotorCommand'
+    real32_T uDLookupTable_tableData[9];
+                                  // Computed Parameter: uDLookupTable_tableData
+                                     //  Referenced by: '<S11>/1-D Lookup Table'
 
-    real32_T Saturation5_UpperSat;     // Expression: Vehicle.Motor.maxLimit
-                                          //  Referenced by: '<S11>/Saturation5'
+    real32_T uDLookupTable_bp01Data[9];
+                                   // Computed Parameter: uDLookupTable_bp01Data
+                                      //  Referenced by: '<S11>/1-D Lookup Table'
 
-    real32_T Saturation5_LowerSat;     // Expression: Vehicle.Motor.minLimit
-                                          //  Referenced by: '<S11>/Saturation5'
+    real32_T Saturation_UpperSat;     // Computed Parameter: Saturation_UpperSat
+                                         //  Referenced by: '<S11>/Saturation'
 
-    real32_T MotorDirections_Gain[4];// Computed Parameter: MotorDirections_Gain
-                                        //  Referenced by: '<S11>/MotorDirections'
+    real32_T Saturation_LowerSat;     // Computed Parameter: Saturation_LowerSat
+                                         //  Referenced by: '<S11>/Saturation'
 
   };
 
@@ -334,7 +332,7 @@ class FCS_model final
             real32_T arg_pos_est[3], real32_T arg_vel_est[3], real32_T
             *arg_yaw_opticalfow, real32_T arg_pos_ref[3], real32_T
             arg_orient_ref[3], real32_T arg_motors_refout[4], real32_T
-            arg_logging_refout[9]);
+            arg_logging_refout[20]);
 
   // model terminate function
   static void terminate();
@@ -380,8 +378,16 @@ class FCS_model final
 //  Block '<S39>/Zero-Order Hold3' : Eliminated since input and output rates are identical
 //  Block '<S39>/Zero-Order Hold4' : Eliminated since input and output rates are identical
 //  Block '<S3>/Data Type Conversion1' : Eliminate redundant data type conversion
+//  Block '<S3>/Data Type Conversion10' : Eliminate redundant data type conversion
+//  Block '<S3>/Data Type Conversion11' : Eliminate redundant data type conversion
+//  Block '<S3>/Data Type Conversion12' : Eliminate redundant data type conversion
 //  Block '<S3>/Data Type Conversion2' : Eliminate redundant data type conversion
 //  Block '<S3>/Data Type Conversion3' : Eliminate redundant data type conversion
+//  Block '<S3>/Data Type Conversion4' : Eliminate redundant data type conversion
+//  Block '<S3>/Data Type Conversion5' : Eliminate redundant data type conversion
+//  Block '<S3>/Data Type Conversion7' : Eliminate redundant data type conversion
+//  Block '<S3>/Data Type Conversion8' : Eliminate redundant data type conversion
+//  Block '<S3>/Data Type Conversion9' : Eliminate redundant data type conversion
 
 
 //-
