@@ -135,18 +135,18 @@ void ModeLab::run()
             ref_power_gain = 0.0f;
             gcs().send_text(MAV_SEVERITY_WARNING, "LAB: power gain out of (0-1) range: %f", ref_power_gain);
         }  
-            motor_out_1 = arg_motors_refout[0] * ref_power_gain * 100 + 1000;
-            motor_out_2 = arg_motors_refout[1] * ref_power_gain * 100 + 1000;
-            motor_out_3 = arg_motors_refout[2] * ref_power_gain * 100 + 1000;
-            motor_out_4 = arg_motors_refout[3] * ref_power_gain * 100 + 1000;
+            motor_out_1 = arg_motors_refout[0] * ref_power_gain * 1000 + 1000;
+            motor_out_2 = arg_motors_refout[1] * ref_power_gain * 1000 + 1000;
+            motor_out_3 = arg_motors_refout[2] * ref_power_gain * 1000 + 1000;
+            motor_out_4 = arg_motors_refout[3] * ref_power_gain * 1000 + 1000;
     }
     else {
-        motor_out_1 = 1100.0F;
-        motor_out_2 = 1100.0F;
-        motor_out_3 = 1100.0F;
-        motor_out_4 = 1100.0F;
+        motor_out_1 = 0.0F;
+        motor_out_2 = 0.0F;
+        motor_out_3 = 0.0F;
+        motor_out_4 = 0.0F;
     }
-
+    
     // send logging data to the dashboard
     mavlink_channel_t chan = MAVLINK_COMM_0;
     mavlink_msg_lab_to_dashboard_send(chan, arg_logging_refout);
@@ -215,7 +215,7 @@ void ModeLab::arm_motors()
 
     // reverse the motors
     hal.rcout->disable_channel_mask_updates();
-    change_motor_direction(true);
+    change_motor_direction(false);
 
     // disable throttle and gps failsafe
     g.failsafe_throttle.set(FS_THR_DISABLED);
