@@ -415,6 +415,7 @@ private:
     float ref_power_gain; 
     
     uint32_t last_dashboard_msg_ms;
+    uint32_t start_time;
 
     // float logging[10];
 

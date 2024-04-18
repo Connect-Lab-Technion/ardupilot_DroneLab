@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'FCS_model'.
 //
-// Model version                  : 5.13
+// Model version                  : 5.21
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Thu Apr 11 20:20:02 2024
+// C/C++ source code generated on : Thu Apr 18 15:33:46 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -50,35 +50,35 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
     },
 
     {
-      2.0,
-      0.033,
+      3.0,
+      0.0225,
       0.008,
       0.0,
       0.000375,
-      1.0209375000000001e-7,
+      4.7460937499999996e-8,
       0.0,
       0.0,
-      1.0209375000000001e-7,
+      4.7460937499999996e-8,
       0.0107,
       0.00078263752785053692,
-      0.15433206602850458,
+      0.33953054526271004,
       0.25481807079117214,
       0.11868238913561441,
       -0.13613568165555773,
       0.15271630954950383,
       5.5,
-      0.0034211943997592849,
-      0.605147136,
-      4.7199903669109095e-8,
-      1.1392838555498841e-10,
-      4.7199903669109095e-8
+      0.0015904312808798326,
+      0.28131839999999997,
+      1.0200358254425275e-8,
+      1.6787067408153957e-11,
+      1.0200358254425275e-8
     },
 
     {
       2000.0,
       1000.0,
       13840.8,
-      1530.72683064892
+      7083.1001370961685
     }
   },
 
@@ -117,12 +117,12 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
   // Variable: w_c_pitch
   //  Referenced by: '<S36>/Gain'
 
-  0.3,
+  3.0,
 
   // Variable: w_c_roll
   //  Referenced by: '<S37>/Gain'
 
-  0.3,
+  3.0,
 
   // Variable: w_c_yaw
   //  Referenced by: '<S43>/Gain'
@@ -177,12 +177,12 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
   // Expression: [num_pitch_disc]
   //  Referenced by: '<S36>/Discrete Transfer Fcn'
 
-  { 0.0, 0.0099850149887567487 },
+  { 0.0, 0.0098514888171639427 },
 
   // Expression: [den_pitch_disc]
   //  Referenced by: '<S36>/Discrete Transfer Fcn'
 
-  { 1.0, -0.997004495503373 },
+  { 1.0, -0.97044553354850815 },
 
   // Expression: 0
   //  Referenced by: '<S36>/Discrete Transfer Fcn'
@@ -192,12 +192,12 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
   // Expression: [num_roll_disc]
   //  Referenced by: '<S37>/Discrete Transfer Fcn'
 
-  { 0.0, 0.0099850149887567487 },
+  { 0.0, 0.0098514888171639427 },
 
   // Expression: [den_roll_disc]
   //  Referenced by: '<S37>/Discrete Transfer Fcn'
 
-  { 1.0, -0.997004495503373 },
+  { 1.0, -0.97044553354850815 },
 
   // Expression: 0
   //  Referenced by: '<S37>/Discrete Transfer Fcn'
@@ -380,22 +380,22 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
   0.0,
 
   // Expression: -1
-  //  Referenced by: '<S38>/Gain1'
-
-  -1.0,
-
-  // Expression: -1
-  //  Referenced by: '<S38>/Gain'
-
-  -1.0,
-
-  // Expression: -1
   //  Referenced by: '<S38>/Gain2'
 
   -1.0,
 
   // Expression: -1
   //  Referenced by: '<S38>/Gain3'
+
+  -1.0,
+
+  // Expression: -1
+  //  Referenced by: '<S38>/Gain4'
+
+  -1.0,
+
+  // Expression: -1
+  //  Referenced by: '<S38>/Gain1'
 
   -1.0,
 
@@ -407,19 +407,19 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
   // Expression: Controller.Q2Ts
   //  Referenced by: '<S7>/TorqueTotalThrustToThrustPerMotor'
 
-  { 0.25F, 0.25F, 0.25F, 0.25F, 103.573624F, -103.573624F, -103.573624F,
-    103.573624F, -5.66592F, 5.66592F, -5.66592F, 5.66592F, 5.66592F, 5.66592F,
-    -5.66592F, -5.66592F },
+  { 0.25F, 0.25F, 0.25F, 0.25F, 151.90799F, -151.90799F, -151.90799F, 151.90799F,
+    -5.66592F, 5.66592F, -5.66592F, 5.66592F, 5.66592F, 5.66592F, -5.66592F,
+    -5.66592F },
 
   // Computed Parameter: SaturationThrust_UpperSat
   //  Referenced by: '<S6>/SaturationThrust'
 
-  4.80817318F,
+  1.03909302F,
 
   // Computed Parameter: SaturationThrust_LowerSat
   //  Referenced by: '<S6>/SaturationThrust'
 
-  -4.80817318F,
+  -1.03909302F,
 
   // Computed Parameter: On1Off0forthrust_Gain
   //  Referenced by: '<S5>/On=1//Off=0 for thrust'

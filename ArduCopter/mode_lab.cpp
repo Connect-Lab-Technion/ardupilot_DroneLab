@@ -22,6 +22,7 @@ bool ModeLab::init(bool ignore_checks)
     arm_motors();
 
     // Start timer for lab message
+    start_time = AP_HAL::millis();
     last_dashboard_msg_ms = AP_HAL::millis();
 
     // set the home for the ahrs
@@ -123,7 +124,7 @@ void ModeLab::run()
     float arg_motors_refout[4];
 
     // '<Root>/logging_refout' 
-    float arg_logging_refout[20];
+    float arg_logging_refout[23];
 
     labController.step(arg_accel, arg_gyro, &arg_bat_V, arg_pos_est, arg_vel_est,
         &arg_yaw_opticalfow, arg_pos_ref, arg_orient_ref, arg_motors_refout, arg_logging_refout);
@@ -146,11 +147,26 @@ void ModeLab::run()
         motor_out_3 = 0.0F;
         motor_out_4 = 0.0F;
     }
+
+    motor_out_1 = 0.0F;
+    motor_out_2 = 0.0F;
+    motor_out_3 = 0.0F;
+    motor_out_4 = 1.0F * ref_power_gain * 1000 + 1000;
     
+    // Define a new array arg_logging_refout_new with time as an additional entry at the beginning
+    float timeSinceStart = float(now - start_time);
+    size_t size = sizeof(arg_logging_refout) / sizeof(arg_logging_refout[23]);
+    float logging_full[size+1];
+    logging_full[0] = timeSinceStart;
+
+    // Copy the values from arg_logging_refout to arg_logging_refout_new starting from index 1
+    for (int i = 0; i < size; ++i) {
+        logging_full[i + 1] = arg_logging_refout[i];
+    }
     // send logging data to the dashboard
     mavlink_channel_t chan = MAVLINK_COMM_0;
-    mavlink_msg_lab_to_dashboard_send(chan, arg_logging_refout);
-    gcs().send_message(MSG_LAB_TO_DASHBOARD);
+    mavlink_msg_lab_to_dashboard_send(chan, logging_full);
+    // gcs().send_message(MSG_LAB_TO_DASHBOARD);
 }
 
 

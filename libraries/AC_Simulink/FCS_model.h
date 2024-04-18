@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'FCS_model'.
 //
-// Model version                  : 5.13
+// Model version                  : 5.21
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Thu Apr 11 20:20:02 2024
+// C/C++ source code generated on : Thu Apr 18 15:33:46 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -250,19 +250,19 @@ class FCS_model final
     real_T On1Off1forroll_Gain;        // Expression: 0
                                           //  Referenced by: '<S5>/On=1//Off=1 for roll'
 
-    real_T Gain1_Gain;                 // Expression: -1
-                                          //  Referenced by: '<S38>/Gain1'
-
-    real_T Gain_Gain;                  // Expression: -1
-                                          //  Referenced by: '<S38>/Gain'
-
     real_T Gain2_Gain;                 // Expression: -1
                                           //  Referenced by: '<S38>/Gain2'
 
     real_T Gain3_Gain;                 // Expression: -1
                                           //  Referenced by: '<S38>/Gain3'
 
-    real_T Gain_Gain_i;                // Expression: -1
+    real_T Gain4_Gain;                 // Expression: -1
+                                          //  Referenced by: '<S38>/Gain4'
+
+    real_T Gain1_Gain;                 // Expression: -1
+                                          //  Referenced by: '<S38>/Gain1'
+
+    real_T Gain_Gain;                  // Expression: -1
                                           //  Referenced by: '<S39>/Gain'
 
     real32_T TorqueTotalThrustToThrustPerMot[16];// Expression: Controller.Q2Ts
@@ -332,7 +332,7 @@ class FCS_model final
             real32_T arg_pos_est[3], real32_T arg_vel_est[3], real32_T
             *arg_yaw_opticalfow, real32_T arg_pos_ref[3], real32_T
             arg_orient_ref[3], real32_T arg_motors_refout[4], real32_T
-            arg_logging_refout[20]);
+            arg_logging_refout[22]);
 
   // model terminate function
   static void terminate();
@@ -352,6 +352,8 @@ class FCS_model final
 //-
 //  These blocks were eliminated from the model due to optimizations:
 //
+//  Block '<S11>/KV [rpm//V]' : Unused code path elimination
+//  Block '<S11>/K_tau [Nm//A]' : Unused code path elimination
 //  Block '<S39>/Divide1' : Unused code path elimination
 //  Block '<S39>/Divide2' : Unused code path elimination
 //  Block '<S39>/Product8' : Unused code path elimination
