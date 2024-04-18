@@ -21,11 +21,11 @@ bool ModeLab::init(bool ignore_checks)
     // arm motors
     arm_motors();
 
-    // Start timer for lab message
+    // Start timers 
     start_time = AP_HAL::millis();
     last_dashboard_msg_ms = AP_HAL::millis();
 
-    // set the home for the ahrs
+    // set the home for the ahrs TODO: returns zeros 
     copter.set_home_to_current_location_inflight();
 
     // turn on notify leds
@@ -37,7 +37,7 @@ bool ModeLab::init(bool ignore_checks)
     motor_out_3         = 0.0f;
     motor_out_4         = 0.0f;
     
-    // set the initial reference values - to be updated by the dashboard
+    // set the initial reference values 
     master_switch       = 0;
     ref_power_gain      = 0.0f;
     ref_pos_x           = 0.0f;
@@ -51,21 +51,27 @@ bool ModeLab::init(bool ignore_checks)
     return true;
 }
 
-// lab_run - runs the lab controller
-// should be called at 100hz or more
-void ModeLab::run()
+void ModeLab::check_if_received_message_from_dashboard(float threshold_ms)
 {
-    // check if we have received a message from the dashboard in the last second, otherwise exit
-    uint32_t now = AP_HAL::millis();
-    uint32_t dashboard_msg_time = now - last_dashboard_msg_ms;
-    if (dashboard_msg_time > 2000) {
-        // exit mode if we haven't received a message from the dashboard in the last second
-        gcs().send_text(MAV_SEVERITY_WARNING, "LAB: no message from dashboard: %f" , double(dashboard_msg_time));
+    uint32_t dashboard_msg_time = AP_HAL::millis() - last_dashboard_msg_ms;
+    if (dashboard_msg_time > threshold_ms) {
+        // Send a warning message to the GCS
+        gcs().send_text(MAV_SEVERITY_WARNING, "LAB: no message from dashboard in: %f ms" , double(dashboard_msg_time));
+        // Run internal exit function
         exit();
-        // switch back to the default mode 
+        // Switch back to the default mode 
         set_mode(Mode::Number::STABILIZE, ModeReason::GCS_COMMAND);
     }
+}
 
+// lab_run - runs the lab controller
+// should be called at 100hz to match the controller rate
+void ModeLab::run()
+{
+    // check if we have received a message from the dashboard within a given time, otherwise exit
+    check_if_received_message_from_dashboard(2000); // 2 seconds
+
+    // Prepare the arguments for the controller, given by the generated ert_main ------------
 
     // '<Root>/accel' -------------------------------------
     Vector3f accel_vals = ahrs.get_accel();
@@ -114,16 +120,16 @@ void ModeLab::run()
     float arg_yaw_opticalfow{ atan2f(flowRate.y, flowRate.x) };
 
     // '<Root>/pos_ref' -----------------------------------
-    float arg_pos_ref[3]{ 0.0F, 0.0F, 0.0F };
+    float arg_pos_ref[3]{ ref_pos_x, ref_pos_y, ref_pos_z};
 
     // '<Root>/orient_ref' --------------------------------
-    float arg_orient_ref[3]{ 0.0F, 0.0F, 0.0F };
+    float arg_orient_ref[3]{ ref_orient_yaw, ref_orient_pitch, ref_orient_roll};
 
     // Return variables from the controller ---------------
     // '<Root>/motors_refout' 
     float arg_motors_refout[4];
 
-    // '<Root>/logging_refout' 
+    // '<Root>/logging_refout' !! The array size is modified during the build process. See also common.xml !!
     float arg_logging_refout[23];
 
     labController.step(arg_accel, arg_gyro, &arg_bat_V, arg_pos_est, arg_vel_est,
@@ -132,14 +138,16 @@ void ModeLab::run()
     // update the motor output, if the master switch is off, set all motors to 0
     // otherwise set the motors to the output from the controller times the power gain
     if (master_switch != 0) {
+        // Check if the power gain is within the range (0-1)
         if (ref_power_gain > 1.0f || ref_power_gain < 0.0f) {
             ref_power_gain = 0.0f;
             gcs().send_text(MAV_SEVERITY_WARNING, "LAB: power gain out of (0-1) range: %f", ref_power_gain);
         }  
-            motor_out_1 = arg_motors_refout[0] * ref_power_gain * 1000 + 1000;
-            motor_out_2 = arg_motors_refout[1] * ref_power_gain * 1000 + 1000;
-            motor_out_3 = arg_motors_refout[2] * ref_power_gain * 1000 + 1000;
-            motor_out_4 = arg_motors_refout[3] * ref_power_gain * 1000 + 1000;
+        // PWM output is between 1000 and 2000 (0% - 100%)
+        motor_out_1 = arg_motors_refout[0] * ref_power_gain * 1000 + 1000;
+        motor_out_2 = arg_motors_refout[1] * ref_power_gain * 1000 + 1000;
+        motor_out_3 = arg_motors_refout[2] * ref_power_gain * 1000 + 1000;
+        motor_out_4 = arg_motors_refout[3] * ref_power_gain * 1000 + 1000;
     }
     else {
         motor_out_1 = 0.0F;
@@ -148,20 +156,21 @@ void ModeLab::run()
         motor_out_4 = 0.0F;
     }
     
-    // Define a new array arg_logging_refout_new with time as an additional entry at the beginning
-    float timeSinceStart = float(now - start_time);
-    size_t size = sizeof(arg_logging_refout) / sizeof(arg_logging_refout[23]);
-    float logging_full[size+1];
-    logging_full[0] = timeSinceStart;
-
-    // Copy the values from arg_logging_refout to arg_logging_refout_new starting from index 1
-    for (int i = 0; i < size; ++i) {
+    // Define a new array logging_full with timeSinceStart as the first element
+    float timeSinceStart_s = float(AP_HAL::millis() - start_time) / 1000.0f; // in seconds
+    
+    size_t size_controller_logging = sizeof(arg_logging_refout) / sizeof(arg_logging_refout[23]);
+    
+    float logging_full[size_controller_logging+1];
+    
+    logging_full[0] = timeSinceStart_s;
+    
+    for (int i = 0; i < size_controller_logging; ++i) {
         logging_full[i + 1] = arg_logging_refout[i];
     }
     // send logging data to the dashboard
     mavlink_channel_t chan = MAVLINK_COMM_0;
     mavlink_msg_lab_to_dashboard_send(chan, logging_full);
-    // gcs().send_message(MSG_LAB_TO_DASHBOARD);
 }
 
 

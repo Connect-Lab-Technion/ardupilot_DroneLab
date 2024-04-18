@@ -405,6 +405,7 @@ protected:
 private: 
     void arm_motors();
     void disarm_motors();
+    void check_if_received_message_from_dashboard(float threshold_ms);
 
     float motor_out_1,motor_out_2,motor_out_3,motor_out_4;
     uint32_t last_throttle_warning_output_ms;
