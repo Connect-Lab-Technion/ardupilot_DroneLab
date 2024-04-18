@@ -147,11 +147,6 @@ void ModeLab::run()
         motor_out_3 = 0.0F;
         motor_out_4 = 0.0F;
     }
-
-    motor_out_1 = 0.0F;
-    motor_out_2 = 0.0F;
-    motor_out_3 = 0.0F;
-    motor_out_4 = 1.0F * ref_power_gain * 1000 + 1000;
     
     // Define a new array arg_logging_refout_new with time as an additional entry at the beginning
     float timeSinceStart = float(now - start_time);
