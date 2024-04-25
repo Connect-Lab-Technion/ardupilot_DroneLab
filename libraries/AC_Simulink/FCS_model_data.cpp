@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'FCS_model'.
 //
-// Model version                  : 5.21
-// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Thu Apr 18 15:33:46 2024
+// Model version                  : 5.19
+// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
+// C/C++ source code generated on : Thu Apr 18 17:44:11 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -38,7 +38,7 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
     },
 
     {
-      0.068,
+      0.0769,
 
       { 6.86e-5, 0.0, 0.0, 0.0, 9.2e-5, 0.0, 0.0, 0.0, 0.0001366 },
       0.0624,
@@ -117,12 +117,12 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
   // Variable: w_c_pitch
   //  Referenced by: '<S36>/Gain'
 
-  3.0,
+  0.03,
 
   // Variable: w_c_roll
   //  Referenced by: '<S37>/Gain'
 
-  3.0,
+  0.3,
 
   // Variable: w_c_yaw
   //  Referenced by: '<S43>/Gain'
@@ -177,12 +177,12 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
   // Expression: [num_pitch_disc]
   //  Referenced by: '<S36>/Discrete Transfer Fcn'
 
-  { 0.0, 0.0098514888171639427 },
+  { 0.0, 0.009998500149988751 },
 
   // Expression: [den_pitch_disc]
   //  Referenced by: '<S36>/Discrete Transfer Fcn'
 
-  { 1.0, -0.97044553354850815 },
+  { 1.0, -0.99970004499550036 },
 
   // Expression: 0
   //  Referenced by: '<S36>/Discrete Transfer Fcn'
@@ -192,12 +192,12 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
   // Expression: [num_roll_disc]
   //  Referenced by: '<S37>/Discrete Transfer Fcn'
 
-  { 0.0, 0.0098514888171639427 },
+  { 0.0, 0.0099850149887567487 },
 
   // Expression: [den_roll_disc]
   //  Referenced by: '<S37>/Discrete Transfer Fcn'
 
-  { 1.0, -0.97044553354850815 },
+  { 1.0, -0.997004495503373 },
 
   // Expression: 0
   //  Referenced by: '<S37>/Discrete Transfer Fcn'
@@ -221,6 +221,11 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
 
   // Expression: 0
   //  Referenced by: '<S12>/Internal'
+
+  0.0,
+
+  // Expression: 0
+  //  Referenced by: '<S6>/Gain'
 
   0.0,
 
@@ -314,10 +319,10 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
 
   0.6,
 
-  // Expression: 1
+  // Expression: 0
   //  Referenced by: '<S5>/On=1//Off=2 for pitch'
 
-  1.0,
+  0.0,
 
   // Expression: 0
   //  Referenced by: '<S5>/roll equilibrium'
@@ -390,17 +395,12 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
   -1.0,
 
   // Expression: -1
-  //  Referenced by: '<S38>/Gain4'
+  //  Referenced by: '<S39>/Gain'
 
   -1.0,
 
   // Expression: -1
   //  Referenced by: '<S38>/Gain1'
-
-  -1.0,
-
-  // Expression: -1
-  //  Referenced by: '<S39>/Gain'
 
   -1.0,
 
@@ -424,22 +424,17 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
   // Computed Parameter: On1Off0forthrust_Gain
   //  Referenced by: '<S5>/On=1//Off=0 for thrust'
 
-  0.0F,
-
-  // Computed Parameter: Gain_Gain_n
-  //  Referenced by: '<S11>/Gain'
-
-  101.936798F,
+  1.0F,
 
   // Computed Parameter: uDLookupTable_tableData
   //  Referenced by: '<S11>/1-D Lookup Table'
 
-  { 0.0F, 0.1F, 0.2F, 0.3F, 0.4F, 0.5F, 0.6F, 0.7F, 0.8F },
+  { 0.1F, 0.2F, 0.3F, 0.4F, 0.5F, 0.6F, 0.7F, 0.8F, 0.9F, 1.0F },
 
   // Computed Parameter: uDLookupTable_bp01Data
   //  Referenced by: '<S11>/1-D Lookup Table'
 
-  { 0.0F, 36.6F, 50.3F, 62.5F, 74.6F, 83.5F, 93.2F, 102.0F, 112.7F },
+  { 0.0F, 0.005F, 0.01F, 0.02F, 0.03F, 0.04F, 0.05F, 0.06F, 0.07F, 0.08F },
 
   // Computed Parameter: Saturation_UpperSat
   //  Referenced by: '<S11>/Saturation'

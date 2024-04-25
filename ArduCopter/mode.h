@@ -396,8 +396,6 @@ public:
     void change_motor_direction(bool reverse);
     void output_to_motors() override;
 
-    void handle_message(const mavlink_message_t &msg);
-
 protected:
     const char *name() const override { return "LAB"; }
     const char *name4() const override { return "LAB"; }
@@ -405,16 +403,11 @@ protected:
 private: 
     void arm_motors();
     void disarm_motors();
-    void check_if_received_message_from_dashboard(float threshold_ms);
+    void monitorDashboardMessage(float threshold_ms);
 
-    float motor_out_1,motor_out_2,motor_out_3,motor_out_4;
+    float *motor_out;
     uint32_t last_throttle_warning_output_ms;
-    
-    u_int8_t master_switch;
-    float ref_pos_x,ref_pos_y,ref_pos_z;
-    float ref_orient_yaw, ref_orient_pitch, ref_orient_roll; 
-    float ref_power_gain; 
-    
+        
     uint32_t last_dashboard_msg_ms;
     uint32_t start_time;
 

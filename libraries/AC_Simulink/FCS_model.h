@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'FCS_model'.
 //
-// Model version                  : 5.21
-// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Thu Apr 18 15:33:46 2024
+// Model version                  : 5.19
+// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
+// C/C++ source code generated on : Thu Apr 18 17:44:11 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -25,18 +25,18 @@
 extern "C"
 {
 
-#include "rt_nonfinite.h"
-
-}
-
-extern "C"
-{
-
-#include "rtGetNaN.h"
+#include "rtGetInf.h"
 
 }
 
 #include "rt_defines.h"
+
+extern "C"
+{
+
+#include "rt_nonfinite.h"
+
+}
 
 // Macros for accessing real-time model data structure
 #ifndef rtmGetErrorStatus
@@ -157,6 +157,9 @@ class FCS_model final
     real_T Internal_InitialCondition;  // Expression: 0
                                           //  Referenced by: '<S12>/Internal'
 
+    real_T Gain_Gain;                  // Expression: 0
+                                          //  Referenced by: '<S6>/Gain'
+
     real_T yawequilibrium_Value;       // Expression: 0
                                           //  Referenced by: '<S5>/yaw equilibrium'
 
@@ -211,7 +214,7 @@ class FCS_model final
     real_T ChangingofJyy_Gain;         // Expression: 0.6
                                           //  Referenced by: '<S5>/Changing of Jyy'
 
-    real_T On1Off2forpitch_Gain;       // Expression: 1
+    real_T On1Off2forpitch_Gain;       // Expression: 0
                                           //  Referenced by: '<S5>/On=1//Off=2 for pitch'
 
     real_T rollequilibrium_Value;      // Expression: 0
@@ -256,14 +259,11 @@ class FCS_model final
     real_T Gain3_Gain;                 // Expression: -1
                                           //  Referenced by: '<S38>/Gain3'
 
-    real_T Gain4_Gain;                 // Expression: -1
-                                          //  Referenced by: '<S38>/Gain4'
+    real_T Gain_Gain_i;                // Expression: -1
+                                          //  Referenced by: '<S39>/Gain'
 
     real_T Gain1_Gain;                 // Expression: -1
                                           //  Referenced by: '<S38>/Gain1'
-
-    real_T Gain_Gain;                  // Expression: -1
-                                          //  Referenced by: '<S39>/Gain'
 
     real32_T TorqueTotalThrustToThrustPerMot[16];// Expression: Controller.Q2Ts
                                                     //  Referenced by: '<S7>/TorqueTotalThrustToThrustPerMotor'
@@ -279,14 +279,11 @@ class FCS_model final
     real32_T On1Off0forthrust_Gain; // Computed Parameter: On1Off0forthrust_Gain
                                        //  Referenced by: '<S5>/On=1//Off=0 for thrust'
 
-    real32_T Gain_Gain_n;              // Computed Parameter: Gain_Gain_n
-                                          //  Referenced by: '<S11>/Gain'
-
-    real32_T uDLookupTable_tableData[9];
+    real32_T uDLookupTable_tableData[10];
                                   // Computed Parameter: uDLookupTable_tableData
                                      //  Referenced by: '<S11>/1-D Lookup Table'
 
-    real32_T uDLookupTable_bp01Data[9];
+    real32_T uDLookupTable_bp01Data[10];
                                    // Computed Parameter: uDLookupTable_bp01Data
                                       //  Referenced by: '<S11>/1-D Lookup Table'
 
@@ -352,8 +349,6 @@ class FCS_model final
 //-
 //  These blocks were eliminated from the model due to optimizations:
 //
-//  Block '<S11>/KV [rpm//V]' : Unused code path elimination
-//  Block '<S11>/K_tau [Nm//A]' : Unused code path elimination
 //  Block '<S39>/Divide1' : Unused code path elimination
 //  Block '<S39>/Divide2' : Unused code path elimination
 //  Block '<S39>/Product8' : Unused code path elimination

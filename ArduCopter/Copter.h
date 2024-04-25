@@ -73,6 +73,11 @@
 #include <AP_OpticalFlow/AP_OpticalFlow.h>
 #include <AP_Winch/AP_Winch_config.h>
 
+
+#if MODE_LAB_ENABLED
+#include <AC_Simulink/AC_Simulink.h>
+#endif
+
 // Configuration
 #include "defines.h"
 #include "config.h"
@@ -315,6 +320,10 @@ private:
 
     // Arming/Disarming management class
     AP_Arming_Copter arming;
+
+#if MODE_LAB_ENABLED
+    AC_Simulink simulinkController;
+#endif
 
     // Optical flow sensor
 #if AP_OPTICALFLOW_ENABLED

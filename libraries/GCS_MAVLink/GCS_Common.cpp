@@ -106,6 +106,10 @@ extern AP_IOMCU iomcu;
 
 #include <ctype.h>
 
+#if MODE_LAB_ENABLED
+#include <AC_Simulink/AC_Simulink.h>
+#endif
+
 extern const AP_HAL::HAL& hal;
 
 struct GCS_MAVLINK::LastRadioStatus GCS_MAVLINK::last_radio_status;
@@ -5440,25 +5444,13 @@ void GCS_MAVLINK::send_extended_sys_state() const
 
 void GCS_MAVLINK::send_lab_to_dashboard() const
 {
-    // gcs().send_text(MAV_SEVERITY_INFO, "GCS_MAVLINK::send_lab_to_dashboard");
-    // float logging1 = 69;
-    // float logging2 = 69;
-    // float logging3 = 69;
-    // float logging4 = 69;
-    // float logging5 = 69;
-    // float logging6 = 69;
-    // float logging7 = 69;
-    // float logging8 = 69;
-    // float logging9 = 69;
-    // mavlink_msg_lab_to_dashboard_send(chan, logging1, 
-    //                                         logging2, 
-    //                                         logging3,
-    //                                         logging4,
-    //                                         logging5,
-    //                                         logging6,
-    //                                         logging7,
-    //                                         logging8,
-    //                                         logging9);
+    // AC_Simulink simulink_Controller;
+
+    // float *logging_data = simulink_Controller.get_logging_data();
+
+    // gcs().send_text(MAV_SEVERITY_INFO, "GCS_MAVLINK::send_lab_to_dashboard, example: %f",logging_data[0]);
+    
+    // mavlink_msg_lab_to_dashboard_send(chan, logging_data);
 }
 
 void GCS_MAVLINK::send_attitude() const
