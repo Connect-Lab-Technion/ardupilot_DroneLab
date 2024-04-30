@@ -98,3 +98,9 @@
 #ifndef AP_MAVLINK_COMMAND_LONG_ENABLED
 #define AP_MAVLINK_COMMAND_LONG_ENABLED 1
 #endif
+
+//////////////////////////////////////////////////////////////////////////////
+// Lab - fly vehicle in custom advanced control lab mode 
+#ifndef MODE_LAB_ENABLED
+# define MODE_LAB_ENABLED 1
+#endif

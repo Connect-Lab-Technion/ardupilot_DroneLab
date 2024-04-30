@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'FCS_model'.
 //
-// Model version                  : 5.21
-// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Thu Apr 18 15:33:46 2024
+// Model version                  : 5.19
+// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
+// C/C++ source code generated on : Sun Apr 28 12:32:03 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -122,6 +122,30 @@ struct struct_OSJpyIZcrpXqReVWwh9iuG
   struct_q6UUpnZ4gTjFvULFx6Rxa Airframe;
   struct_OMRgDnJcZuQneKEj9vdTyD Rotor;
   struct_p3FXZIgqtjF2uqDpmYjb6C Motor;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_struct_sfjjhK32Dt7MmV2O18UsO_
+#define DEFINED_TYPEDEF_FOR_struct_sfjjhK32Dt7MmV2O18UsO_
+
+struct struct_sfjjhK32Dt7MmV2O18UsO
+{
+  real_T Ts2Q[16];
+  real_T Q2Ts[16];
+  real_T totalThrustMaxRelative;
+  real_T motorsThrustPerMotorMax;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_struct_dNTl6UkWY4GnjER3gqbKpG_
+#define DEFINED_TYPEDEF_FOR_struct_dNTl6UkWY4GnjER3gqbKpG_
+
+struct struct_dNTl6UkWY4GnjER3gqbKpG
+{
+  real_T pwm_percentage[10];
+  real_T thrust_N[10];
 };
 
 #endif

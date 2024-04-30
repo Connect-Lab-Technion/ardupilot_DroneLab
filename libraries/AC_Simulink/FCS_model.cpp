@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'FCS_model'.
 //
-// Model version                  : 5.21
-// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Thu Apr 18 15:33:46 2024
+// Model version                  : 5.19
+// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
+// C/C++ source code generated on : Sun Apr 28 12:32:03 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -20,6 +20,7 @@
 #include "rtwtypes.h"
 #include "FCS_model_private.h"
 #include <cmath>
+#include "rt_defines.h"
 
 extern "C"
 {
@@ -27,8 +28,6 @@ extern "C"
 #include "rt_nonfinite.h"
 
 }
-
-#include "rt_defines.h"
 
 real32_T look1_iflf_binlx(real32_T u0, const real32_T bp0[], const real32_T
   table[], uint32_T maxIndex)
@@ -136,18 +135,16 @@ void FCS_model::step(real32_T arg_accel[3], real32_T arg_gyro[3], real32_T
   real_T rtb_Sum1_jt;
   real_T rtb_DataTypeConversion6[3];
   real_T rtb_DataTypeConversion7[3];
-  real_T rtb_Product5;
+  real_T rtb_roll;
+  real_T Sum;
   real_T numAccum;
-  real_T numAccum_0;
-  real_T rtb_Gain4;
   real_T rtb_Product3;
-  real_T rtb_Product4;
-  real_T rtb_pitch;
-  int32_T iU;
+  real_T rtb_TrigonometricFunction4;
+  real_T rtb_pitchrate;
+  real_T rtb_rollrate;
   real32_T rtb_DataTypeConversion2_i;
   real32_T rtb_DataTypeConversion6_b;
   real32_T rtb_On1Off0forthrust;
-  real32_T u0;
   UNUSED_PARAMETER(arg_bat_V);
 
   // If: '<S40>/If1' incorporates:
@@ -198,23 +195,24 @@ void FCS_model::step(real32_T arg_accel[3], real32_T arg_gyro[3], real32_T
   // End of If: '<S40>/If1'
 
   // DiscreteTransferFcn: '<S36>/Discrete Transfer Fcn'
-  numAccum = FCS_model_P.DiscreteTransferFcn_NumCoef_n[1] *
+  Sum = FCS_model_P.DiscreteTransferFcn_NumCoef_n[1] *
     FCS_model_DW.DiscreteTransferFcn_states;
 
   // DiscreteTransferFcn: '<S37>/Discrete Transfer Fcn'
-  numAccum_0 = FCS_model_P.DiscreteTransferFcn_NumCoef_a[1] *
+  numAccum = FCS_model_P.DiscreteTransferFcn_NumCoef_a[1] *
     FCS_model_DW.DiscreteTransferFcn_states_e;
 
   // DiscreteStateSpace: '<S12>/Internal'
   {
-    rtb_Product5 = (FCS_model_P.Internal_C[0])*FCS_model_DW.Internal_DSTATE[0]
+    rtb_roll = (FCS_model_P.Internal_C[0])*FCS_model_DW.Internal_DSTATE[0]
       + (FCS_model_P.Internal_C[1])*FCS_model_DW.Internal_DSTATE[1];
   }
 
-  // Product: '<S39>/Product5' incorporates:
+  // Trigonometry: '<S38>/Trigonometric Function' incorporates:
   //   Constant: '<S6>/Constant1'
   //   DataTypeConversion: '<S4>/Data Type Conversion4'
   //   DataTypeConversion: '<S4>/Data Type Conversion5'
+  //   Gain: '<S6>/Gain'
   //   Gain: '<S6>/KDz'
   //   Gain: '<S6>/zDz'
   //   Inport: '<Root>/pos_est'
@@ -223,35 +221,34 @@ void FCS_model::step(real32_T arg_accel[3], real32_T arg_gyro[3], real32_T
   //   Sum: '<S6>/Sum2'
   //   Sum: '<S6>/Sum3'
 
-  rtb_Product5 -= arg_pos_est[2];
-  rtb_Product5 *= FCS_model_P.zDz;
-  rtb_Product5 -= arg_vel_est[2];
-  rtb_Product5 = -FCS_model_P.Vehicle.Airframe.mass * FCS_model_P.g +
-    FCS_model_P.KDz * rtb_Product5;
+  rtb_roll -= arg_pos_est[2];
+  rtb_roll *= FCS_model_P.zDz;
+  rtb_roll -= arg_vel_est[2];
+  rtb_roll = FCS_model_P.KDz * rtb_roll * FCS_model_P.Gain_Gain +
+    -FCS_model_P.Vehicle.Airframe.mass * FCS_model_P.g;
 
   // Saturate: '<S6>/SaturationThrust'
-  if (rtb_Product5 > FCS_model_P.SaturationThrust_UpperSat) {
-    rtb_Gain4 = FCS_model_P.SaturationThrust_UpperSat;
-  } else if (rtb_Product5 < FCS_model_P.SaturationThrust_LowerSat) {
-    rtb_Gain4 = FCS_model_P.SaturationThrust_LowerSat;
+  if (rtb_roll > FCS_model_P.SaturationThrust_UpperSat) {
+    rtb_rollrate = FCS_model_P.SaturationThrust_UpperSat;
+  } else if (rtb_roll < FCS_model_P.SaturationThrust_LowerSat) {
+    rtb_rollrate = FCS_model_P.SaturationThrust_LowerSat;
   } else {
-    rtb_Gain4 = rtb_Product5;
+    rtb_rollrate = rtb_roll;
   }
 
   // Gain: '<S5>/On=1//Off=0 for thrust' incorporates:
   //   Saturate: '<S6>/SaturationThrust'
 
   rtb_On1Off0forthrust = FCS_model_P.On1Off0forthrust_Gain *
-    static_cast<real32_T>(rtb_Gain4);
+    static_cast<real32_T>(rtb_rollrate);
 
   // DiscreteStateSpace: '<S32>/Internal'
   {
-    rtb_Product5 = (FCS_model_P.Internal_C_a[0])*FCS_model_DW.Internal_DSTATE_h
-      [0]
+    rtb_roll = (FCS_model_P.Internal_C_a[0])*FCS_model_DW.Internal_DSTATE_h[0]
       + (FCS_model_P.Internal_C_a[1])*FCS_model_DW.Internal_DSTATE_h[1];
   }
 
-  // Product: '<S39>/Product5' incorporates:
+  // Trigonometry: '<S38>/Trigonometric Function' incorporates:
   //   Constant: '<S5>/yaw equilibrium'
   //   DataTypeConversion: '<S4>/Data Type Conversion1'
   //   Gain: '<S10>/KDpsi'
@@ -263,36 +260,34 @@ void FCS_model::step(real32_T arg_accel[3], real32_T arg_gyro[3], real32_T
   //   Sum: '<S10>/Sum3'
   //   Sum: '<S5>/Sum3'
 
-  rtb_Product5 = FCS_model_P.zDpsi * 2.0 * (rtb_Product5 -
+  rtb_roll = FCS_model_P.zDpsi * 2.0 * (rtb_roll -
     FCS_model_DW.Memory_PreviousInput);
-  rtb_Product5 -= arg_gyro[2];
-  rtb_Product5 = (FCS_model_P.KDpsi * 1.3 * rtb_Product5 *
-                  FCS_model_P.ChangingofJzz_Gain +
-                  FCS_model_P.yawequilibrium_Value) *
-    FCS_model_P.On1Off1foryaw_Gain;
+  rtb_roll -= arg_gyro[2];
+  rtb_roll = (FCS_model_P.KDpsi * 1.3 * rtb_roll *
+              FCS_model_P.ChangingofJzz_Gain + FCS_model_P.yawequilibrium_Value)
+    * FCS_model_P.On1Off1foryaw_Gain;
 
   // DataTypeConversion: '<S5>/Data Type Conversion2'
-  rtb_DataTypeConversion2_i = static_cast<real32_T>(rtb_Product5);
+  rtb_DataTypeConversion2_i = static_cast<real32_T>(rtb_roll);
 
   // DiscreteStateSpace: '<S16>/Internal'
   {
-    rtb_Product5 = (FCS_model_P.Internal_C_i[0])*FCS_model_DW.Internal_DSTATE_a
-      [0]
+    rtb_roll = (FCS_model_P.Internal_C_i[0])*FCS_model_DW.Internal_DSTATE_a[0]
       + (FCS_model_P.Internal_C_i[1])*FCS_model_DW.Internal_DSTATE_a[1];
   }
 
   // Sum: '<S8>/Sum1' incorporates:
   //   DiscreteTransferFcn: '<S36>/Discrete Transfer Fcn'
 
-  rtb_Sum1_j = rtb_Product5 - numAccum;
+  rtb_Sum1_j = rtb_roll - Sum;
 
   // DiscreteStateSpace: '<S17>/Internal'
   {
-    rtb_Product5 = FCS_model_P.Internal_C_ai*FCS_model_DW.Internal_DSTATE_g;
-    rtb_Product5 += FCS_model_P.Internal_D_e*rtb_Sum1_j;
+    rtb_roll = FCS_model_P.Internal_C_ai*FCS_model_DW.Internal_DSTATE_g;
+    rtb_roll += FCS_model_P.Internal_D_e*rtb_Sum1_j;
   }
 
-  // Product: '<S39>/Product5' incorporates:
+  // Trigonometry: '<S38>/Trigonometric Function' incorporates:
   //   Constant: '<S5>/pitch equilibrium'
   //   DataTypeConversion: '<S4>/Data Type Conversion1'
   //   Gain: '<S5>/Changing of Jyy'
@@ -303,35 +298,34 @@ void FCS_model::step(real32_T arg_accel[3], real32_T arg_gyro[3], real32_T
   //   Sum: '<S5>/Sum1'
   //   Sum: '<S8>/Sum3'
 
-  rtb_Product5 *= FCS_model_P.zDtheta * 7.0;
-  rtb_Product5 -= arg_gyro[1];
-  rtb_Product5 = (FCS_model_P.KDtheta * 1.4 * rtb_Product5 *
-                  FCS_model_P.ChangingofJyy_Gain +
-                  FCS_model_P.pitchequilibrium_Value) *
+  rtb_roll *= FCS_model_P.zDtheta * 7.0;
+  rtb_roll -= arg_gyro[1];
+  rtb_roll = (FCS_model_P.KDtheta * 1.4 * rtb_roll *
+              FCS_model_P.ChangingofJyy_Gain +
+              FCS_model_P.pitchequilibrium_Value) *
     FCS_model_P.On1Off2forpitch_Gain;
 
   // DataTypeConversion: '<S5>/Data Type Conversion6'
-  rtb_DataTypeConversion6_b = static_cast<real32_T>(rtb_Product5);
+  rtb_DataTypeConversion6_b = static_cast<real32_T>(rtb_roll);
 
   // DiscreteStateSpace: '<S24>/Internal'
   {
-    rtb_Product5 = (FCS_model_P.Internal_C_c[0])*FCS_model_DW.Internal_DSTATE_l
-      [0]
+    rtb_roll = (FCS_model_P.Internal_C_c[0])*FCS_model_DW.Internal_DSTATE_l[0]
       + (FCS_model_P.Internal_C_c[1])*FCS_model_DW.Internal_DSTATE_l[1];
   }
 
   // Sum: '<S9>/Sum1' incorporates:
   //   DiscreteTransferFcn: '<S37>/Discrete Transfer Fcn'
 
-  rtb_Sum1_jt = rtb_Product5 - numAccum_0;
+  rtb_Sum1_jt = rtb_roll - numAccum;
 
   // DiscreteStateSpace: '<S25>/Internal'
   {
-    rtb_Product5 = FCS_model_P.Internal_C_g*FCS_model_DW.Internal_DSTATE_gs;
-    rtb_Product5 += FCS_model_P.Internal_D_h*rtb_Sum1_jt;
+    rtb_roll = FCS_model_P.Internal_C_g*FCS_model_DW.Internal_DSTATE_gs;
+    rtb_roll += FCS_model_P.Internal_D_h*rtb_Sum1_jt;
   }
 
-  // Product: '<S39>/Product5' incorporates:
+  // Trigonometry: '<S38>/Trigonometric Function' incorporates:
   //   Constant: '<S5>/roll equilibrium'
   //   DataTypeConversion: '<S4>/Data Type Conversion1'
   //   Gain: '<S5>/Changing of Jxx'
@@ -342,31 +336,33 @@ void FCS_model::step(real32_T arg_accel[3], real32_T arg_gyro[3], real32_T
   //   Sum: '<S5>/Sum2'
   //   Sum: '<S9>/Sum3'
 
-  rtb_Product5 *= FCS_model_P.zDphi * 7.0;
-  rtb_Product5 -= arg_gyro[0];
-  rtb_Product5 = (FCS_model_P.KDphi * 1.4 * rtb_Product5 *
-                  FCS_model_P.ChangingofJxx_Gain +
-                  FCS_model_P.rollequilibrium_Value) *
-    FCS_model_P.On1Off1forroll_Gain;
-  for (iU = 0; iU < 4; iU++) {
-    // Gain: '<S11>/Gain' incorporates:
+  rtb_roll *= FCS_model_P.zDphi * 7.0;
+  rtb_roll -= arg_gyro[0];
+  rtb_roll = (FCS_model_P.KDphi * 1.4 * rtb_roll *
+              FCS_model_P.ChangingofJxx_Gain + FCS_model_P.rollequilibrium_Value)
+    * FCS_model_P.On1Off1forroll_Gain;
+  for (int32_T iU{0}; iU < 4; iU++) {
+    real32_T u0;
+
+    // Product: '<S7>/Product' incorporates:
     //   Constant: '<S7>/TorqueTotalThrustToThrustPerMotor'
     //   DataTypeConversion: '<S5>/Data Type Conversion1'
-    //   Product: '<S7>/Product'
     //   SignalConversion generated from: '<S7>/Product'
 
-    arg_motors_refout[iU] = (((FCS_model_P.TorqueTotalThrustToThrustPerMot[iU +
-      4] * rtb_DataTypeConversion2_i +
-      FCS_model_P.TorqueTotalThrustToThrustPerMot[iU] * rtb_On1Off0forthrust) +
-      FCS_model_P.TorqueTotalThrustToThrustPerMot[iU + 8] *
-      rtb_DataTypeConversion6_b) +
-      FCS_model_P.TorqueTotalThrustToThrustPerMot[iU + 12] *
-      static_cast<real32_T>(rtb_Product5)) * FCS_model_P.Gain_Gain_n;
+    arg_motors_refout[iU] = 0.0F;
+    arg_motors_refout[iU] += FCS_model_P.TorqueTotalThrustToThrustPerMot[iU] *
+      rtb_On1Off0forthrust;
+    arg_motors_refout[iU] += FCS_model_P.TorqueTotalThrustToThrustPerMot[iU + 4]
+      * rtb_DataTypeConversion2_i;
+    arg_motors_refout[iU] += FCS_model_P.TorqueTotalThrustToThrustPerMot[iU + 8]
+      * rtb_DataTypeConversion6_b;
+    arg_motors_refout[iU] += FCS_model_P.TorqueTotalThrustToThrustPerMot[iU + 12]
+      * static_cast<real32_T>(rtb_roll);
 
     // Lookup_n-D: '<S11>/1-D Lookup Table'
     arg_motors_refout[iU] = look1_iflf_binlx(arg_motors_refout[iU],
       FCS_model_P.uDLookupTable_bp01Data, FCS_model_P.uDLookupTable_tableData,
-      8U);
+      9U);
 
     // Saturate: '<S11>/Saturation'
     u0 = arg_motors_refout[iU];
@@ -374,34 +370,35 @@ void FCS_model::step(real32_T arg_accel[3], real32_T arg_gyro[3], real32_T
       arg_motors_refout[iU] = FCS_model_P.Saturation_UpperSat;
     } else if (u0 < FCS_model_P.Saturation_LowerSat) {
       arg_motors_refout[iU] = FCS_model_P.Saturation_LowerSat;
+    } else {
+      arg_motors_refout[iU] = u0;
     }
 
     // End of Saturate: '<S11>/Saturation'
   }
 
-  // Product: '<S39>/Product5' incorporates:
+  // Trigonometry: '<S38>/Trigonometric Function' incorporates:
   //   DataTypeConversion: '<S4>/Data Type Conversion'
   //   Gain: '<S38>/Gain2'
-  //   Inport: '<Root>/accel'
-
-  rtb_Product5 = FCS_model_P.Gain2_Gain * arg_accel[1];
-
-  // Gain: '<S38>/Gain4' incorporates:
-  //   DataTypeConversion: '<S4>/Data Type Conversion'
   //   Gain: '<S38>/Gain3'
   //   Inport: '<Root>/accel'
-  //   Trigonometry: '<S38>/Trigonometric Function'
 
-  rtb_Gain4 = rt_atan2d_snf(rtb_Product5, FCS_model_P.Gain3_Gain * arg_accel[2])
-    * FCS_model_P.Gain4_Gain;
-
-  // Product: '<S39>/Product5' incorporates:
-  //   Trigonometry: '<S39>/Trigonometric Function2'
-
-  rtb_Product5 = std::sin(rtb_Gain4);
+  rtb_roll = FCS_model_P.Gain2_Gain * arg_accel[1];
+  rtb_roll = rt_atan2d_snf(rtb_roll, FCS_model_P.Gain3_Gain * arg_accel[2]);
 
   // Trigonometry: '<S39>/Trigonometric Function2'
-  rtb_Product4 = std::cos(rtb_Gain4);
+  rtb_rollrate = std::sin(rtb_roll);
+  rtb_Product3 = std::cos(rtb_roll);
+
+  // Sum: '<S39>/Sum1' incorporates:
+  //   DataTypeConversion: '<S4>/Data Type Conversion1'
+  //   Gain: '<S39>/Gain'
+  //   Inport: '<Root>/gyro'
+  //   Product: '<S39>/Product4'
+  //   Product: '<S39>/Product5'
+
+  rtb_pitchrate = FCS_model_P.Gain_Gain_i * rtb_rollrate * arg_gyro[2] +
+    rtb_Product3 * arg_gyro[1];
 
   // Product: '<S38>/Divide' incorporates:
   //   Constant: '<S38>/Constant'
@@ -409,32 +406,19 @@ void FCS_model::step(real32_T arg_accel[3], real32_T arg_gyro[3], real32_T
   //   Gain: '<S38>/Gain1'
   //   Inport: '<Root>/accel'
 
-  rtb_pitch = FCS_model_P.Gain1_Gain * arg_accel[0] / FCS_model_P.g;
+  rtb_TrigonometricFunction4 = FCS_model_P.Gain1_Gain * arg_accel[0] /
+    FCS_model_P.g;
 
   // Trigonometry: '<S38>/Trigonometric Function1'
-  if (rtb_pitch > 1.0) {
-    rtb_pitch = 1.0;
-  } else if (rtb_pitch < -1.0) {
-    rtb_pitch = -1.0;
+  if (rtb_TrigonometricFunction4 > 1.0) {
+    rtb_TrigonometricFunction4 = 1.0;
+  } else if (rtb_TrigonometricFunction4 < -1.0) {
+    rtb_TrigonometricFunction4 = -1.0;
   }
 
-  rtb_pitch = std::asin(rtb_pitch);
+  rtb_TrigonometricFunction4 = std::asin(rtb_TrigonometricFunction4);
 
   // End of Trigonometry: '<S38>/Trigonometric Function1'
-
-  // Trigonometry: '<S39>/Trigonometric Function4'
-  rtb_Product3 = std::tan(rtb_pitch);
-
-  // Sum: '<S39>/Sum' incorporates:
-  //   DataTypeConversion: '<S4>/Data Type Conversion1'
-  //   Inport: '<Root>/gyro'
-  //   Product: '<S39>/Product'
-  //   Product: '<S39>/Product1'
-  //   Product: '<S39>/Product2'
-  //   Product: '<S39>/Product3'
-
-  rtb_Product3 = (rtb_Product5 * rtb_Product3 * arg_gyro[1] + arg_gyro[0]) +
-    rtb_Product4 * rtb_Product3 * arg_gyro[2];
 
   // Outport: '<Root>/logging_out' incorporates:
   //   DataTypeConversion: '<S3>/Data Type Conversion13'
@@ -453,8 +437,8 @@ void FCS_model::step(real32_T arg_accel[3], real32_T arg_gyro[3], real32_T
 
   arg_logging_refout[0] = static_cast<real32_T>
     (FCS_model_DW.Memory_PreviousInput);
-  arg_logging_refout[1] = static_cast<real32_T>(numAccum);
-  arg_logging_refout[2] = static_cast<real32_T>(numAccum_0);
+  arg_logging_refout[1] = static_cast<real32_T>(Sum);
+  arg_logging_refout[2] = static_cast<real32_T>(numAccum);
   arg_logging_refout[9] = *arg_yaw_opticalfow;
   arg_logging_refout[3] = arg_accel[0];
   arg_logging_refout[6] = arg_gyro[0];
@@ -472,16 +456,16 @@ void FCS_model::step(real32_T arg_accel[3], real32_T arg_gyro[3], real32_T
   arg_logging_refout[17] = arg_motors_refout[1];
   arg_logging_refout[18] = arg_motors_refout[2];
   arg_logging_refout[19] = arg_motors_refout[3];
-  arg_logging_refout[20] = static_cast<real32_T>(rtb_Product3);
-  arg_logging_refout[21] = static_cast<real32_T>(rtb_Gain4);
+  arg_logging_refout[20] = static_cast<real32_T>(rtb_pitchrate);
+  arg_logging_refout[21] = static_cast<real32_T>(rtb_TrigonometricFunction4);
 
-  // Product: '<S39>/Product5' incorporates:
-  //   DataTypeConversion: '<S4>/Data Type Conversion1'
-  //   Gain: '<S39>/Gain'
-  //   Inport: '<Root>/gyro'
+  // Sum: '<S36>/Sum' incorporates:
+  //   Gain: '<S36>/Gain'
 
-  rtb_Product5 *= FCS_model_P.Gain_Gain;
-  rtb_Product5 *= arg_gyro[2];
+  Sum = FCS_model_P.w_c_pitch * rtb_TrigonometricFunction4 + rtb_pitchrate;
+
+  // Trigonometry: '<S39>/Trigonometric Function4'
+  rtb_TrigonometricFunction4 = std::tan(rtb_TrigonometricFunction4);
 
   // DataTypeConversion: '<S4>/Data Type Conversion6' incorporates:
   //   Inport: '<Root>/pos_ref'
@@ -513,26 +497,27 @@ void FCS_model::step(real32_T arg_accel[3], real32_T arg_gyro[3], real32_T
 
   rtb_DataTypeConversion7[2] = arg_orient_ref[2];
 
-  // Update for DiscreteTransferFcn: '<S36>/Discrete Transfer Fcn' incorporates:
-  //   DataTypeConversion: '<S4>/Data Type Conversion1'
-  //   Gain: '<S36>/Gain'
-  //   Inport: '<Root>/gyro'
-  //   Product: '<S39>/Product4'
-  //   Sum: '<S36>/Sum'
-  //   Sum: '<S39>/Sum1'
-
-  FCS_model_DW.DiscreteTransferFcn_states = (((rtb_Product4 * arg_gyro[1] +
-    rtb_Product5) + FCS_model_P.w_c_pitch * rtb_pitch) -
+  // Update for DiscreteTransferFcn: '<S36>/Discrete Transfer Fcn'
+  FCS_model_DW.DiscreteTransferFcn_states = (Sum -
     FCS_model_P.DiscreteTransferFcn_DenCoef_n[1] *
     FCS_model_DW.DiscreteTransferFcn_states) /
     FCS_model_P.DiscreteTransferFcn_DenCoef_n[0];
 
   // Update for DiscreteTransferFcn: '<S37>/Discrete Transfer Fcn' incorporates:
+  //   DataTypeConversion: '<S4>/Data Type Conversion1'
   //   Gain: '<S37>/Gain'
+  //   Inport: '<Root>/gyro'
+  //   Product: '<S39>/Product'
+  //   Product: '<S39>/Product1'
+  //   Product: '<S39>/Product2'
+  //   Product: '<S39>/Product3'
   //   Sum: '<S37>/Sum'
+  //   Sum: '<S39>/Sum'
 
-  FCS_model_DW.DiscreteTransferFcn_states_e = ((FCS_model_P.w_c_roll * rtb_Gain4
-    + rtb_Product3) - FCS_model_P.DiscreteTransferFcn_DenCoef_o[1] *
+  FCS_model_DW.DiscreteTransferFcn_states_e = ((((rtb_rollrate *
+    rtb_TrigonometricFunction4 * arg_gyro[1] + arg_gyro[0]) + rtb_Product3 *
+    rtb_TrigonometricFunction4 * arg_gyro[2]) + FCS_model_P.w_c_roll * rtb_roll)
+    - FCS_model_P.DiscreteTransferFcn_DenCoef_o[1] *
     FCS_model_DW.DiscreteTransferFcn_states_e) /
     FCS_model_P.DiscreteTransferFcn_DenCoef_o[0];
 
@@ -665,8 +650,10 @@ FCS_model::FCS_model() :
 }
 
 // Destructor
-// Currently there is no destructor body generated.
-FCS_model::~FCS_model() = default;
+FCS_model::~FCS_model()
+{
+  // Currently there is no destructor body generated.
+}
 
 // Real-Time Model get method
 FCS_model::RT_MODEL_FCS_model_T * FCS_model::getRTM()
