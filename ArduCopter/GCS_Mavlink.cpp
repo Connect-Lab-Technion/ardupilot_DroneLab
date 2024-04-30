@@ -1507,7 +1507,6 @@ void GCS_MAVLINK_Copter::handleMessage(const mavlink_message_t &msg)
 #endif
 #if MODE_LAB_ENABLED == ENABLED
     case MAVLINK_MSG_ID_LAB_FROM_DASHBOARD:
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "RECIEVED LAB_FROM_DASHBOARD");
         copter.simulinkController.handle_message(msg);
         break;
 #endif

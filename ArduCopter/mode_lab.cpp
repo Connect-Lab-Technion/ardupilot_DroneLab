@@ -10,6 +10,7 @@
 // lab_init - initialise lab controller
 bool ModeLab::init(bool ignore_checks)
 {   
+    // Initialise the controller
     copter.simulinkController.inititalize();
 
     // Arm motors. Overrides and disables failsafes. 
@@ -33,8 +34,11 @@ void ModeLab::run()
     // run the controller
     copter.simulinkController.runController(motor_out);
 
+    float *logging_data = copter.simulinkController.get_logging_data();
+
+    gcs().send_text(MAV_SEVERITY_INFO, "LAB: logging data %f %f %f %f", logging_data[0], logging_data[1], logging_data[2], logging_data[3]);
     // send the logging data to the dashboard
-    gcs().send_message(MSG_LAB_TO_DASHBOARD); // TODO: Implement this message /home/joseph/ardupilot_DroneLab/libraries/GCS_MAVLink/GCS_Common.cpp:5445
+    // gcs().send_message(MSG_LAB_TO_DASHBOARD); // TODO: Implement this message /home/joseph/ardupilot_DroneLab/libraries/GCS_MAVLink/GCS_Common.cpp:5445
     
 }
 
@@ -43,8 +47,7 @@ void ModeLab::monitorDashboardMessage(float threshold_ms)
     if(!copter.simulinkController.recentDashboardMessage(threshold_ms)) {
         // Send a warning message to the GCS
         gcs().send_text(MAV_SEVERITY_WARNING, "LAB: no message from dashboard in: %f ms" , threshold_ms);
-        // Run internal exit function
-        // exit();
+
         // Switch back to the default mode 
         set_mode(Mode::Number::STABILIZE, ModeReason::GCS_COMMAND);
     }

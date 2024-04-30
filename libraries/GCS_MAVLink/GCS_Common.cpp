@@ -5444,13 +5444,14 @@ void GCS_MAVLINK::send_extended_sys_state() const
 
 void GCS_MAVLINK::send_lab_to_dashboard() const
 {
-    // AC_Simulink simulink_Controller;
+    AC_Simulink simulink_Controller;
 
-    // float *logging_data = simulink_Controller.get_logging_data();
+    float *logging_data = simulink_Controller.get_logging_data();
 
+    // hal.console->printf("logging_data[0]: (%f)", logging_data[0]);
     // gcs().send_text(MAV_SEVERITY_INFO, "GCS_MAVLINK::send_lab_to_dashboard, example: %f",logging_data[0]);
     
-    // mavlink_msg_lab_to_dashboard_send(chan, logging_data);
+    mavlindk_msg_lab_to_dashboard_send(chan, logging_data);
 }
 
 void GCS_MAVLINK::send_attitude() const

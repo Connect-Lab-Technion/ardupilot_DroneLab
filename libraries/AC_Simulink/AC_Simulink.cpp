@@ -96,6 +96,8 @@ void AC_Simulink::runController(float* arg_motors_refout) {
     simulinkModel.step(arg_accel, arg_gyro, &arg_bat_V, arg_pos_est, arg_vel_est,
         &arg_yaw_opticalfow, arg_pos_ref, arg_orient_ref, arg_motors_refout, arg_logging_refout);
     
+ 
+    gcs().send_text(MAV_SEVERITY_INFO, "SIMULINK: logging data %f %f %f %f", double( AP_HAL::millis()) , arg_logging_refout[1], arg_logging_refout[2], arg_logging_refout[3]);
 }
 
 // TODO: change the build process to change this instead

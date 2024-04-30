@@ -1,7 +1,3 @@
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wfloat-equal"
-
-
 //
 // Academic License - for use in teaching, academic research, and meeting
 // course requirements at degree granting institutions only.  Not for
@@ -13,7 +9,7 @@
 //
 // Model version                  : 5.19
 // Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Thu Apr 18 17:44:11 2024
+// C/C++ source code generated on : Sun Apr 28 12:32:03 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -126,6 +122,3 @@ extern "C"
 //
 // [EOF]
 //
-
-
-#pragma GCC diagnostic pop
