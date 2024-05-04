@@ -80,7 +80,7 @@ void ModeLab::run()
     // '<Root>/gyro' --------------------------------------
     Vector3f gyro_vals = ahrs.get_gyro();
     float arg_gyro[3]{ gyro_vals.x, gyro_vals.y, gyro_vals.z };
-
+    
     // '<Root>/bat_V' -------------------------------------
     float arg_bat_V{ 0.0F };
 
@@ -115,10 +115,9 @@ void ModeLab::run()
     }
 
     // '<Root>/yaw_opticalfow' ----------------------------
-    // const AP_OpticalFlow *optflow = AP::opticalflow();
-    const Vector2f &flowRate = Vector2f(0.0F, 0.0F); //optflow->flowRate();
-    float arg_yaw_opticalfow{ atan2f(flowRate.y, flowRate.x) };
-
+    Vector2f raw_flow = copter.optflow.flowRate() - copter.optflow.bodyRate();
+    float arg_yaw_opticalfow{ atan2f(raw_flow.y, raw_flow.x) };
+    
     // '<Root>/pos_ref' -----------------------------------
     float arg_pos_ref[3]{ ref_pos_x, ref_pos_y, ref_pos_z};
 
