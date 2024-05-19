@@ -157,6 +157,12 @@
 #endif
 
 //////////////////////////////////////////////////////////////////////////////
+// Simulink - fly vehicle with simulink based controller
+#ifndef MODE_SIMULINK_ENABLED
+# define MODE_SIMULINK_ENABLED ENABLED
+#endif
+
+//////////////////////////////////////////////////////////////////////////////
 // Acro - fly vehicle in acrobatic mode
 #ifndef MODE_ACRO_ENABLED
 # define MODE_ACRO_ENABLED ENABLED
