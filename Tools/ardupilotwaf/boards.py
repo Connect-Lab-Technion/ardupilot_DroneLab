@@ -12,6 +12,8 @@ import json
 _board_classes = {}
 _board = None
 
+technion_controlLab_flag = True # set to True if building for lab
+
 class BoardMeta(type):
     def __init__(cls, name, bases, dct):
         super(BoardMeta, cls).__init__(name, bases, dct)
@@ -121,6 +123,23 @@ class Board:
             cfg.msg("GPS Debug Logging", 'yes')
         else:
             cfg.msg("GPS Debug Logging", 'no', color='YELLOW')
+
+        # build the appropriate libraries and enable the proper environment variables 
+        # for the simulink mode for the advanced control lab
+        if technion_controlLab_flag :
+            env.MODE_SIMULINK_ENABLED = True
+            env.DEFINES.update(
+                MODE_SIMULINK_ENABLED=1,
+            )
+            env.AP_LIBRARIES += [
+                'AC_Simulink'
+            ]
+            cfg.msg("Enabled simulink controller", 'yes')
+        else:
+            env.DEFINES.update(
+                MODE_SIMULINK_ENABLED=0,
+            )
+            cfg.msg("Enabled simulink controller", 'no', color='YELLOW')
 
         # allow enable of custom controller for any board
         # enabled on sitl by default

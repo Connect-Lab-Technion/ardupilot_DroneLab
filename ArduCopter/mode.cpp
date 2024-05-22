@@ -36,7 +36,11 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
             ret = &mode_acro;
             break;
 #endif
-
+#if MODE_SIMULINK_ENABLED == ENABLED
+        case Mode::Number::SIMULINK:
+            ret = &mode_simulink;
+            break;
+#endif
         case Mode::Number::STABILIZE:
             ret = &mode_stabilize;
             break;

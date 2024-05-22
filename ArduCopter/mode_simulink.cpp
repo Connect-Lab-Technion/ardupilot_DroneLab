@@ -25,8 +25,8 @@ bool ModeSimulink::init(bool ignore_checks)
     start_time = AP_HAL::millis();
     last_dashboard_msg_ms = AP_HAL::millis();
 
-    // set the home for the ahrs TODO: returns zeros 
-    copter.set_home_to_current_location_inflight();
+    // // set the home for the ahrs TODO: returns zeros 
+    // copter.set_home_to_current_location_inflight();
 
     // turn on notify leds
     AP_Notify::flags.esc_calibration = true;
@@ -115,8 +115,7 @@ void ModeSimulink::run()
     }
 
     // '<Root>/yaw_opticalfow' ----------------------------
-    Vector2f raw_flow = copter.optflow.flowRate() - copter.optflow.bodyRate();
-    float arg_yaw_opticalfow{ atan2f(raw_flow.y, raw_flow.x) };
+    float arg_yaw_opticalfow{ ahrs.get_yaw() };
     
     // '<Root>/pos_ref' -----------------------------------
     float arg_pos_ref[3]{ ref_pos_x, ref_pos_y, ref_pos_z};
