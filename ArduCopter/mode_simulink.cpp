@@ -24,6 +24,7 @@ bool ModeSimulink::init(bool ignore_checks)
     // Start timers 
     start_time = AP_HAL::millis();
     last_dashboard_msg_ms = AP_HAL::millis();
+    last_drone_msg_ms = AP_HAL::millis();
 
     // // set the home for the ahrs TODO: returns zeros 
     // copter.set_home_to_current_location_inflight();
@@ -154,21 +155,14 @@ void ModeSimulink::run()
         motor_out_4 = 0.0F;
     }
     
-    // Define a new array logging_full with timeSinceStart as the first element
-    float timeSinceStart_s = float(AP_HAL::millis() - start_time) / 1000.0f; // in seconds
-    
-    size_t size_controller_logging = sizeof(arg_logging_refout) / sizeof(arg_logging_refout[25]);
-    
-    float logging_full[size_controller_logging+1];
-    
-    logging_full[0] = timeSinceStart_s;
-    
-    for (int i = 0; i < size_controller_logging; ++i) {
-        logging_full[i + 1] = arg_logging_refout[i];
-    }
     // send logging data to the dashboard
-    mavlink_channel_t chan = MAVLINK_COMM_0;
-    mavlink_msg_drone_to_dashboard_send(chan, logging_full);
+
+    uint32_t drone_msg_time = AP_HAL::millis() - last_drone_msg_ms;
+    if (drone_msg_time > 20.F) {
+        mavlink_channel_t chan = MAVLINK_COMM_0;
+        mavlink_msg_drone_to_dashboard_send(chan, arg_logging_refout);
+        last_drone_msg_ms = AP_HAL::millis();
+    }
 }
 
 
@@ -255,7 +249,7 @@ void ModeSimulink::output_to_motors()
     if (allow_output) {
         
         float motor_outputs[] = {motor_out_1, motor_out_2, motor_out_3, motor_out_4};
-        gcs().send_text(MAV_SEVERITY_INFO, "PWM:: %f,%f,%f,%f", motor_out_1, motor_out_2, motor_out_3, motor_out_4);
+        // gcs().send_text(MAV_SEVERITY_INFO, "PWM:: %f,%f,%f,%f", motor_out_1, motor_out_2, motor_out_3, motor_out_4);
 
         // convert output to PWM and send to each motor
         int8_t i;   
@@ -288,6 +282,7 @@ void ModeSimulink::handle_message(const mavlink_message_t &msg)
     ref_orient_yaw      = m.ref_yaw;
     ref_orient_pitch    = m.ref_pitch;
     ref_orient_roll     = m.ref_roll; 
+    // GCS_SEND_TEXT(MAV_SEVERITY_INFO, "MAVLINK_MSG_ID_DASHBOARD_TO_DRONE: %f", ref_power_gain);  
 
 }
 
