@@ -128,7 +128,7 @@ void ModeSimulink::run()
     float arg_motors_refout[4];
 
     // '<Root>/logging_refout' !! The array size is modified during the build process. See also common.xml !!
-    float arg_logging_refout[23];
+    float arg_logging_refout[25];
 
     labController.step(arg_accel, arg_gyro, &arg_bat_V, arg_pos_est, arg_vel_est,
         &arg_yaw_opticalfow, arg_pos_ref, arg_orient_ref, arg_motors_refout, arg_logging_refout);
@@ -157,7 +157,7 @@ void ModeSimulink::run()
     // Define a new array logging_full with timeSinceStart as the first element
     float timeSinceStart_s = float(AP_HAL::millis() - start_time) / 1000.0f; // in seconds
     
-    size_t size_controller_logging = sizeof(arg_logging_refout) / sizeof(arg_logging_refout[23]);
+    size_t size_controller_logging = sizeof(arg_logging_refout) / sizeof(arg_logging_refout[25]);
     
     float logging_full[size_controller_logging+1];
     
@@ -168,7 +168,7 @@ void ModeSimulink::run()
     }
     // send logging data to the dashboard
     mavlink_channel_t chan = MAVLINK_COMM_0;
-    mavlink_msg_lab_to_dashboard_send(chan, logging_full);
+    mavlink_msg_drone_to_dashboard_send(chan, logging_full);
 }
 
 
@@ -274,11 +274,11 @@ void ModeSimulink::handle_message(const mavlink_message_t &msg)
     // keep track of the last time we received a message from the dashboard
     last_dashboard_msg_ms = AP_HAL::millis();
 
-    if (msg.msgid != MAVLINK_MSG_ID_LAB_FROM_DASHBOARD) {
+    if (msg.msgid != MAVLINK_MSG_ID_DASHBOARD_TO_DRONE) {
         return;
     }
-    mavlink_lab_from_dashboard_t m;
-    mavlink_msg_lab_from_dashboard_decode(&msg, &m);
+    mavlink_dashboard_to_drone_t m;
+    mavlink_msg_dashboard_to_drone_decode(&msg, &m);
 
     master_switch       = m.master_switch;
     ref_power_gain      = m.power;
