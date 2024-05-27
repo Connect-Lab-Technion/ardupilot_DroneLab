@@ -1417,9 +1417,8 @@ void GCS_MAVLINK_Copter::handleMessage(const mavlink_message_t &msg)
         break;
 #endif
 #if MODE_SIMULINK_ENABLED == ENABLED
-    case MAVLINK_MSG_ID_DRONE_TO_DASHBOARD: { 
+    case MAVLINK_MSG_ID_DASHBOARD_TO_DRONE: { 
         copter.mode_simulink.handle_message(msg);
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "MAVLINK_MSG_ID_DRONE_TO_DASHBOARD");  
         break;
     }
 #endif      
