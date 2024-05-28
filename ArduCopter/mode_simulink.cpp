@@ -129,8 +129,9 @@ void ModeSimulink::run()
     float arg_motors_refout[4];
 
     // '<Root>/logging_refout' !! The array size is modified during the build process. See also common.xml !!
-    float arg_logging_refout[25];
+    float arg_logging_refout[31];
 
+    // Step the model
     labController.step(arg_accel, arg_gyro, &arg_bat_V, arg_pos_est, arg_vel_est,
         &arg_yaw_opticalfow, arg_pos_ref, arg_orient_ref, arg_motors_refout, arg_logging_refout);
 
@@ -156,9 +157,9 @@ void ModeSimulink::run()
     }
     
     // send logging data to the dashboard
-
+    float rate_drone_to_dashboard = 50; // Hz
     uint32_t drone_msg_time = AP_HAL::millis() - last_drone_msg_ms;
-    if (drone_msg_time > 20.F) {
+    if (drone_msg_time > (1000/rate_drone_to_dashboard)) {
         mavlink_channel_t chan = MAVLINK_COMM_0;
         mavlink_msg_drone_to_dashboard_send(chan, arg_logging_refout);
         last_drone_msg_ms = AP_HAL::millis();
@@ -249,7 +250,6 @@ void ModeSimulink::output_to_motors()
     if (allow_output) {
         
         float motor_outputs[] = {motor_out_1, motor_out_2, motor_out_3, motor_out_4};
-        // gcs().send_text(MAV_SEVERITY_INFO, "PWM:: %f,%f,%f,%f", motor_out_1, motor_out_2, motor_out_3, motor_out_4);
 
         // convert output to PWM and send to each motor
         int8_t i;   
@@ -282,7 +282,6 @@ void ModeSimulink::handle_message(const mavlink_message_t &msg)
     ref_orient_yaw      = m.ref_yaw;
     ref_orient_pitch    = m.ref_pitch;
     ref_orient_roll     = m.ref_roll; 
-    // GCS_SEND_TEXT(MAV_SEVERITY_INFO, "MAVLINK_MSG_ID_DASHBOARD_TO_DRONE: %f", ref_power_gain);  
 
 }
 
