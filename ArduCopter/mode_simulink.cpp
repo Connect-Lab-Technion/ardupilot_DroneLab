@@ -160,9 +160,13 @@ void ModeSimulink::run()
     float rate_drone_to_dashboard = 50; // Hz
     uint32_t drone_msg_time = AP_HAL::millis() - last_drone_msg_ms;
     if (drone_msg_time > (1000/rate_drone_to_dashboard)) {
-        mavlink_channel_t chan = MAVLINK_COMM_0;
-        mavlink_msg_drone_to_dashboard_send(chan, arg_logging_refout);
-        last_drone_msg_ms = AP_HAL::millis();
+        uint8_t chan;
+        for(chan = 0; chan < MAVLINK_COMM_NUM_BUFFERS; chan++){
+            // mavlink_channel_t chan = MAVLINK_COMM_0;
+            mavlink_msg_drone_to_dashboard_send((mavlink_channel_t)chan, arg_logging_refout);
+            last_drone_msg_ms = AP_HAL::millis();
+
+        }
     }
 }
 
