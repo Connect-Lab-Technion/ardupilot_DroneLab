@@ -48,7 +48,7 @@ bool ModeSimulink::init(bool ignore_checks)
     ref_orient_pitch    = 0.0f;
     ref_orient_roll     = 0.0f; 
 
-    gcs().send_text(MAV_SEVERITY_INFO, "LAB: intitialised");
+    gcs().send_text(MAV_SEVERITY_INFO, "SIMULINK: intitialised");
     return true;
 }
 
