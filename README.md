@@ -1,3 +1,71 @@
+# Ardupilot DroneLab Project 
+
+## First time Setup
+```bash
+# make sure you're on a stable branch 
+git checkout master-Copter-4.4
+
+# update submodule references  
+git submodule update --init --recursive 
+
+# Install additional dependancies 
+./Tools/environment_install/install-prereqs-ubuntu.sh
+
+# At this point log out / restart computer to finish first time setup
+```
+## Building the code 
+```bash
+# Check that the mavlink message definition file is up to date
+cat modules/mavlink/message_definitions/v1.0/common.xml | grep 9901 -A 10
+# If nothing shows up -> copy the up to date file from the front end 
+
+# Configure and build 
+./waf configure --board SITL 
+./waf copter 
+```
+
+## Simulation - Software in the loop (SITL)
+Run the following command to configure, build, and start a simulation environment for the ardupilot system. 
+Look through the file for additional tags. 
+`./Tools/autotest/sim_vehicle.py`
+
+## Errors 
+
+### warnings as fatal errors
+
+#### Error
+"compilation terminated due to -Wfatal-errors."
+
+#### Solution
+Search through `Tools/ardupilotwaf/boards.py` and comment out the respective error tags. 
+Example: 
+```python 
+'-Werror=float-equal',
+```
+
+
+### ‘arm-none-eabi-ar’ 1 (incomplete installation)
+#### Error
+`“Could not find the program [‘arm-none-eabi-ar’]`
+
+#### Solution
+Restart the linux system.
+
+### ‘arm-none-eabi-ar’ 2 (zsh)
+#### Error
+`“Could not find the program [‘arm-none-eabi-ar’]`
+
+#### Solution
+
+See [completion](Tools/completion/completion.md). 
+
+## Acknowlegements 
+Joseph Attias
+Yael Marciano 
+Ruslan Archipov 
+
+Below is the standard Ardupilot Readme: 
+
 # ArduPilot Project
 
 <a href="https://ardupilot.org/discord"><img src="https://img.shields.io/discord/674039678562861068.svg" alt="Discord">
