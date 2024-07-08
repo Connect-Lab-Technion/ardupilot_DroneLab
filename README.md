@@ -1,4 +1,5 @@
 # Ardupilot DroneLab Project 
+[Go-to Ardupilot ReadMe](#ardupilot-project)
 
 ## First time Setup
 ```bash
@@ -33,10 +34,10 @@ Look through the file for additional tags.
 
 ### warnings as fatal errors
 
-#### Error
+**Error** \
 "compilation terminated due to -Wfatal-errors."
 
-#### Solution
+**Solution** \
 Search through `Tools/ardupilotwaf/boards.py` and comment out the respective error tags. 
 Example: 
 ```python 
@@ -45,26 +46,28 @@ Example:
 
 
 ### ‘arm-none-eabi-ar’ 1 (incomplete installation)
-#### Error
+**Error**\
 `“Could not find the program [‘arm-none-eabi-ar’]`
 
-#### Solution
+**Solution**\
 Restart the linux system.
 
 ### ‘arm-none-eabi-ar’ 2 (zsh)
-#### Error
+**Error**\
 `“Could not find the program [‘arm-none-eabi-ar’]`
 
-#### Solution
-
+**Solution**\
 See [completion](Tools/completion/completion.md). 
 
-## Acknowlegements 
-Joseph Attias
-Yael Marciano 
-Ruslan Archipov 
 
-Below is the standard Ardupilot Readme: 
+
+## Acknowlegements 
+- Joseph Attias
+- Yael Marciano 
+- Ruslan Archipov 
+
+---
+Below is the forked Ardupilot Readme: 
 
 # ArduPilot Project
 
