@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'FCS_model'.
 //
-// Model version                  : 7.6
-// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Mon May 27 18:48:57 2024
+// Model version                  : 7.11
+// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
+// C/C++ source code generated on : Fri Jul 12 13:35:24 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -18,14 +18,6 @@
 //
 #ifndef RTW_HEADER_rtGetNaN_h_
 #define RTW_HEADER_rtGetNaN_h_
-
-extern "C"
-{
-
-#include "rt_nonfinite.h"
-
-}
-
 #include "rtwtypes.h"
 #ifdef __cplusplus
 

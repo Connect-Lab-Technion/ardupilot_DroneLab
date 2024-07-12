@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'FCS_model'.
 //
-// Model version                  : 7.6
-// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Mon May 27 18:48:57 2024
+// Model version                  : 7.11
+// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
+// C/C++ source code generated on : Fri Jul 12 13:35:24 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -319,10 +319,10 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
 
   0.6,
 
-  // Expression: 0
+  // Expression: 1
   //  Referenced by: '<S1>/On=1//Off=2 for pitch'
 
-  0.0,
+  1.0,
 
   // Expression: 0
   //  Referenced by: '<S1>/roll equilibrium'
@@ -414,17 +414,17 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
   // Computed Parameter: SaturationThrust_UpperSat
   //  Referenced by: '<S5>/SaturationThrust'
 
-  1.03909302F,
+  441.6F,
 
   // Computed Parameter: SaturationThrust_LowerSat
   //  Referenced by: '<S5>/SaturationThrust'
 
-  -1.03909302F,
+  -441.6F,
 
   // Computed Parameter: On1Off0forthrust_Gain
   //  Referenced by: '<S1>/On=1//Off=0 for thrust'
 
-  1.0F,
+  0.0F,
 
   // Computed Parameter: uDLookupTable_tableData
   //  Referenced by: '<S10>/1-D Lookup Table'
