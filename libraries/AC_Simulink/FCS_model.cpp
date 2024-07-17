@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'FCS_model'.
 //
-// Model version                  : 7.6
-// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Mon May 27 18:48:57 2024
+// Model version                  : 7.11
+// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
+// C/C++ source code generated on : Fri Jul 12 13:35:24 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -20,6 +20,7 @@
 #include "rtwtypes.h"
 #include "FCS_model_private.h"
 #include <cmath>
+#include "rt_defines.h"
 
 extern "C"
 {
@@ -27,8 +28,6 @@ extern "C"
 #include "rt_nonfinite.h"
 
 }
-
-#include "rt_defines.h"
 
 real32_T look1_iflf_binlx(real32_T u0, const real32_T bp0[], const real32_T
   table[], uint32_T maxIndex)
@@ -129,7 +128,7 @@ void FCS_model::step(real32_T arg_accel[3], real32_T arg_gyro[3], real32_T
                      *arg_bat_V, real32_T arg_pos_est[3], real32_T arg_vel_est[3],
                      real32_T *arg_yaw, real32_T arg_pos_ref[3], real32_T
                      arg_orient_ref[3], real32_T arg_motors_refout[4], real32_T
-                     arg_logging_refout[24])
+                     arg_logging_refout[30])
 {
   // local block i/o variables
   real_T rtb_Sum1_j;
@@ -143,11 +142,9 @@ void FCS_model::step(real32_T arg_accel[3], real32_T arg_gyro[3], real32_T
   real_T rtb_TrigonometricFunction4;
   real_T rtb_pitchrate;
   real_T rtb_rollrate;
-  int32_T iU;
   real32_T rtb_DataTypeConversion2_i;
   real32_T rtb_DataTypeConversion6_b;
   real32_T rtb_On1Off0forthrust;
-  real32_T u0;
 
   // If: '<S39>/If1' incorporates:
   //   Constant: '<S2>/Constant'
@@ -342,19 +339,23 @@ void FCS_model::step(real32_T arg_accel[3], real32_T arg_gyro[3], real32_T
   rtb_roll = (FCS_model_P.KDphi * 1.4 * rtb_roll *
               FCS_model_P.ChangingofJxx_Gain + FCS_model_P.rollequilibrium_Value)
     * FCS_model_P.On1Off1forroll_Gain;
-  for (iU = 0; iU < 4; iU++) {
+  for (int32_T iU{0}; iU < 4; iU++) {
+    real32_T u0;
+
     // Product: '<S6>/Product' incorporates:
     //   Constant: '<S6>/TorqueTotalThrustToThrustPerMotor'
     //   DataTypeConversion: '<S1>/Data Type Conversion1'
     //   SignalConversion generated from: '<S6>/Product'
 
-    arg_motors_refout[iU] = ((FCS_model_P.TorqueTotalThrustToThrustPerMot[iU + 4]
-      * rtb_DataTypeConversion2_i +
-      FCS_model_P.TorqueTotalThrustToThrustPerMot[iU] * rtb_On1Off0forthrust) +
-      FCS_model_P.TorqueTotalThrustToThrustPerMot[iU + 8] *
-      rtb_DataTypeConversion6_b) +
-      FCS_model_P.TorqueTotalThrustToThrustPerMot[iU + 12] *
-      static_cast<real32_T>(rtb_roll);
+    arg_motors_refout[iU] = 0.0F;
+    arg_motors_refout[iU] += FCS_model_P.TorqueTotalThrustToThrustPerMot[iU] *
+      rtb_On1Off0forthrust;
+    arg_motors_refout[iU] += FCS_model_P.TorqueTotalThrustToThrustPerMot[iU + 4]
+      * rtb_DataTypeConversion2_i;
+    arg_motors_refout[iU] += FCS_model_P.TorqueTotalThrustToThrustPerMot[iU + 8]
+      * rtb_DataTypeConversion6_b;
+    arg_motors_refout[iU] += FCS_model_P.TorqueTotalThrustToThrustPerMot[iU + 12]
+      * static_cast<real32_T>(rtb_roll);
 
     // Lookup_n-D: '<S10>/1-D Lookup Table'
     arg_motors_refout[iU] = look1_iflf_binlx(arg_motors_refout[iU],
@@ -367,6 +368,8 @@ void FCS_model::step(real32_T arg_accel[3], real32_T arg_gyro[3], real32_T
       arg_motors_refout[iU] = FCS_model_P.Saturation_UpperSat;
     } else if (u0 < FCS_model_P.Saturation_LowerSat) {
       arg_motors_refout[iU] = FCS_model_P.Saturation_LowerSat;
+    } else {
+      arg_motors_refout[iU] = u0;
     }
 
     // End of Saturate: '<S10>/Saturation'
@@ -416,21 +419,11 @@ void FCS_model::step(real32_T arg_accel[3], real32_T arg_gyro[3], real32_T
   // End of Trigonometry: '<S37>/Trigonometric Function1'
 
   // Outport: '<Root>/logging_out' incorporates:
-  //   DataTypeConversion: '<S3>/Data Type Conversion13'
   //   DataTypeConversion: '<S3>/Data Type Conversion6'
-  //   DataTypeConversion: '<S4>/Data Type Conversion'
-  //   DataTypeConversion: '<S4>/Data Type Conversion1'
-  //   DataTypeConversion: '<S4>/Data Type Conversion4'
-  //   DataTypeConversion: '<S4>/Data Type Conversion5'
   //   DigitalClock: '<S3>/Digital Clock'
   //   DiscreteTransferFcn: '<S35>/Discrete Transfer Fcn'
   //   DiscreteTransferFcn: '<S36>/Discrete Transfer Fcn'
-  //   Inport: '<Root>/accel'
   //   Inport: '<Root>/bat_V'
-  //   Inport: '<Root>/gyro'
-  //   Inport: '<Root>/pos_est'
-  //   Inport: '<Root>/vel_est'
-  //   Inport: '<Root>/yaw_est'
 
   arg_logging_refout[0] = static_cast<real32_T>((((&FCS_model_M)
     ->Timing.clockTick0) * 0.0025));
@@ -439,33 +432,6 @@ void FCS_model::step(real32_T arg_accel[3], real32_T arg_gyro[3], real32_T
   arg_logging_refout[2] = static_cast<real32_T>(Sum);
   arg_logging_refout[3] = static_cast<real32_T>(numAccum);
   arg_logging_refout[10] = *arg_bat_V;
-  arg_logging_refout[4] = arg_accel[0];
-  arg_logging_refout[7] = arg_gyro[0];
-  arg_logging_refout[11] = arg_pos_est[0];
-  arg_logging_refout[14] = arg_vel_est[0];
-  arg_logging_refout[5] = arg_accel[1];
-  arg_logging_refout[8] = arg_gyro[1];
-  arg_logging_refout[12] = arg_pos_est[1];
-  arg_logging_refout[15] = arg_vel_est[1];
-  arg_logging_refout[6] = arg_accel[2];
-  arg_logging_refout[9] = arg_gyro[2];
-  arg_logging_refout[13] = arg_pos_est[2];
-  arg_logging_refout[16] = arg_vel_est[2];
-  arg_logging_refout[17] = *arg_yaw;
-  arg_logging_refout[18] = arg_motors_refout[0];
-  arg_logging_refout[19] = arg_motors_refout[1];
-  arg_logging_refout[20] = arg_motors_refout[2];
-  arg_logging_refout[21] = arg_motors_refout[3];
-  arg_logging_refout[22] = static_cast<real32_T>(rtb_pitchrate);
-  arg_logging_refout[23] = static_cast<real32_T>(rtb_TrigonometricFunction4);
-
-  // Sum: '<S35>/Sum' incorporates:
-  //   Gain: '<S35>/Gain'
-
-  Sum = FCS_model_P.w_c_pitch * rtb_TrigonometricFunction4 + rtb_pitchrate;
-
-  // Trigonometry: '<S38>/Trigonometric Function4'
-  rtb_TrigonometricFunction4 = std::tan(rtb_TrigonometricFunction4);
 
   // DataTypeConversion: '<S4>/Data Type Conversion6' incorporates:
   //   Inport: '<Root>/pos_ref'
@@ -477,6 +443,21 @@ void FCS_model::step(real32_T arg_accel[3], real32_T arg_gyro[3], real32_T
 
   rtb_DataTypeConversion7[0] = arg_orient_ref[0];
 
+  // Outport: '<Root>/logging_out' incorporates:
+  //   DataTypeConversion: '<S4>/Data Type Conversion'
+  //   DataTypeConversion: '<S4>/Data Type Conversion1'
+  //   DataTypeConversion: '<S4>/Data Type Conversion4'
+  //   DataTypeConversion: '<S4>/Data Type Conversion5'
+  //   Inport: '<Root>/accel'
+  //   Inport: '<Root>/gyro'
+  //   Inport: '<Root>/pos_est'
+  //   Inport: '<Root>/vel_est'
+
+  arg_logging_refout[4] = arg_accel[0];
+  arg_logging_refout[7] = arg_gyro[0];
+  arg_logging_refout[11] = arg_pos_est[0];
+  arg_logging_refout[14] = arg_vel_est[0];
+
   // DataTypeConversion: '<S4>/Data Type Conversion6' incorporates:
   //   Inport: '<Root>/pos_ref'
 
@@ -487,6 +468,21 @@ void FCS_model::step(real32_T arg_accel[3], real32_T arg_gyro[3], real32_T
 
   rtb_DataTypeConversion7[1] = arg_orient_ref[1];
 
+  // Outport: '<Root>/logging_out' incorporates:
+  //   DataTypeConversion: '<S4>/Data Type Conversion'
+  //   DataTypeConversion: '<S4>/Data Type Conversion1'
+  //   DataTypeConversion: '<S4>/Data Type Conversion4'
+  //   DataTypeConversion: '<S4>/Data Type Conversion5'
+  //   Inport: '<Root>/accel'
+  //   Inport: '<Root>/gyro'
+  //   Inport: '<Root>/pos_est'
+  //   Inport: '<Root>/vel_est'
+
+  arg_logging_refout[5] = arg_accel[1];
+  arg_logging_refout[8] = arg_gyro[1];
+  arg_logging_refout[12] = arg_pos_est[1];
+  arg_logging_refout[15] = arg_vel_est[1];
+
   // DataTypeConversion: '<S4>/Data Type Conversion6' incorporates:
   //   Inport: '<Root>/pos_ref'
 
@@ -496,6 +492,45 @@ void FCS_model::step(real32_T arg_accel[3], real32_T arg_gyro[3], real32_T
   //   Inport: '<Root>/orient_ref'
 
   rtb_DataTypeConversion7[2] = arg_orient_ref[2];
+
+  // Outport: '<Root>/logging_out' incorporates:
+  //   DataTypeConversion: '<S3>/Data Type Conversion5'
+  //   DataTypeConversion: '<S3>/Data Type Conversion6'
+  //   DataTypeConversion: '<S4>/Data Type Conversion'
+  //   DataTypeConversion: '<S4>/Data Type Conversion1'
+  //   DataTypeConversion: '<S4>/Data Type Conversion4'
+  //   DataTypeConversion: '<S4>/Data Type Conversion5'
+  //   Inport: '<Root>/accel'
+  //   Inport: '<Root>/gyro'
+  //   Inport: '<Root>/pos_est'
+  //   Inport: '<Root>/vel_est'
+  //   Inport: '<Root>/yaw_est'
+
+  arg_logging_refout[6] = arg_accel[2];
+  arg_logging_refout[9] = arg_gyro[2];
+  arg_logging_refout[13] = arg_pos_est[2];
+  arg_logging_refout[16] = arg_vel_est[2];
+  arg_logging_refout[17] = *arg_yaw;
+  arg_logging_refout[18] = arg_motors_refout[0];
+  arg_logging_refout[19] = arg_motors_refout[1];
+  arg_logging_refout[20] = arg_motors_refout[2];
+  arg_logging_refout[21] = arg_motors_refout[3];
+  arg_logging_refout[22] = static_cast<real32_T>(rtb_DataTypeConversion6[0]);
+  arg_logging_refout[25] = static_cast<real32_T>(rtb_DataTypeConversion7[0]);
+  arg_logging_refout[23] = static_cast<real32_T>(rtb_DataTypeConversion6[1]);
+  arg_logging_refout[26] = static_cast<real32_T>(rtb_DataTypeConversion7[1]);
+  arg_logging_refout[24] = static_cast<real32_T>(rtb_DataTypeConversion6[2]);
+  arg_logging_refout[27] = static_cast<real32_T>(rtb_DataTypeConversion7[2]);
+  arg_logging_refout[28] = static_cast<real32_T>(rtb_pitchrate);
+  arg_logging_refout[29] = static_cast<real32_T>(rtb_TrigonometricFunction4);
+
+  // Sum: '<S35>/Sum' incorporates:
+  //   Gain: '<S35>/Gain'
+
+  Sum = FCS_model_P.w_c_pitch * rtb_TrigonometricFunction4 + rtb_pitchrate;
+
+  // Trigonometry: '<S38>/Trigonometric Function4'
+  rtb_TrigonometricFunction4 = std::tan(rtb_TrigonometricFunction4);
 
   // Update for DiscreteTransferFcn: '<S35>/Discrete Transfer Fcn'
   FCS_model_DW.DiscreteTransferFcn_states = (Sum -
@@ -658,8 +693,10 @@ FCS_model::FCS_model() :
 }
 
 // Destructor
-// Currently there is no destructor body generated.
-FCS_model::~FCS_model() = default;
+FCS_model::~FCS_model()
+{
+  // Currently there is no destructor body generated.
+}
 
 // Real-Time Model get method
 FCS_model::RT_MODEL_FCS_model_T * FCS_model::getRTM()

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'FCS_model'.
 //
-// Model version                  : 7.6
-// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Mon May 27 18:48:57 2024
+// Model version                  : 7.11
+// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
+// C/C++ source code generated on : Fri Jul 12 13:35:24 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -25,14 +25,14 @@
 extern "C"
 {
 
-#include "rt_nonfinite.h"
+#include "rtGetInf.h"
 
 }
 
 extern "C"
 {
 
-#include "rtGetNaN.h"
+#include "rt_nonfinite.h"
 
 }
 
@@ -212,7 +212,7 @@ class FCS_model final
     real_T ChangingofJyy_Gain;         // Expression: 0.6
                                           //  Referenced by: '<S1>/Changing of Jyy'
 
-    real_T On1Off2forpitch_Gain;       // Expression: 0
+    real_T On1Off2forpitch_Gain;       // Expression: 1
                                           //  Referenced by: '<S1>/On=1//Off=2 for pitch'
 
     real_T rollequilibrium_Value;      // Expression: 0
@@ -335,7 +335,7 @@ class FCS_model final
   void step(real32_T arg_accel[3], real32_T arg_gyro[3], real32_T *arg_bat_V,
             real32_T arg_pos_est[3], real32_T arg_vel_est[3], real32_T *arg_yaw,
             real32_T arg_pos_ref[3], real32_T arg_orient_ref[3], real32_T
-            arg_motors_refout[4], real32_T arg_logging_refout[24]);
+            arg_motors_refout[4], real32_T arg_logging_refout[30]);
 
   // model terminate function
   static void terminate();
@@ -355,6 +355,7 @@ class FCS_model final
 //-
 //  These blocks were eliminated from the model due to optimizations:
 //
+//  Block '<S1>/Constant' : Unused code path elimination
 //  Block '<S38>/Divide1' : Unused code path elimination
 //  Block '<S38>/Divide2' : Unused code path elimination
 //  Block '<S38>/Product8' : Unused code path elimination
@@ -380,16 +381,10 @@ class FCS_model final
 //  Block '<S38>/Zero-Order Hold3' : Eliminated since input and output rates are identical
 //  Block '<S38>/Zero-Order Hold4' : Eliminated since input and output rates are identical
 //  Block '<S3>/Data Type Conversion1' : Eliminate redundant data type conversion
-//  Block '<S3>/Data Type Conversion10' : Eliminate redundant data type conversion
 //  Block '<S3>/Data Type Conversion12' : Eliminate redundant data type conversion
 //  Block '<S3>/Data Type Conversion14' : Eliminate redundant data type conversion
 //  Block '<S3>/Data Type Conversion2' : Eliminate redundant data type conversion
 //  Block '<S3>/Data Type Conversion3' : Eliminate redundant data type conversion
-//  Block '<S3>/Data Type Conversion4' : Eliminate redundant data type conversion
-//  Block '<S3>/Data Type Conversion5' : Eliminate redundant data type conversion
-//  Block '<S3>/Data Type Conversion7' : Eliminate redundant data type conversion
-//  Block '<S3>/Data Type Conversion8' : Eliminate redundant data type conversion
-//  Block '<S3>/Data Type Conversion9' : Eliminate redundant data type conversion
 //  Block '<S4>/Data Type Conversion3' : Eliminate redundant data type conversion
 
 
