@@ -142,7 +142,7 @@ void ModeSimulink::run()
         if (ref_power_gain > 1.0f || ref_power_gain < 0.0f) {
             ref_power_gain = 0.0f;
             gcs().send_text(MAV_SEVERITY_WARNING, "SIMULINK: power gain out of (0-1) range: %f", ref_power_gain);
-        }  
+        }
         // PWM output is between 1000 and 2000 (0% - 100%)
         motor_out_1 = arg_motors_refout[0] * ref_power_gain * 1000 + 1000;
         motor_out_2 = arg_motors_refout[1] * ref_power_gain * 1000 + 1000;
@@ -156,13 +156,15 @@ void ModeSimulink::run()
         motor_out_4 = 0.0F;
     }
     
-    // send logging data to the dashboard
-    float rate_drone_to_dashboard = 50; // Hz
+    float rate_drone_to_dashboard = 400; // Hz
     uint32_t drone_msg_time = AP_HAL::millis() - last_drone_msg_ms;
     if (drone_msg_time > (1000 / rate_drone_to_dashboard)) {
         if (arg_logging_refout != nullptr) {
-            mavlink_msg_drone_to_dashboard_send(MAVLINK_COMM_0, arg_logging_refout);
-            last_drone_msg_ms = AP_HAL::millis();
+            uint8_t chan;
+            for(chan = 0; chan < MAVLINK_COMM_NUM_BUFFERS; chan++){
+                mavlink_msg_drone_to_dashboard_send((mavlink_channel_t)chan, arg_logging_refout);
+                last_drone_msg_ms = AP_HAL::millis();
+            }
         } else {
             gcs().send_text(MAV_SEVERITY_WARNING, "SIMULINK: logging data is null");
         }
