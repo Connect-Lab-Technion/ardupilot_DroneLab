@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'FCS_model'.
 //
-// Model version                  : 7.11
+// Model version                  : 7.24
 // Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Fri Jul 12 13:35:24 2024
+// C/C++ source code generated on : Wed Jul 17 11:32:30 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -22,7 +22,7 @@
 #include "FCS_model_types.h"
 #include "FCS_model.h"
 
-extern real_T rt_atan2d_snf(real_T u0, real_T u1);
+extern real32_T rt_atan2f_snf(real32_T u0, real32_T u1);
 extern real32_T look1_iflf_binlx(real32_T u0, const real32_T bp0[], const
   real32_T table[], uint32_T maxIndex);
 
