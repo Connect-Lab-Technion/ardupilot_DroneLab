@@ -362,11 +362,11 @@ private:
     float motor_out_1,motor_out_2,motor_out_3,motor_out_4;
     uint32_t last_throttle_warning_output_ms;
     
-    u_int8_t master_switch;
+    u_int8_t ref_master_switch;
     float ref_pos_x,ref_pos_y,ref_pos_z;
     float ref_orient_yaw, ref_orient_pitch, ref_orient_roll; 
     float ref_power_gain; 
-    
+
     uint32_t last_dashboard_msg_ms;
     uint32_t last_drone_msg_ms;
     uint32_t start_time;

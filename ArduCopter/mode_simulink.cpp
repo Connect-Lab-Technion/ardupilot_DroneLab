@@ -39,7 +39,7 @@ bool ModeSimulink::init(bool ignore_checks)
     motor_out_4         = 0.0f;
     
     // set the initial reference values 
-    master_switch       = 0;
+    ref_master_switch   = 0;
     ref_power_gain      = 0.0f;
     ref_pos_x           = 0.0f;
     ref_pos_y           = 0.0f;
@@ -74,6 +74,12 @@ void ModeSimulink::run()
 
     // Prepare the arguments for the controller, given by the generated ert_main ------------
 
+    // '<Root>/master_switch'
+    u_int8_t arg_switch{ ref_master_switch };
+
+    // '<Root>/power gain'
+    float arg_gain{ ref_power_gain };
+
     // '<Root>/accel' -------------------------------------
     Vector3f accel_vals = ahrs.get_accel();
     float arg_accel[3]{ accel_vals.x, accel_vals.y, accel_vals.z };
@@ -86,7 +92,7 @@ void ModeSimulink::run()
     float arg_bat_V{ 0.0F };
 
     // '<Root>/pos_est' -----------------------------------
-    Vector3f position;
+    Vector3f position_;
     float arg_pos_est[3];
     if (ahrs.get_relative_position_NED_origin(position)) {        
         arg_pos_est[0] = position.x;
@@ -116,7 +122,7 @@ void ModeSimulink::run()
     }
 
     // '<Root>/yaw_opticalfow' ----------------------------
-    float arg_yaw_opticalfow{ ahrs.get_yaw() };
+    float arg_yaw{ ahrs.get_yaw() };
     
     // '<Root>/pos_ref' -----------------------------------
     float arg_pos_ref[3]{ ref_pos_x, ref_pos_y, ref_pos_z};
@@ -129,33 +135,20 @@ void ModeSimulink::run()
     float arg_motors_refout[4];
 
     // '<Root>/logging_refout' !! The array size is modified during the build process. See also common.xml !!
-    float arg_logging_refout[31];
+    float arg_logging_refout[36];
 
     // Step the model
-    labController.step(arg_accel, arg_gyro, &arg_bat_V, arg_pos_est, arg_vel_est,
-        &arg_yaw_opticalfow, arg_pos_ref, arg_orient_ref, arg_motors_refout, arg_logging_refout);
+    labController.step(&arg_switch, &arg_gain, arg_accel, arg_gyro, &arg_bat_V,
+                     arg_pos_est, arg_vel_est, &arg_yaw, arg_pos_ref,
+                     arg_orient_ref, arg_motors_refout, arg_logging_refout);
 
-    // update the motor output, if the master switch is off, set all motors to 0
-    // otherwise set the motors to the output from the controller times the power gain
-    if (master_switch != 0) {
-        // Check if the power gain is within the range (0-1)
-        if (ref_power_gain > 1.0f || ref_power_gain < 0.0f) {
-            ref_power_gain = 0.0f;
-            gcs().send_text(MAV_SEVERITY_WARNING, "SIMULINK: power gain out of (0-1) range: %f", ref_power_gain);
-        }
-        // PWM output is between 1000 and 2000 (0% - 100%)
-        motor_out_1 = arg_motors_refout[0] * ref_power_gain * 1000 + 1000;
-        motor_out_2 = arg_motors_refout[1] * ref_power_gain * 1000 + 1000;
-        motor_out_3 = arg_motors_refout[2] * ref_power_gain * 1000 + 1000;
-        motor_out_4 = arg_motors_refout[3] * ref_power_gain * 1000 + 1000;
-    }
-    else {
-        motor_out_1 = 0.0F;
-        motor_out_2 = 0.0F;
-        motor_out_3 = 0.0F;
-        motor_out_4 = 0.0F;
-    }
-    
+    // PWM output is between 1000 and 2000 (0% - 100%)
+    motor_out_1 = arg_motors_refout[0] * 1000 + 1000;
+    motor_out_2 = arg_motors_refout[1] * 1000 + 1000;
+    motor_out_4 = arg_motors_refout[3] * 1000 + 1000;
+    motor_out_3 = arg_motors_refout[2] * 1000 + 1000;
+
+    // Mavlink message to the dashboard
     float rate_drone_to_dashboard = 400; // Hz
     uint32_t drone_msg_time = AP_HAL::millis() - last_drone_msg_ms;
     if (drone_msg_time > (1000 / rate_drone_to_dashboard)) {
@@ -279,7 +272,7 @@ void ModeSimulink::handle_message(const mavlink_message_t &msg)
     mavlink_dashboard_to_drone_t m;
     mavlink_msg_dashboard_to_drone_decode(&msg, &m);
 
-    master_switch       = m.master_switch;
+    ref_master_switch       = m.master_switch;
     ref_power_gain      = m.power;
     ref_pos_x           = m.ref_x;
     ref_pos_y           = m.ref_y;
