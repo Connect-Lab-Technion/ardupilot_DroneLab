@@ -92,7 +92,7 @@ void ModeSimulink::run()
     float arg_bat_V{ 0.0F };
 
     // '<Root>/pos_est' -----------------------------------
-    Vector3f position_;
+    Vector3f position;
     float arg_pos_est[3];
     if (ahrs.get_relative_position_NED_origin(position)) {        
         arg_pos_est[0] = position.x;
