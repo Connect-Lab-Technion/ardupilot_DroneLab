@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'FCS_model'.
 //
-// Model version                  : 7.24
+// Model version                  : 7.39
 // Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Wed Jul 17 11:32:30 2024
+// C/C++ source code generated on : Tue Jul 30 12:41:33 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -19,6 +19,7 @@
 #ifndef RTW_HEADER_FCS_model_private_h_
 #define RTW_HEADER_FCS_model_private_h_
 #include "rtwtypes.h"
+#include "zero_crossing_types.h"
 #include "FCS_model_types.h"
 #include "FCS_model.h"
 

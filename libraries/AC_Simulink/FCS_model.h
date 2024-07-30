@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'FCS_model'.
 //
-// Model version                  : 7.24
+// Model version                  : 7.39
 // Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Wed Jul 17 11:32:30 2024
+// C/C++ source code generated on : Tue Jul 30 12:41:33 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -36,6 +36,8 @@ extern "C"
 
 }
 
+#include "zero_crossing_types.h"
+
 // Macros for accessing real-time model data structure
 #ifndef rtmGetErrorStatus
 #define rtmGetErrorStatus(rtm)         ((rtm)->errorStatus)
@@ -50,36 +52,57 @@ class FCS_model final
 {
   // public data and function members
  public:
+  // Block signals (default storage)
+  struct B_FCS_model_T {
+    real_T Product2[4];                // '<S94>/Product2'
+    real_T Product3[4];                // '<S92>/Product3'
+    real32_T position[3];              // '<S111>/position'
+    real32_T u;                        // '<S110>/1'
+  };
+
   // Block states (default storage) for system '<Root>'
   struct DW_FCS_model_T {
+    real_T MemoryX_DSTATE[4];          // '<S39>/MemoryX'
+    real32_T DiscreteTransferFcn_states;// '<S100>/Discrete Transfer Fcn'
+    real32_T DiscreteTransferFcn_states_e;// '<S101>/Discrete Transfer Fcn'
     real32_T Internal_DSTATE[2];       // '<S12>/Internal'
     real32_T Internal_DSTATE_h[2];     // '<S32>/Internal'
     real32_T Internal_DSTATE_a[2];     // '<S16>/Internal'
-    real32_T DiscreteTransferFcn_states;// '<S36>/Discrete Transfer Fcn'
     real32_T Internal_DSTATE_g;        // '<S17>/Internal'
     real32_T Internal_DSTATE_l[2];     // '<S24>/Internal'
-    real32_T DiscreteTransferFcn_states_e;// '<S37>/Discrete Transfer Fcn'
     real32_T Internal_DSTATE_gs;       // '<S25>/Internal'
-    real32_T DiscreteTransferFcn_states_n;// '<S43>/Discrete Transfer Fcn'
-    real32_T Memory_PreviousInput;     // '<S2>/Memory'
+    real32_T DiscreteTransferFcn_states_n;// '<S107>/Discrete Transfer Fcn'
+    real32_T Memory_PreviousInput;     // '<S37>/Memory'
+    boolean_T icLoad;                  // '<S39>/MemoryX'
+    boolean_T EnabledSubsystem_MODE;   // '<S69>/Enabled Subsystem'
+    boolean_T MeasurementUpdate_MODE;  // '<S63>/MeasurementUpdate'
+  };
+
+  // Zero-crossing (trigger) state
+  struct PrevZCX_FCS_model_T {
+    ZCSigState TriggeredSubsystem_Trig_ZCE;// '<S109>/Triggered Subsystem'
+    ZCSigState TriggeredSubsystem_Trig_ZCE_d;// '<S108>/Triggered Subsystem'
   };
 
   // Parameters (default storage)
   struct P_FCS_model_T {
+    struct_p4xwbJBU4TOx0OKqnGpJsD Sensors;// Variable: Sensors
+                                             //  Referenced by: '<S38>/prsToAltGain'
+
     real32_T KDz;                      // Variable: KDz
                                           //  Referenced by: '<S5>/KDz'
 
     real32_T Ts;                       // Variable: Ts
-                                          //  Referenced by: '<S41>/Gain'
+                                          //  Referenced by: '<S105>/Gain'
 
     real32_T w_c_pitch;                // Variable: w_c_pitch
-                                          //  Referenced by: '<S36>/Gain'
+                                          //  Referenced by: '<S100>/Gain'
 
     real32_T w_c_roll;                 // Variable: w_c_roll
-                                          //  Referenced by: '<S37>/Gain'
+                                          //  Referenced by: '<S101>/Gain'
 
     real32_T w_c_yaw;                  // Variable: w_c_yaw
-                                          //  Referenced by: '<S43>/Gain'
+                                          //  Referenced by: '<S107>/Gain'
 
     real32_T zDz;                      // Variable: zDz
                                           //  Referenced by: '<S5>/zDz'
@@ -87,14 +110,41 @@ class FCS_model final
     real_T Constant_Value[4];          // Expression: [0 0 0 0]
                                           //  Referenced by: '<S9>/Constant'
 
+    real_T Lykyhatkk1_Y0;              // Expression: 0
+                                          //  Referenced by: '<S92>/L*(y[k]-yhat[k|k-1])'
+
+    real_T deltax_Y0;                  // Expression: 0
+                                          //  Referenced by: '<S94>/deltax'
+
+    real_T A_Value[16];                // Expression: pInitialization.A
+                                          //  Referenced by: '<S39>/A'
+
+    real_T KalmanGainM_Value[12];      // Expression: pInitialization.M
+                                          //  Referenced by: '<S43>/KalmanGainM'
+
+    real_T C_Value[12];                // Expression: pInitialization.C
+                                          //  Referenced by: '<S39>/C'
+
+    real_T KalmanGainL_Value[12];      // Expression: pInitialization.L
+                                          //  Referenced by: '<S43>/KalmanGainL'
+
+    real_T Constant_Value_a;           // Expression: 1
+                                          //  Referenced by: '<S37>/Constant'
+
+    real_T X0_Value[4];                // Expression: pInitialization.X0
+                                          //  Referenced by: '<S39>/X0'
+
+    real_T Constant_Value_n;           // Expression: 0
+                                          //  Referenced by: '<S38>/Constant'
+
+    real_T gravity_Value[3];           // Expression: [0 0 g]
+                                          //  Referenced by: '<S38>/gravity'
+
     real_T Constant1_Value;            // Expression: (Vehicle.Airframe.mass)*g
                                           //  Referenced by: '<S5>/Constant1'
 
     real_T yawequilibrium_Value;       // Expression: 0
                                           //  Referenced by: '<S1>/yaw equilibrium'
-
-    real_T Constant_Value_a;           // Expression: 1
-                                          //  Referenced by: '<S2>/Constant'
 
     real_T On1Off1foryaw_Gain;         // Expression: 0
                                           //  Referenced by: '<S1>/On=1//Off=1 for yaw'
@@ -111,40 +161,84 @@ class FCS_model final
     real_T On1Off1forroll_Gain;        // Expression: 0
                                           //  Referenced by: '<S1>/On=1//Off=1 for roll'
 
+    real_T D_Value[3];                 // Expression: pInitialization.D
+                                          //  Referenced by: '<S39>/D'
+
+    real_T u_Value;                    // Expression: 0
+                                          //  Referenced by: '<S39>/u'
+
+    real_T B_Value[4];                 // Expression: pInitialization.B
+                                          //  Referenced by: '<S39>/B'
+
+    real_T CovarianceZ_Value[16];      // Expression: pInitialization.Z
+                                          //  Referenced by: '<S43>/CovarianceZ'
+
+    real32_T TorqueTotalThrustToThrustPerMot[16];// Expression: Controller.Q2Ts
+                                                    //  Referenced by: '<S6>/TorqueTotalThrustToThrustPerMotor'
+
+    real32_T uDLookupTable2_tableData[10];
+                                 // Computed Parameter: uDLookupTable2_tableData
+                                    //  Referenced by: '<S11>/1-D Lookup Table2'
+
+    real32_T uDLookupTable2_bp01Data[10];
+                                  // Computed Parameter: uDLookupTable2_bp01Data
+                                     //  Referenced by: '<S11>/1-D Lookup Table2'
+
     real32_T Saturation_UpperSat;     // Computed Parameter: Saturation_UpperSat
                                          //  Referenced by: '<S9>/Saturation'
 
     real32_T Saturation_LowerSat;     // Computed Parameter: Saturation_LowerSat
                                          //  Referenced by: '<S9>/Saturation'
 
-    real32_T TorqueTotalThrustToThrustPerMot[16];// Expression: Controller.Q2Ts
-                                                    //  Referenced by: '<S6>/TorqueTotalThrustToThrustPerMotor'
-
-    real32_T uDLookupTable_tableData[10];
-                                  // Computed Parameter: uDLookupTable_tableData
-                                     //  Referenced by: '<S11>/1-D Lookup Table'
-
-    real32_T uDLookupTable_bp01Data[10];
-                                   // Computed Parameter: uDLookupTable_bp01Data
-                                      //  Referenced by: '<S11>/1-D Lookup Table'
-
-    real32_T Saturation_UpperSat_e; // Computed Parameter: Saturation_UpperSat_e
-                                       //  Referenced by: '<S11>/Saturation'
-
-    real32_T Saturation_LowerSat_j; // Computed Parameter: Saturation_LowerSat_j
-                                       //  Referenced by: '<S11>/Saturation'
-
     real32_T DiscreteTransferFcn_NumCoef[2];
                               // Computed Parameter: DiscreteTransferFcn_NumCoef
-                                 //  Referenced by: '<S43>/Discrete Transfer Fcn'
+                                 //  Referenced by: '<S107>/Discrete Transfer Fcn'
 
     real32_T DiscreteTransferFcn_DenCoef[2];
                               // Computed Parameter: DiscreteTransferFcn_DenCoef
-                                 //  Referenced by: '<S43>/Discrete Transfer Fcn'
+                                 //  Referenced by: '<S107>/Discrete Transfer Fcn'
 
     real32_T DiscreteTransferFcn_InitialStat;
                           // Computed Parameter: DiscreteTransferFcn_InitialStat
-                             //  Referenced by: '<S43>/Discrete Transfer Fcn'
+                             //  Referenced by: '<S107>/Discrete Transfer Fcn'
+
+    real32_T Out1_Y0;                  // Computed Parameter: Out1_Y0
+                                          //  Referenced by: '<S110>/Out1'
+
+    real32_T Out1_Y0_k[3];             // Computed Parameter: Out1_Y0_k
+                                          //  Referenced by: '<S111>/Out1'
+
+    real32_T Memory_InitialCondition;
+                                  // Computed Parameter: Memory_InitialCondition
+                                     //  Referenced by: '<S37>/Memory'
+
+    real32_T DiscreteTransferFcn_NumCoef_n[2];
+                            // Computed Parameter: DiscreteTransferFcn_NumCoef_n
+                               //  Referenced by: '<S100>/Discrete Transfer Fcn'
+
+    real32_T DiscreteTransferFcn_DenCoef_n[2];
+                            // Computed Parameter: DiscreteTransferFcn_DenCoef_n
+                               //  Referenced by: '<S100>/Discrete Transfer Fcn'
+
+    real32_T DiscreteTransferFcn_InitialSt_c;
+                          // Computed Parameter: DiscreteTransferFcn_InitialSt_c
+                             //  Referenced by: '<S100>/Discrete Transfer Fcn'
+
+    real32_T DiscreteTransferFcn_NumCoef_a[2];
+                            // Computed Parameter: DiscreteTransferFcn_NumCoef_a
+                               //  Referenced by: '<S101>/Discrete Transfer Fcn'
+
+    real32_T DiscreteTransferFcn_DenCoef_o[2];
+                            // Computed Parameter: DiscreteTransferFcn_DenCoef_o
+                               //  Referenced by: '<S101>/Discrete Transfer Fcn'
+
+    real32_T DiscreteTransferFcn_InitialSt_g;
+                          // Computed Parameter: DiscreteTransferFcn_InitialSt_g
+                             //  Referenced by: '<S101>/Discrete Transfer Fcn'
+
+    real32_T RangfinderScaleGain1_Gain;
+                                // Computed Parameter: RangfinderScaleGain1_Gain
+                                   //  Referenced by: '<S38>/RangfinderScaleGain1'
 
     real32_T Internal_A[3];            // Computed Parameter: Internal_A
                                           //  Referenced by: '<S12>/Internal'
@@ -162,6 +256,10 @@ class FCS_model final
     real32_T Gain_Gain;                // Computed Parameter: Gain_Gain
                                           //  Referenced by: '<S5>/Gain'
 
+    real32_T WithControl1WithoutControl0_Gai;
+                          // Computed Parameter: WithControl1WithoutControl0_Gai
+                             //  Referenced by: '<S5>/WithControl=1 WithoutControl=0'
+
     real32_T SaturationThrust_UpperSat;
                                 // Computed Parameter: SaturationThrust_UpperSat
                                    //  Referenced by: '<S5>/SaturationThrust'
@@ -172,10 +270,6 @@ class FCS_model final
 
     real32_T On1Off0forthrust_Gain; // Computed Parameter: On1Off0forthrust_Gain
                                        //  Referenced by: '<S1>/On=1//Off=0 for thrust'
-
-    real32_T Memory_InitialCondition;
-                                  // Computed Parameter: Memory_InitialCondition
-                                     //  Referenced by: '<S2>/Memory'
 
     real32_T Internal_A_d[3];          // Computed Parameter: Internal_A_d
                                           //  Referenced by: '<S32>/Internal'
@@ -211,18 +305,6 @@ class FCS_model final
     real32_T Internal_InitialCondition_ps;
                              // Computed Parameter: Internal_InitialCondition_ps
                                 //  Referenced by: '<S16>/Internal'
-
-    real32_T DiscreteTransferFcn_NumCoef_n[2];
-                            // Computed Parameter: DiscreteTransferFcn_NumCoef_n
-                               //  Referenced by: '<S36>/Discrete Transfer Fcn'
-
-    real32_T DiscreteTransferFcn_DenCoef_n[2];
-                            // Computed Parameter: DiscreteTransferFcn_DenCoef_n
-                               //  Referenced by: '<S36>/Discrete Transfer Fcn'
-
-    real32_T DiscreteTransferFcn_InitialSt_c;
-                          // Computed Parameter: DiscreteTransferFcn_InitialSt_c
-                             //  Referenced by: '<S36>/Discrete Transfer Fcn'
 
     real32_T Internal_A_f;             // Computed Parameter: Internal_A_f
                                           //  Referenced by: '<S17>/Internal'
@@ -262,18 +344,6 @@ class FCS_model final
                               // Computed Parameter: Internal_InitialCondition_c
                                  //  Referenced by: '<S24>/Internal'
 
-    real32_T DiscreteTransferFcn_NumCoef_a[2];
-                            // Computed Parameter: DiscreteTransferFcn_NumCoef_a
-                               //  Referenced by: '<S37>/Discrete Transfer Fcn'
-
-    real32_T DiscreteTransferFcn_DenCoef_o[2];
-                            // Computed Parameter: DiscreteTransferFcn_DenCoef_o
-                               //  Referenced by: '<S37>/Discrete Transfer Fcn'
-
-    real32_T DiscreteTransferFcn_InitialSt_g;
-                          // Computed Parameter: DiscreteTransferFcn_InitialSt_g
-                             //  Referenced by: '<S37>/Discrete Transfer Fcn'
-
     real32_T Internal_A_l;             // Computed Parameter: Internal_A_l
                                           //  Referenced by: '<S25>/Internal'
 
@@ -299,20 +369,26 @@ class FCS_model final
     real32_T ChangingofJxx_Gain;       // Computed Parameter: ChangingofJxx_Gain
                                           //  Referenced by: '<S1>/Changing of Jxx'
 
-    real32_T Gain2_Gain;               // Computed Parameter: Gain2_Gain
-                                          //  Referenced by: '<S38>/Gain2'
-
-    real32_T Gain3_Gain;               // Computed Parameter: Gain3_Gain
-                                          //  Referenced by: '<S38>/Gain3'
-
-    real32_T Gain_Gain_i;              // Computed Parameter: Gain_Gain_i
-                                          //  Referenced by: '<S39>/Gain'
-
     real32_T Gain1_Gain;               // Computed Parameter: Gain1_Gain
-                                          //  Referenced by: '<S38>/Gain1'
+                                          //  Referenced by: '<S102>/Gain1'
 
     real32_T Constant_Value_o;         // Expression: g
-                                          //  Referenced by: '<S38>/Constant'
+                                          //  Referenced by: '<S102>/Constant'
+
+    real32_T Gain2_Gain;               // Computed Parameter: Gain2_Gain
+                                          //  Referenced by: '<S102>/Gain2'
+
+    real32_T Gain3_Gain;               // Computed Parameter: Gain3_Gain
+                                          //  Referenced by: '<S102>/Gain3'
+
+    real32_T Gain_Gain_i;              // Computed Parameter: Gain_Gain_i
+                                          //  Referenced by: '<S103>/Gain'
+
+    boolean_T Enable_Value;            // Expression: true()
+                                          //  Referenced by: '<S39>/Enable'
+
+    boolean_T isSqrtUsed_Value;        // Expression: pInitialization.isSqrtUsed
+                                          //  Referenced by: '<S90>/isSqrtUsed'
 
     uint8_T Switch_Threshold;          // Computed Parameter: Switch_Threshold
                                           //  Referenced by: '<S9>/Switch'
@@ -348,21 +424,28 @@ class FCS_model final
   // Real-Time Model get method
   FCS_model::RT_MODEL_FCS_model_T * getRTM();
 
+  // Block signals
+  B_FCS_model_T FCS_model_B;
+
   // Block states
   DW_FCS_model_T FCS_model_DW;
 
   // Tunable parameters
   static P_FCS_model_T FCS_model_P;
 
+  // Triggered events
+  PrevZCX_FCS_model_T FCS_model_PrevZCX;
+
   // model initialize function
   void initialize();
 
   // model step function
   void step(uint8_T *arg_switch, real32_T *arg_gain, real32_T arg_accel[3],
-            real32_T arg_gyro[3], real32_T *arg_bat_V, real32_T arg_pos_est[3],
-            real32_T arg_vel_est[3], real32_T *arg_yaw, real32_T arg_pos_ref[3],
-            real32_T arg_orient_ref[3], real32_T arg_motors_refout[4], real32_T
-            arg_logging_refout[36]);
+            real32_T arg_gyro[3], real32_T *arg_bat_V, real32_T arg_flowRate[2],
+            real32_T *arg_baro, real32_T *arg_rangefinder, real32_T arg_pos_est
+            [3], real32_T arg_vel_est[3], real32_T *arg_yaw, real32_T
+            arg_pos_ref[3], real32_T arg_orient_ref[3], real32_T
+            arg_motors_refout[4], real32_T arg_logging_refout[40]);
 
   // model terminate function
   static void terminate();
@@ -383,12 +466,64 @@ class FCS_model final
 //  These blocks were eliminated from the model due to optimizations:
 //
 //  Block '<S1>/Constant' : Unused code path elimination
-//  Block '<S39>/Divide1' : Unused code path elimination
-//  Block '<S39>/Divide2' : Unused code path elimination
-//  Block '<S39>/Product8' : Unused code path elimination
-//  Block '<S39>/Product9' : Unused code path elimination
-//  Block '<S39>/Sum2' : Unused code path elimination
-//  Block '<S39>/Trigonometric Function3' : Unused code path elimination
+//  Block '<S38>/Delay2' : Unused code path elimination
+//  Block '<S85>/Data Type Duplicate' : Unused code path elimination
+//  Block '<S86>/Data Type Duplicate' : Unused code path elimination
+//  Block '<S87>/Conversion' : Unused code path elimination
+//  Block '<S87>/Data Type Duplicate' : Unused code path elimination
+//  Block '<S88>/Data Type Duplicate' : Unused code path elimination
+//  Block '<S44>/Product' : Unused code path elimination
+//  Block '<S46>/Data Type Duplicate' : Unused code path elimination
+//  Block '<S47>/Data Type Duplicate' : Unused code path elimination
+//  Block '<S48>/Data Type Duplicate' : Unused code path elimination
+//  Block '<S49>/Data Type Duplicate' : Unused code path elimination
+//  Block '<S51>/Data Type Duplicate' : Unused code path elimination
+//  Block '<S52>/Data Type Duplicate' : Unused code path elimination
+//  Block '<S53>/Data Type Duplicate' : Unused code path elimination
+//  Block '<S54>/Conversion' : Unused code path elimination
+//  Block '<S54>/Data Type Duplicate' : Unused code path elimination
+//  Block '<S55>/Data Type Duplicate' : Unused code path elimination
+//  Block '<S56>/Data Type Duplicate' : Unused code path elimination
+//  Block '<S57>/Data Type Duplicate' : Unused code path elimination
+//  Block '<S59>/Data Type Duplicate' : Unused code path elimination
+//  Block '<S60>/Data Type Duplicate' : Unused code path elimination
+//  Block '<S61>/Data Type Duplicate' : Unused code path elimination
+//  Block '<S39>/G' : Unused code path elimination
+//  Block '<S39>/H' : Unused code path elimination
+//  Block '<S39>/N' : Unused code path elimination
+//  Block '<S39>/P0' : Unused code path elimination
+//  Block '<S39>/Q' : Unused code path elimination
+//  Block '<S39>/R' : Unused code path elimination
+//  Block '<S39>/Reshapeyhat' : Unused code path elimination
+//  Block '<S84>/CheckSignalProperties' : Unused code path elimination
+//  Block '<S40>/Absestdiff' : Unused code path elimination
+//  Block '<S40>/Absestdiff1' : Unused code path elimination
+//  Block '<S40>/Absestdiff2' : Unused code path elimination
+//  Block '<S40>/Add' : Unused code path elimination
+//  Block '<S40>/Add1' : Unused code path elimination
+//  Block '<S40>/Add2' : Unused code path elimination
+//  Block '<S40>/SaturationSonar' : Unused code path elimination
+//  Block '<S95>/Compare' : Unused code path elimination
+//  Block '<S95>/Constant' : Unused code path elimination
+//  Block '<S96>/Compare' : Unused code path elimination
+//  Block '<S96>/Constant' : Unused code path elimination
+//  Block '<S97>/Compare' : Unused code path elimination
+//  Block '<S97>/Constant' : Unused code path elimination
+//  Block '<S40>/findingoutliers' : Unused code path elimination
+//  Block '<S40>/newupdateneeded' : Unused code path elimination
+//  Block '<S40>/nicemeasurementor newupdateneeded' : Unused code path elimination
+//  Block '<S98>/Compare' : Unused code path elimination
+//  Block '<S98>/Constant' : Unused code path elimination
+//  Block '<S40>/pressureFilter_IIR' : Unused code path elimination
+//  Block '<S40>/soonarFilter_IIR' : Unused code path elimination
+//  Block '<S42>/Compare' : Unused code path elimination
+//  Block '<S42>/Constant' : Unused code path elimination
+//  Block '<S103>/Divide1' : Unused code path elimination
+//  Block '<S103>/Divide2' : Unused code path elimination
+//  Block '<S103>/Product8' : Unused code path elimination
+//  Block '<S103>/Product9' : Unused code path elimination
+//  Block '<S103>/Sum2' : Unused code path elimination
+//  Block '<S103>/Trigonometric Function3' : Unused code path elimination
 //  Block '<S5>/Zero-Order Hold' : Eliminated since input and output rates are identical
 //  Block '<S5>/Zero-Order Hold1' : Eliminated since input and output rates are identical
 //  Block '<S1>/Data Type Conversion3' : Eliminate redundant data type conversion
@@ -398,15 +533,26 @@ class FCS_model final
 //  Block '<S8>/Zero-Order Hold1' : Eliminated since input and output rates are identical
 //  Block '<S10>/Zero-Order Hold' : Eliminated since input and output rates are identical
 //  Block '<S10>/Zero-Order Hold1' : Eliminated since input and output rates are identical
-//  Block '<S38>/Zero-Order Hold' : Eliminated since input and output rates are identical
-//  Block '<S38>/Zero-Order Hold1' : Eliminated since input and output rates are identical
-//  Block '<S38>/Zero-Order Hold2' : Eliminated since input and output rates are identical
-//  Block '<S38>/Zero-Order Hold3' : Eliminated since input and output rates are identical
-//  Block '<S39>/Zero-Order Hold' : Eliminated since input and output rates are identical
-//  Block '<S39>/Zero-Order Hold1' : Eliminated since input and output rates are identical
-//  Block '<S39>/Zero-Order Hold2' : Eliminated since input and output rates are identical
-//  Block '<S39>/Zero-Order Hold3' : Eliminated since input and output rates are identical
-//  Block '<S39>/Zero-Order Hold4' : Eliminated since input and output rates are identical
+//  Block '<S36>/Data Type Conversion3' : Eliminate redundant data type conversion
+//  Block '<S38>/Data Type Conversion1' : Eliminate redundant data type conversion
+//  Block '<S85>/Conversion' : Eliminate redundant data type conversion
+//  Block '<S86>/Conversion' : Eliminate redundant data type conversion
+//  Block '<S88>/Conversion' : Eliminate redundant data type conversion
+//  Block '<S59>/Conversion' : Eliminate redundant data type conversion
+//  Block '<S63>/Reshape' : Reshape block reduction
+//  Block '<S39>/ReshapeX0' : Reshape block reduction
+//  Block '<S39>/Reshapeu' : Reshape block reduction
+//  Block '<S39>/Reshapexhat' : Reshape block reduction
+//  Block '<S99>/Reshape (9) to [3x3] column-major' : Reshape block reduction
+//  Block '<S102>/Zero-Order Hold' : Eliminated since input and output rates are identical
+//  Block '<S102>/Zero-Order Hold1' : Eliminated since input and output rates are identical
+//  Block '<S102>/Zero-Order Hold2' : Eliminated since input and output rates are identical
+//  Block '<S102>/Zero-Order Hold3' : Eliminated since input and output rates are identical
+//  Block '<S103>/Zero-Order Hold' : Eliminated since input and output rates are identical
+//  Block '<S103>/Zero-Order Hold1' : Eliminated since input and output rates are identical
+//  Block '<S103>/Zero-Order Hold2' : Eliminated since input and output rates are identical
+//  Block '<S103>/Zero-Order Hold3' : Eliminated since input and output rates are identical
+//  Block '<S103>/Zero-Order Hold4' : Eliminated since input and output rates are identical
 //  Block '<S3>/Data Type Conversion1' : Eliminate redundant data type conversion
 //  Block '<S3>/Data Type Conversion12' : Eliminate redundant data type conversion
 //  Block '<S3>/Data Type Conversion2' : Eliminate redundant data type conversion
@@ -414,8 +560,12 @@ class FCS_model final
 //  Block '<S3>/Data Type Conversion4' : Eliminate redundant data type conversion
 //  Block '<S3>/Data Type Conversion5' : Eliminate redundant data type conversion
 //  Block '<S3>/Data Type Conversion6' : Eliminate redundant data type conversion
+//  Block '<S3>/Data Type Conversion7' : Eliminate redundant data type conversion
 //  Block '<S4>/Data Type Conversion' : Eliminate redundant data type conversion
 //  Block '<S4>/Data Type Conversion1' : Eliminate redundant data type conversion
+//  Block '<S4>/Data Type Conversion10' : Eliminate redundant data type conversion
+//  Block '<S4>/Data Type Conversion11' : Eliminate redundant data type conversion
+//  Block '<S4>/Data Type Conversion12' : Eliminate redundant data type conversion
 //  Block '<S4>/Data Type Conversion2' : Eliminate redundant data type conversion
 //  Block '<S4>/Data Type Conversion3' : Eliminate redundant data type conversion
 //  Block '<S4>/Data Type Conversion4' : Eliminate redundant data type conversion
@@ -442,7 +592,7 @@ class FCS_model final
 //
 //  '<Root>' : 'FCS_model'
 //  '<S1>'   : 'FCS_model/Controller'
-//  '<S2>'   : 'FCS_model/Estimator'
+//  '<S2>'   : 'FCS_model/Estimatiors'
 //  '<S3>'   : 'FCS_model/Logging'
 //  '<S4>'   : 'FCS_model/bus_prep'
 //  '<S5>'   : 'FCS_model/Controller/Altitude Controller'
@@ -476,14 +626,82 @@ class FCS_model final
 //  '<S33>'  : 'FCS_model/Controller/Yaw Controller/LTI System5/IO Delay'
 //  '<S34>'  : 'FCS_model/Controller/Yaw Controller/LTI System5/Input Delay'
 //  '<S35>'  : 'FCS_model/Controller/Yaw Controller/LTI System5/Output Delay'
-//  '<S36>'  : 'FCS_model/Estimator/Complementary Filter for Pitch (disc.)'
-//  '<S37>'  : 'FCS_model/Estimator/Complementary Filter for Roll (disc.)'
-//  '<S38>'  : 'FCS_model/Estimator/Roll and Pitch Angles (Lecture 2, slide 39)'
-//  '<S39>'  : 'FCS_model/Estimator/Roll, Pitch, and Yaw Rates (Lecture1, slide 22)1'
-//  '<S40>'  : 'FCS_model/Estimator/yaw estimator'
-//  '<S41>'  : 'FCS_model/Estimator/yaw estimator/If Action Subsystem3'
-//  '<S42>'  : 'FCS_model/Estimator/yaw estimator/If Action Subsystem'
-//  '<S43>'  : 'FCS_model/Estimator/yaw estimator/If Action Subsystem/Complementary Filter for Yaw (disc.)'
+//  '<S36>'  : 'FCS_model/Estimatiors/Altitude Estimation'
+//  '<S37>'  : 'FCS_model/Estimatiors/Attitude Estimation'
+//  '<S38>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1'
+//  '<S39>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude'
+//  '<S40>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/OutlierHandling'
+//  '<S41>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/Rotation Angles to Direction Cosine Matrix'
+//  '<S42>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/outlierBelowFloor'
+//  '<S43>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/CalculatePL'
+//  '<S44>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/CalculateYhat'
+//  '<S45>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/CovarianceOutputConfigurator'
+//  '<S46>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/DataTypeConversionA'
+//  '<S47>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/DataTypeConversionB'
+//  '<S48>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/DataTypeConversionC'
+//  '<S49>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/DataTypeConversionD'
+//  '<S50>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/DataTypeConversionEnable'
+//  '<S51>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/DataTypeConversionG'
+//  '<S52>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/DataTypeConversionH'
+//  '<S53>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/DataTypeConversionN'
+//  '<S54>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/DataTypeConversionP'
+//  '<S55>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/DataTypeConversionP0'
+//  '<S56>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/DataTypeConversionQ'
+//  '<S57>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/DataTypeConversionR'
+//  '<S58>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/DataTypeConversionReset'
+//  '<S59>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/DataTypeConversionX'
+//  '<S60>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/DataTypeConversionX0'
+//  '<S61>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/DataTypeConversionu'
+//  '<S62>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/MemoryP'
+//  '<S63>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/Observer'
+//  '<S64>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/ReducedQRN'
+//  '<S65>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/Reset'
+//  '<S66>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/ScalarExpansionP0'
+//  '<S67>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/ScalarExpansionQ'
+//  '<S68>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/ScalarExpansionR'
+//  '<S69>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/UseCurrentEstimator'
+//  '<S70>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/checkA'
+//  '<S71>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/checkB'
+//  '<S72>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/checkC'
+//  '<S73>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/checkD'
+//  '<S74>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/checkEnable'
+//  '<S75>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/checkG'
+//  '<S76>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/checkH'
+//  '<S77>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/checkN'
+//  '<S78>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/checkP0'
+//  '<S79>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/checkQ'
+//  '<S80>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/checkR'
+//  '<S81>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/checkReset'
+//  '<S82>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/checkX0'
+//  '<S83>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/checku'
+//  '<S84>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/checky'
+//  '<S85>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/CalculatePL/DataTypeConversionL'
+//  '<S86>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/CalculatePL/DataTypeConversionM'
+//  '<S87>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/CalculatePL/DataTypeConversionP'
+//  '<S88>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/CalculatePL/DataTypeConversionZ'
+//  '<S89>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/CalculatePL/Ground'
+//  '<S90>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/CovarianceOutputConfigurator/decideOutput'
+//  '<S91>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/CovarianceOutputConfigurator/decideOutput/SqrtUsedFcn'
+//  '<S92>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/Observer/MeasurementUpdate'
+//  '<S93>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/ReducedQRN/Ground'
+//  '<S94>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/KalmanFilter_altitude/UseCurrentEstimator/Enabled Subsystem'
+//  '<S95>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/OutlierHandling/check for min altitude'
+//  '<S96>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/OutlierHandling/currentEstimateVeryOffFromPressure'
+//  '<S97>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/OutlierHandling/currentStateVeryOffsonarflt'
+//  '<S98>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/OutlierHandling/outlierJump'
+//  '<S99>'  : 'FCS_model/Estimatiors/Altitude Estimation/EstimatorAltitude1/Rotation Angles to Direction Cosine Matrix/Create 3x3 Matrix'
+//  '<S100>' : 'FCS_model/Estimatiors/Attitude Estimation/Complementary Filter for Pitch (disc.)'
+//  '<S101>' : 'FCS_model/Estimatiors/Attitude Estimation/Complementary Filter for Roll (disc.)'
+//  '<S102>' : 'FCS_model/Estimatiors/Attitude Estimation/Roll and Pitch Angles (Lecture 2, slide 39)'
+//  '<S103>' : 'FCS_model/Estimatiors/Attitude Estimation/Roll, Pitch, and Yaw Rates (Lecture1, slide 22)1'
+//  '<S104>' : 'FCS_model/Estimatiors/Attitude Estimation/yaw estimator'
+//  '<S105>' : 'FCS_model/Estimatiors/Attitude Estimation/yaw estimator/If Action Subsystem3'
+//  '<S106>' : 'FCS_model/Estimatiors/Attitude Estimation/yaw estimator/If Action Subsystem'
+//  '<S107>' : 'FCS_model/Estimatiors/Attitude Estimation/yaw estimator/If Action Subsystem/Complementary Filter for Yaw (disc.)'
+//  '<S108>' : 'FCS_model/bus_prep/master_switch_zero_baro'
+//  '<S109>' : 'FCS_model/bus_prep/master_switch_zero_position'
+//  '<S110>' : 'FCS_model/bus_prep/master_switch_zero_baro/Triggered Subsystem'
+//  '<S111>' : 'FCS_model/bus_prep/master_switch_zero_position/Triggered Subsystem'
 
 #endif                                 // RTW_HEADER_FCS_model_h_
 

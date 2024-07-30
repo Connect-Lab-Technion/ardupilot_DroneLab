@@ -123,7 +123,22 @@ void ModeSimulink::run()
 
     // '<Root>/yaw_opticalfow' ----------------------------
     float arg_yaw{ ahrs.get_yaw() };
+
+
+    // '<Root>/flowRate' --------------------------------
     
+    // Get the optical flow sensor
+    Vector2f optFlow_Rate = copter.optflow.flowRate();
+    float arg_flowRate[2]{ optFlow_Rate.x, optFlow_Rate.y };
+    
+    // '<Root>/baro' ----------------------------
+    float baro_altitude = copter.barometer.get_pressure();
+    float arg_baro{ baro_altitude };
+
+    // '<Root>/rangefinder' ----------------------------
+    float rangefinder_distance = copter.rangefinder_state.alt_cm;
+    float arg_rangefinder{ rangefinder_distance };
+
     // '<Root>/pos_ref' -----------------------------------
     float arg_pos_ref[3]{ ref_pos_x, ref_pos_y, ref_pos_z};
 
@@ -135,12 +150,13 @@ void ModeSimulink::run()
     float arg_motors_refout[4];
 
     // '<Root>/logging_refout' !! The array size is modified during the build process. See also common.xml !!
-    float arg_logging_refout[36];
+    float arg_logging_refout[40];
 
     // Step the model
     labController.step(&arg_switch, &arg_gain, arg_accel, arg_gyro, &arg_bat_V,
-                     arg_pos_est, arg_vel_est, &arg_yaw, arg_pos_ref,
-                     arg_orient_ref, arg_motors_refout, arg_logging_refout);
+                     arg_flowRate, &arg_baro, &arg_rangefinder, arg_pos_est,
+                     arg_vel_est, &arg_yaw, arg_pos_ref, arg_orient_ref,
+                     arg_motors_refout, arg_logging_refout);
 
     // PWM output is between 1000 and 2000 (0% - 100%)
     motor_out_1 = arg_motors_refout[0] * 1000 + 1000;

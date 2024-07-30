@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'FCS_model'.
 //
-// Model version                  : 7.24
+// Model version                  : 7.39
 // Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Wed Jul 17 11:32:30 2024
+// C/C++ source code generated on : Tue Jul 30 12:41:33 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -19,6 +19,77 @@
 #ifndef RTW_HEADER_FCS_model_types_h_
 #define RTW_HEADER_FCS_model_types_h_
 #include "rtwtypes.h"
+#ifndef DEFINED_TYPEDEF_FOR_struct_eF5OUT33sX0T9pzS8027m_
+#define DEFINED_TYPEDEF_FOR_struct_eF5OUT33sX0T9pzS8027m_
+
+struct struct_eF5OUT33sX0T9pzS8027m
+{
+  real_T cg[3];
+  real_T location[3];
+  real_T accNatFreq;
+  real_T accDamping;
+  real_T accScaleCross[9];
+  real_T accBias[3];
+  real_T accLimits[6];
+  real_T gyroNatFreq;
+  real_T gyroDamping;
+  real_T gyroScaleCross[9];
+  real_T gyroBias[3];
+  real_T gyroGBias[3];
+  real_T gyroLimits[6];
+  real_T noiseSeeds[6];
+  real_T noiseWeights[6];
+  real_T noisePower[6];
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_struct_FIfaVnupBjYAxo1EdNiDlF_
+#define DEFINED_TYPEDEF_FOR_struct_FIfaVnupBjYAxo1EdNiDlF_
+
+struct struct_FIfaVnupBjYAxo1EdNiDlF
+{
+  real_T noisePower;
+  real_T noiseSeeds;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_struct_eFnp8sKFNJLN84XLbLzaFF_
+#define DEFINED_TYPEDEF_FOR_struct_eFnp8sKFNJLN84XLbLzaFF_
+
+struct struct_eFnp8sKFNJLN84XLbLzaFF
+{
+  real_T posVISNoVisionAvail[4];
+  real_T usePosVISFlag;
+  real_T batteryStatus[2];
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_struct_p4xwbJBU4TOx0OKqnGpJsD_
+#define DEFINED_TYPEDEF_FOR_struct_p4xwbJBU4TOx0OKqnGpJsD_
+
+struct struct_p4xwbJBU4TOx0OKqnGpJsD
+{
+  real_T IMUAccelGain[3];
+  real_T IMUGyroGain[3];
+  struct_eF5OUT33sX0T9pzS8027m IMU;
+  struct_FIfaVnupBjYAxo1EdNiDlF Sonar;
+  real_T NO_VIS_X;
+  real_T NO_VIS_YAW;
+  struct_eFnp8sKFNJLN84XLbLzaFF dummy;
+  real_T sensorDelay;
+  real_T airDensity;
+  real_T altToPrsGain;
+  real_T altToPrsBias;
+  real_T inverseIMUGain[6];
+  real_T altSensorMin;
+  real_T cameraResolution[2];
+};
+
+#endif
+
 #ifndef DEFINED_TYPEDEF_FOR_struct_XRMsui9C07VjBvdq1msujB_
 #define DEFINED_TYPEDEF_FOR_struct_XRMsui9C07VjBvdq1msujB_
 

@@ -225,6 +225,7 @@ public:
     friend class ModeZigZag;
     friend class ModeAutorotate;
     friend class ModeTurtle;
+    friend class ModeSimulink;
 
     Copter(void);
 
