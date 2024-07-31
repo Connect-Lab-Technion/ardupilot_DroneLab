@@ -9,7 +9,7 @@
 //
 // Model version                  : 7.39
 // Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Tue Jul 30 12:41:33 2024
+// C/C++ source code generated on : Wed Jul 31 08:29:29 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -90,22 +90,22 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
   0.3498F,
 
   // Variable: Ts
-  //  Referenced by: '<S105>/Gain'
+  //  Referenced by: '<S98>/Gain'
 
   0.0025F,
 
   // Variable: w_c_pitch
-  //  Referenced by: '<S100>/Gain'
+  //  Referenced by: '<S93>/Gain'
 
   0.03F,
 
   // Variable: w_c_roll
-  //  Referenced by: '<S101>/Gain'
+  //  Referenced by: '<S94>/Gain'
 
   0.3F,
 
   // Variable: w_c_yaw
-  //  Referenced by: '<S107>/Gain'
+  //  Referenced by: '<S100>/Gain'
 
   55.0F,
 
@@ -120,12 +120,12 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
   { 0.0, 0.0, 0.0, 0.0 },
 
   // Expression: 0
-  //  Referenced by: '<S92>/L*(y[k]-yhat[k|k-1])'
+  //  Referenced by: '<S89>/L*(y[k]-yhat[k|k-1])'
 
   0.0,
 
   // Expression: 0
-  //  Referenced by: '<S94>/deltax'
+  //  Referenced by: '<S91>/deltax'
 
   0.0,
 
@@ -136,7 +136,7 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
     0.0, 1.0 },
 
   // Expression: pInitialization.M
-  //  Referenced by: '<S43>/KalmanGainM'
+  //  Referenced by: '<S41>/KalmanGainM'
 
   { 2.3640237993003584E-5, 6.2650522961656867E-5, 7.9342391514520768E-5,
     7.9342391513559027E-5, 0.014775148745627239, 0.039156576851035532,
@@ -149,7 +149,7 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
   { 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, -1.0 },
 
   // Expression: pInitialization.L
-  //  Referenced by: '<S43>/KalmanGainL'
+  //  Referenced by: '<S41>/KalmanGainL'
 
   { 2.3796864300407757E-5, 6.2848878940443382E-5, 7.9342391514523967E-5,
     7.9342391513559176E-5, 0.014873040187755364, 0.0392805493377795,
@@ -227,7 +227,7 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
   { 0.0, 0.0, 0.0, 0.0 },
 
   // Expression: pInitialization.Z
-  //  Referenced by: '<S43>/CovarianceZ'
+  //  Referenced by: '<S41>/CovarianceZ'
 
   { 5.910059498250896E-6, 1.5662630740414217E-5, 1.9835597878630189E-5,
     1.983559787838976E-5, 1.5662630740414213E-5, 7.3974317413854647E-5,
@@ -264,27 +264,27 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
   0.0F,
 
   // Computed Parameter: DiscreteTransferFcn_NumCoef
-  //  Referenced by: '<S107>/Discrete Transfer Fcn'
+  //  Referenced by: '<S100>/Discrete Transfer Fcn'
 
   { 0.0F, 0.00233573909F },
 
   // Computed Parameter: DiscreteTransferFcn_DenCoef
-  //  Referenced by: '<S107>/Discrete Transfer Fcn'
+  //  Referenced by: '<S100>/Discrete Transfer Fcn'
 
   { 1.0F, -0.871534348F },
 
   // Computed Parameter: DiscreteTransferFcn_InitialStat
-  //  Referenced by: '<S107>/Discrete Transfer Fcn'
+  //  Referenced by: '<S100>/Discrete Transfer Fcn'
+
+  0.0F,
+
+  // Computed Parameter: baro_0_Y0
+  //  Referenced by: '<S103>/baro_0'
 
   0.0F,
 
   // Computed Parameter: Out1_Y0
-  //  Referenced by: '<S110>/Out1'
-
-  0.0F,
-
-  // Computed Parameter: Out1_Y0_k
-  //  Referenced by: '<S111>/Out1'
+  //  Referenced by: '<S104>/Out1'
 
   { 0.0F, 0.0F, 0.0F },
 
@@ -294,32 +294,32 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
   0.0F,
 
   // Computed Parameter: DiscreteTransferFcn_NumCoef_n
-  //  Referenced by: '<S100>/Discrete Transfer Fcn'
+  //  Referenced by: '<S93>/Discrete Transfer Fcn'
 
   { 0.0F, 0.00249990635F },
 
   // Computed Parameter: DiscreteTransferFcn_DenCoef_n
-  //  Referenced by: '<S100>/Discrete Transfer Fcn'
+  //  Referenced by: '<S93>/Discrete Transfer Fcn'
 
   { 1.0F, -0.999925F },
 
   // Computed Parameter: DiscreteTransferFcn_InitialSt_c
-  //  Referenced by: '<S100>/Discrete Transfer Fcn'
+  //  Referenced by: '<S93>/Discrete Transfer Fcn'
 
   0.0F,
 
   // Computed Parameter: DiscreteTransferFcn_NumCoef_a
-  //  Referenced by: '<S101>/Discrete Transfer Fcn'
+  //  Referenced by: '<S94>/Discrete Transfer Fcn'
 
   { 0.0F, 0.0024990628F },
 
   // Computed Parameter: DiscreteTransferFcn_DenCoef_o
-  //  Referenced by: '<S101>/Discrete Transfer Fcn'
+  //  Referenced by: '<S94>/Discrete Transfer Fcn'
 
   { 1.0F, -0.999250293F },
 
   // Computed Parameter: DiscreteTransferFcn_InitialSt_g
-  //  Referenced by: '<S101>/Discrete Transfer Fcn'
+  //  Referenced by: '<S94>/Discrete Transfer Fcn'
 
   0.0F,
 
@@ -356,7 +356,7 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
   // Computed Parameter: WithControl1WithoutControl0_Gai
   //  Referenced by: '<S5>/WithControl=1 WithoutControl=0'
 
-  0.0F,
+  1.0F,
 
   // Computed Parameter: SaturationThrust_UpperSat
   //  Referenced by: '<S5>/SaturationThrust'
@@ -529,37 +529,32 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
   0.6F,
 
   // Computed Parameter: Gain1_Gain
-  //  Referenced by: '<S102>/Gain1'
+  //  Referenced by: '<S95>/Gain1'
 
   -1.0F,
 
   // Expression: g
-  //  Referenced by: '<S102>/Constant'
+  //  Referenced by: '<S95>/Constant'
 
   9.81F,
 
   // Computed Parameter: Gain2_Gain
-  //  Referenced by: '<S102>/Gain2'
+  //  Referenced by: '<S95>/Gain2'
 
   -1.0F,
 
   // Computed Parameter: Gain3_Gain
-  //  Referenced by: '<S102>/Gain3'
+  //  Referenced by: '<S95>/Gain3'
 
   -1.0F,
 
   // Computed Parameter: Gain_Gain_i
-  //  Referenced by: '<S103>/Gain'
+  //  Referenced by: '<S96>/Gain'
 
   -1.0F,
 
-  // Expression: true()
-  //  Referenced by: '<S39>/Enable'
-
-  true,
-
   // Expression: pInitialization.isSqrtUsed
-  //  Referenced by: '<S90>/isSqrtUsed'
+  //  Referenced by: '<S87>/isSqrtUsed'
 
   false,
 

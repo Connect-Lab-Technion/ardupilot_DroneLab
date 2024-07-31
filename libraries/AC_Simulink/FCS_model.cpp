@@ -9,7 +9,7 @@
 //
 // Model version                  : 7.39
 // Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Tue Jul 30 12:41:33 2024
+// C/C++ source code generated on : Wed Jul 31 08:29:29 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -156,61 +156,61 @@ void FCS_model::step(uint8_T *arg_switch, real32_T *arg_gain, real32_T
   real32_T rtb_TrigonometricFunction4;
   real32_T rtb_rollrate;
 
-  // If: '<S104>/If1' incorporates:
+  // If: '<S97>/If1' incorporates:
   //   Constant: '<S37>/Constant'
-  //   DataTypeConversion: '<S104>/Data Type Conversion'
+  //   DataTypeConversion: '<S97>/Data Type Conversion'
 
   if (static_cast<real32_T>(FCS_model_P.Constant_Value_a) > 0.0F) {
-    // Outputs for IfAction SubSystem: '<S104>/If Action Subsystem' incorporates:
-    //   ActionPort: '<S106>/Action Port'
+    // Outputs for IfAction SubSystem: '<S97>/If Action Subsystem' incorporates:
+    //   ActionPort: '<S99>/Action Port'
 
-    // Merge: '<S104>/Merge1' incorporates:
-    //   DiscreteTransferFcn: '<S107>/Discrete Transfer Fcn'
+    // Merge: '<S97>/Merge1' incorporates:
+    //   DiscreteTransferFcn: '<S100>/Discrete Transfer Fcn'
 
     FCS_model_DW.Memory_PreviousInput = FCS_model_P.DiscreteTransferFcn_NumCoef
       [1] * FCS_model_DW.DiscreteTransferFcn_states_n;
 
-    // Update for DiscreteTransferFcn: '<S107>/Discrete Transfer Fcn' incorporates:
-    //   Gain: '<S107>/Gain'
+    // Update for DiscreteTransferFcn: '<S100>/Discrete Transfer Fcn' incorporates:
+    //   Gain: '<S100>/Gain'
     //   Inport: '<Root>/gyro'
     //   Inport: '<Root>/yaw_est'
-    //   Sum: '<S107>/Sum'
+    //   Sum: '<S100>/Sum'
 
     FCS_model_DW.DiscreteTransferFcn_states_n = ((FCS_model_P.w_c_yaw * *arg_yaw
       + arg_gyro[2]) - FCS_model_P.DiscreteTransferFcn_DenCoef[1] *
       FCS_model_DW.DiscreteTransferFcn_states_n) /
       FCS_model_P.DiscreteTransferFcn_DenCoef[0];
 
-    // End of Outputs for SubSystem: '<S104>/If Action Subsystem'
+    // End of Outputs for SubSystem: '<S97>/If Action Subsystem'
   } else {
-    // Outputs for IfAction SubSystem: '<S104>/If Action Subsystem3' incorporates:
-    //   ActionPort: '<S105>/Action Port'
+    // Outputs for IfAction SubSystem: '<S97>/If Action Subsystem3' incorporates:
+    //   ActionPort: '<S98>/Action Port'
 
-    // Merge: '<S104>/Merge1' incorporates:
-    //   Gain: '<S105>/Gain'
+    // Merge: '<S97>/Merge1' incorporates:
+    //   Gain: '<S98>/Gain'
     //   Inport: '<Root>/gyro'
     //   Memory: '<S37>/Memory'
-    //   Sum: '<S105>/Sum'
+    //   Sum: '<S98>/Sum'
 
     FCS_model_DW.Memory_PreviousInput += FCS_model_P.Ts * arg_gyro[2];
 
-    // End of Outputs for SubSystem: '<S104>/If Action Subsystem3'
+    // End of Outputs for SubSystem: '<S97>/If Action Subsystem3'
   }
 
-  // End of If: '<S104>/If1'
+  // End of If: '<S97>/If1'
 
-  // DiscreteTransferFcn: '<S100>/Discrete Transfer Fcn'
+  // DiscreteTransferFcn: '<S93>/Discrete Transfer Fcn'
   rtb_TrigonometricFunction4 = FCS_model_P.DiscreteTransferFcn_NumCoef_n[1] *
     FCS_model_DW.DiscreteTransferFcn_states;
 
-  // DiscreteTransferFcn: '<S101>/Discrete Transfer Fcn'
+  // DiscreteTransferFcn: '<S94>/Discrete Transfer Fcn'
   rtb_rollrate = FCS_model_P.DiscreteTransferFcn_NumCoef_a[1] *
     FCS_model_DW.DiscreteTransferFcn_states_e;
 
-  // Trigonometry: '<S41>/sincos' incorporates:
+  // Trigonometry: '<S40>/sincos' incorporates:
   //   DataTypeConversion: '<S36>/Data Type Conversion4'
-  //   DiscreteTransferFcn: '<S100>/Discrete Transfer Fcn'
-  //   DiscreteTransferFcn: '<S101>/Discrete Transfer Fcn'
+  //   DiscreteTransferFcn: '<S93>/Discrete Transfer Fcn'
+  //   DiscreteTransferFcn: '<S94>/Discrete Transfer Fcn'
 
   rtb_sincos_o2[0] = std::cos(static_cast<real_T>
     (FCS_model_DW.Memory_PreviousInput));
@@ -221,45 +221,45 @@ void FCS_model::step(uint8_T *arg_switch, real32_T *arg_gain, real32_T
   rtb_sincos_o2[2] = std::cos(static_cast<real_T>(rtb_rollrate));
   rtb_Sum_f = std::sin(static_cast<real_T>(rtb_rollrate));
 
-  // Fcn: '<S41>/Fcn11'
+  // Fcn: '<S40>/Fcn11'
   rtb_VectorConcatenate[0] = rtb_sincos_o2[0] * rtb_sincos_o2[1];
 
-  // Fcn: '<S41>/Fcn21' incorporates:
-  //   Fcn: '<S41>/Fcn22'
+  // Fcn: '<S40>/Fcn21' incorporates:
+  //   Fcn: '<S40>/Fcn22'
 
   rtb_VectorConcatenate_tmp = rtb_Akxhatkk1_idx_1 * rtb_Sum_f;
   rtb_VectorConcatenate[1] = rtb_VectorConcatenate_tmp * rtb_sincos_o2[0] -
     rtb_Akxhatkk1_idx_0 * rtb_sincos_o2[2];
 
-  // Fcn: '<S41>/Fcn31' incorporates:
-  //   Fcn: '<S41>/Fcn32'
+  // Fcn: '<S40>/Fcn31' incorporates:
+  //   Fcn: '<S40>/Fcn32'
 
   rtb_VectorConcatenate_tmp_0 = rtb_Akxhatkk1_idx_1 * rtb_sincos_o2[2];
   rtb_VectorConcatenate[2] = rtb_VectorConcatenate_tmp_0 * rtb_sincos_o2[0] +
     rtb_Akxhatkk1_idx_0 * rtb_Sum_f;
 
-  // Fcn: '<S41>/Fcn12'
+  // Fcn: '<S40>/Fcn12'
   rtb_VectorConcatenate[3] = rtb_Akxhatkk1_idx_0 * rtb_sincos_o2[1];
 
-  // Fcn: '<S41>/Fcn22'
+  // Fcn: '<S40>/Fcn22'
   rtb_VectorConcatenate[4] = rtb_VectorConcatenate_tmp * rtb_Akxhatkk1_idx_0 +
     rtb_sincos_o2[0] * rtb_sincos_o2[2];
 
-  // Fcn: '<S41>/Fcn32'
+  // Fcn: '<S40>/Fcn32'
   rtb_VectorConcatenate[5] = rtb_VectorConcatenate_tmp_0 * rtb_Akxhatkk1_idx_0 -
     rtb_sincos_o2[0] * rtb_Sum_f;
 
-  // Fcn: '<S41>/Fcn13'
+  // Fcn: '<S40>/Fcn13'
   rtb_VectorConcatenate[6] = -rtb_Akxhatkk1_idx_1;
 
-  // Fcn: '<S41>/Fcn23'
+  // Fcn: '<S40>/Fcn23'
   rtb_VectorConcatenate[7] = rtb_sincos_o2[1] * rtb_Sum_f;
 
-  // Fcn: '<S41>/Fcn33'
+  // Fcn: '<S40>/Fcn33'
   rtb_VectorConcatenate[8] = rtb_sincos_o2[1] * rtb_sincos_o2[2];
 
   // Math: '<S38>/Math Function' incorporates:
-  //   Concatenate: '<S99>/Vector Concatenate'
+  //   Concatenate: '<S92>/Vector Concatenate'
 
   for (int32_T iU{0}; iU < 3; iU++) {
     rtb_MathFunction[3 * iU] = rtb_VectorConcatenate[iU];
@@ -269,13 +269,13 @@ void FCS_model::step(uint8_T *arg_switch, real32_T *arg_gain, real32_T
 
   // End of Math: '<S38>/Math Function'
 
-  // Outputs for Triggered SubSystem: '<S108>/Triggered Subsystem' incorporates:
-  //   TriggerPort: '<S110>/Trigger'
+  // Outputs for Triggered SubSystem: '<S101>/Triggered Subsystem' incorporates:
+  //   TriggerPort: '<S103>/Trigger'
 
   // Inport: '<Root>/master_switch'
   if ((*arg_switch > 0) && (FCS_model_PrevZCX.TriggeredSubsystem_Trig_ZCE_d !=
        POS_ZCSIG)) {
-    // SignalConversion generated from: '<S110>/1' incorporates:
+    // SignalConversion generated from: '<S103>/1' incorporates:
     //   Inport: '<Root>/baro'
 
     FCS_model_B.u = *arg_baro;
@@ -283,9 +283,9 @@ void FCS_model::step(uint8_T *arg_switch, real32_T *arg_gain, real32_T
 
   FCS_model_PrevZCX.TriggeredSubsystem_Trig_ZCE_d = (*arg_switch > 0);
 
-  // End of Outputs for SubSystem: '<S108>/Triggered Subsystem'
+  // End of Outputs for SubSystem: '<S101>/Triggered Subsystem'
 
-  // Sum: '<S108>/Subtract' incorporates:
+  // Sum: '<S101>/Subtract' incorporates:
   //   Inport: '<Root>/baro'
 
   rtb_Product4 = *arg_baro - FCS_model_B.u;
@@ -365,17 +365,19 @@ void FCS_model::step(uint8_T *arg_switch, real32_T *arg_gain, real32_T
   rtb_sincos_o2[1] = rtb_Sum[2];
   rtb_sincos_o2[2] = rtb_MathFunction_0[2];
 
-  // Outputs for Enabled SubSystem: '<S69>/Enabled Subsystem' incorporates:
-  //   EnablePort: '<S94>/Enable'
+  // Outputs for Enabled SubSystem: '<S66>/Enabled Subsystem' incorporates:
+  //   EnablePort: '<S91>/Enable'
 
-  // Constant: '<S39>/Enable'
-  if (FCS_model_P.Enable_Value) {
+  // DataTypeConversion: '<S39>/DataTypeConversionEnable' incorporates:
+  //   Inport: '<Root>/master_switch'
+
+  if (*arg_switch != 0) {
     FCS_model_DW.EnabledSubsystem_MODE = true;
 
-    // Sum: '<S94>/Add1' incorporates:
+    // Sum: '<S91>/Add1' incorporates:
     //   Constant: '<S39>/C'
     //   Delay: '<S39>/MemoryX'
-    //   Product: '<S94>/Product'
+    //   Product: '<S91>/Product'
 
     for (int32_T iU{0}; iU < 3; iU++) {
       rtb_Sum[iU] = rtb_sincos_o2[iU] - (((FCS_model_P.C_Value[iU + 3] *
@@ -385,10 +387,10 @@ void FCS_model::step(uint8_T *arg_switch, real32_T *arg_gain, real32_T
         FCS_model_DW.MemoryX_DSTATE[3]);
     }
 
-    // End of Sum: '<S94>/Add1'
+    // End of Sum: '<S91>/Add1'
     for (int32_T iU{0}; iU < 4; iU++) {
-      // Product: '<S94>/Product2' incorporates:
-      //   Constant: '<S43>/KalmanGainM'
+      // Product: '<S91>/Product2' incorporates:
+      //   Constant: '<S41>/KalmanGainM'
 
       FCS_model_B.Product2[iU] = 0.0;
       FCS_model_B.Product2[iU] += FCS_model_P.KalmanGainM_Value[iU] * rtb_Sum[0];
@@ -398,8 +400,8 @@ void FCS_model::step(uint8_T *arg_switch, real32_T *arg_gain, real32_T
         rtb_Sum[2];
     }
   } else if (FCS_model_DW.EnabledSubsystem_MODE) {
-    // Disable for Product: '<S94>/Product2' incorporates:
-    //   Outport: '<S94>/deltax'
+    // Disable for Product: '<S91>/Product2' incorporates:
+    //   Outport: '<S91>/deltax'
 
     FCS_model_B.Product2[0] = FCS_model_P.deltax_Y0;
     FCS_model_B.Product2[1] = FCS_model_P.deltax_Y0;
@@ -408,16 +410,16 @@ void FCS_model::step(uint8_T *arg_switch, real32_T *arg_gain, real32_T
     FCS_model_DW.EnabledSubsystem_MODE = false;
   }
 
-  // End of Outputs for SubSystem: '<S69>/Enabled Subsystem'
+  // End of Outputs for SubSystem: '<S66>/Enabled Subsystem'
 
-  // Sum: '<S69>/Add' incorporates:
+  // Sum: '<S66>/Add' incorporates:
   //   Delay: '<S39>/MemoryX'
 
   rtb_Akxhatkk1_idx_0 = FCS_model_B.Product2[0] + FCS_model_DW.MemoryX_DSTATE[0];
   rtb_Akxhatkk1_idx_1 = FCS_model_B.Product2[1] + FCS_model_DW.MemoryX_DSTATE[1];
 
   // Product: '<S38>/Product1' incorporates:
-  //   Concatenate: '<S99>/Vector Concatenate'
+  //   Concatenate: '<S92>/Vector Concatenate'
   //   SignalConversion generated from: '<S38>/Product1'
 
   for (int32_T iU{0}; iU < 3; iU++) {
@@ -454,13 +456,13 @@ void FCS_model::step(uint8_T *arg_switch, real32_T *arg_gain, real32_T
 
   // Saturate: '<S5>/SaturationThrust'
   if (rtb_Akxhatkk1_idx_1 > FCS_model_P.SaturationThrust_UpperSat) {
-    // Trigonometry: '<S102>/Trigonometric Function'
+    // Trigonometry: '<S95>/Trigonometric Function'
     rtb_roll = FCS_model_P.SaturationThrust_UpperSat;
   } else if (rtb_Akxhatkk1_idx_1 < FCS_model_P.SaturationThrust_LowerSat) {
-    // Trigonometry: '<S102>/Trigonometric Function'
+    // Trigonometry: '<S95>/Trigonometric Function'
     rtb_roll = FCS_model_P.SaturationThrust_LowerSat;
   } else {
-    // Trigonometry: '<S102>/Trigonometric Function'
+    // Trigonometry: '<S95>/Trigonometric Function'
     rtb_roll = static_cast<real32_T>(rtb_Akxhatkk1_idx_1);
   }
 
@@ -477,7 +479,7 @@ void FCS_model::step(uint8_T *arg_switch, real32_T *arg_gain, real32_T
       + (FCS_model_P.Internal_C_a[1])*FCS_model_DW.Internal_DSTATE_h[1];
   }
 
-  // Trigonometry: '<S102>/Trigonometric Function' incorporates:
+  // Trigonometry: '<S95>/Trigonometric Function' incorporates:
   //   Gain: '<S10>/zDpsi'
   //   Inport: '<Root>/gyro'
   //   Sum: '<S10>/Sum1'
@@ -507,7 +509,7 @@ void FCS_model::step(uint8_T *arg_switch, real32_T *arg_gain, real32_T
   }
 
   // Sum: '<S7>/Sum1' incorporates:
-  //   DiscreteTransferFcn: '<S100>/Discrete Transfer Fcn'
+  //   DiscreteTransferFcn: '<S93>/Discrete Transfer Fcn'
 
   rtb_Sum1_j = rtb_roll - rtb_TrigonometricFunction4;
 
@@ -517,7 +519,7 @@ void FCS_model::step(uint8_T *arg_switch, real32_T *arg_gain, real32_T
     rtb_roll += FCS_model_P.Internal_D_e*rtb_Sum1_j;
   }
 
-  // Trigonometry: '<S102>/Trigonometric Function' incorporates:
+  // Trigonometry: '<S95>/Trigonometric Function' incorporates:
   //   Gain: '<S7>/zDtheta'
   //   Inport: '<Root>/gyro'
   //   Sum: '<S7>/Sum3'
@@ -545,7 +547,7 @@ void FCS_model::step(uint8_T *arg_switch, real32_T *arg_gain, real32_T
   }
 
   // Sum: '<S8>/Sum1' incorporates:
-  //   DiscreteTransferFcn: '<S101>/Discrete Transfer Fcn'
+  //   DiscreteTransferFcn: '<S94>/Discrete Transfer Fcn'
 
   rtb_Sum1_jt = rtb_roll - rtb_rollrate;
 
@@ -555,7 +557,7 @@ void FCS_model::step(uint8_T *arg_switch, real32_T *arg_gain, real32_T
     rtb_roll += FCS_model_P.Internal_D_h*rtb_Sum1_jt;
   }
 
-  // Trigonometry: '<S102>/Trigonometric Function' incorporates:
+  // Trigonometry: '<S95>/Trigonometric Function' incorporates:
   //   Gain: '<S8>/zDphi'
   //   Inport: '<Root>/gyro'
   //   Sum: '<S8>/Sum3'
@@ -626,19 +628,19 @@ void FCS_model::step(uint8_T *arg_switch, real32_T *arg_gain, real32_T
 
   // End of Switch: '<S9>/Switch'
 
-  // Trigonometry: '<S102>/Trigonometric Function' incorporates:
+  // Trigonometry: '<S95>/Trigonometric Function' incorporates:
   //   DataTypeConversion: '<S3>/Data Type Conversion14'
   //   DigitalClock: '<S3>/Digital Clock'
 
   rtb_roll = static_cast<real32_T>((((&FCS_model_M)->Timing.clockTick0) * 0.0025));
 
-  // Outputs for Triggered SubSystem: '<S109>/Triggered Subsystem' incorporates:
-  //   TriggerPort: '<S111>/Trigger'
+  // Outputs for Triggered SubSystem: '<S102>/Triggered Subsystem' incorporates:
+  //   TriggerPort: '<S104>/Trigger'
 
   // Inport: '<Root>/master_switch'
   if ((*arg_switch > 0) && (FCS_model_PrevZCX.TriggeredSubsystem_Trig_ZCE !=
        POS_ZCSIG)) {
-    // SignalConversion generated from: '<S111>/position' incorporates:
+    // SignalConversion generated from: '<S104>/position' incorporates:
     //   Inport: '<Root>/pos_est'
 
     FCS_model_B.position[0] = arg_pos_est[0];
@@ -648,14 +650,14 @@ void FCS_model::step(uint8_T *arg_switch, real32_T *arg_gain, real32_T
 
   FCS_model_PrevZCX.TriggeredSubsystem_Trig_ZCE = (*arg_switch > 0);
 
-  // End of Outputs for SubSystem: '<S109>/Triggered Subsystem'
+  // End of Outputs for SubSystem: '<S102>/Triggered Subsystem'
 
   // Outport: '<Root>/logging_out' incorporates:
   //   DataTypeConversion: '<S38>/Data Type Conversion'
   //   DataTypeConversion: '<S38>/Data Type Conversion2'
   //   DataTypeConversion: '<S3>/Data Type Conversion'
-  //   DiscreteTransferFcn: '<S100>/Discrete Transfer Fcn'
-  //   DiscreteTransferFcn: '<S101>/Discrete Transfer Fcn'
+  //   DiscreteTransferFcn: '<S93>/Discrete Transfer Fcn'
+  //   DiscreteTransferFcn: '<S94>/Discrete Transfer Fcn'
   //   Inport: '<Root>/accel'
   //   Inport: '<Root>/bat_V'
   //   Inport: '<Root>/flowRate'
@@ -668,7 +670,7 @@ void FCS_model::step(uint8_T *arg_switch, real32_T *arg_gain, real32_T
   //   Inport: '<Root>/rangefinder'
   //   Inport: '<Root>/vel_est'
   //   Inport: '<Root>/yaw_est'
-  //   Sum: '<S109>/Subtract'
+  //   Sum: '<S102>/Subtract'
 
   arg_logging_refout[0] = rtb_roll;
   arg_logging_refout[1] = FCS_model_DW.Memory_PreviousInput;
@@ -711,21 +713,23 @@ void FCS_model::step(uint8_T *arg_switch, real32_T *arg_gain, real32_T
   arg_logging_refout[38] = rtb_DataTypeConversion6;
   arg_logging_refout[39] = rtb_DataTypeConversion1_o;
 
-  // Outputs for Enabled SubSystem: '<S63>/MeasurementUpdate' incorporates:
-  //   EnablePort: '<S92>/Enable'
+  // Outputs for Enabled SubSystem: '<S60>/MeasurementUpdate' incorporates:
+  //   EnablePort: '<S89>/Enable'
 
-  // Constant: '<S39>/Enable'
-  if (FCS_model_P.Enable_Value) {
+  // DataTypeConversion: '<S39>/DataTypeConversionEnable' incorporates:
+  //   Inport: '<Root>/master_switch'
+
+  if (*arg_switch != 0) {
     FCS_model_DW.MeasurementUpdate_MODE = true;
     for (int32_T iU{0}; iU < 3; iU++) {
-      // Sum: '<S92>/Sum' incorporates:
+      // Sum: '<S89>/Sum' incorporates:
       //   Constant: '<S39>/C'
       //   Constant: '<S39>/D'
       //   Constant: '<S39>/u'
       //   Delay: '<S39>/MemoryX'
-      //   Product: '<S92>/C[k]*xhat[k|k-1]'
-      //   Product: '<S92>/D[k]*u[k]'
-      //   Sum: '<S92>/Add1'
+      //   Product: '<S89>/C[k]*xhat[k|k-1]'
+      //   Product: '<S89>/D[k]*u[k]'
+      //   Sum: '<S89>/Add1'
 
       rtb_Sum[iU] = rtb_sincos_o2[iU] - ((((FCS_model_P.C_Value[iU + 3] *
         FCS_model_DW.MemoryX_DSTATE[1] + FCS_model_P.C_Value[iU] *
@@ -736,8 +740,8 @@ void FCS_model::step(uint8_T *arg_switch, real32_T *arg_gain, real32_T
     }
 
     for (int32_T iU{0}; iU < 4; iU++) {
-      // Product: '<S92>/Product3' incorporates:
-      //   Constant: '<S43>/KalmanGainL'
+      // Product: '<S89>/Product3' incorporates:
+      //   Constant: '<S41>/KalmanGainL'
 
       FCS_model_B.Product3[iU] = 0.0;
       FCS_model_B.Product3[iU] += FCS_model_P.KalmanGainL_Value[iU] * rtb_Sum[0];
@@ -747,8 +751,8 @@ void FCS_model::step(uint8_T *arg_switch, real32_T *arg_gain, real32_T
         rtb_Sum[2];
     }
   } else if (FCS_model_DW.MeasurementUpdate_MODE) {
-    // Disable for Product: '<S92>/Product3' incorporates:
-    //   Outport: '<S92>/L*(y[k]-yhat[k|k-1])'
+    // Disable for Product: '<S89>/Product3' incorporates:
+    //   Outport: '<S89>/L*(y[k]-yhat[k|k-1])'
 
     FCS_model_B.Product3[0] = FCS_model_P.Lykyhatkk1_Y0;
     FCS_model_B.Product3[1] = FCS_model_P.Lykyhatkk1_Y0;
@@ -757,17 +761,17 @@ void FCS_model::step(uint8_T *arg_switch, real32_T *arg_gain, real32_T
     FCS_model_DW.MeasurementUpdate_MODE = false;
   }
 
-  // End of Outputs for SubSystem: '<S63>/MeasurementUpdate'
+  // End of Outputs for SubSystem: '<S60>/MeasurementUpdate'
 
-  // Product: '<S102>/Divide' incorporates:
-  //   Constant: '<S102>/Constant'
-  //   Gain: '<S102>/Gain1'
+  // Product: '<S95>/Divide' incorporates:
+  //   Constant: '<S95>/Constant'
+  //   Gain: '<S95>/Gain1'
   //   Inport: '<Root>/accel'
 
   rtb_TrigonometricFunction4 = FCS_model_P.Gain1_Gain * arg_accel[0] /
     FCS_model_P.Constant_Value_o;
 
-  // Trigonometry: '<S102>/Trigonometric Function1'
+  // Trigonometry: '<S95>/Trigonometric Function1'
   if (rtb_TrigonometricFunction4 > 1.0F) {
     rtb_TrigonometricFunction4 = 1.0F;
   } else if (rtb_TrigonometricFunction4 < -1.0F) {
@@ -776,50 +780,50 @@ void FCS_model::step(uint8_T *arg_switch, real32_T *arg_gain, real32_T
 
   rtb_TrigonometricFunction4 = std::asin(rtb_TrigonometricFunction4);
 
-  // End of Trigonometry: '<S102>/Trigonometric Function1'
+  // End of Trigonometry: '<S95>/Trigonometric Function1'
 
-  // Trigonometry: '<S102>/Trigonometric Function' incorporates:
-  //   Gain: '<S102>/Gain2'
-  //   Gain: '<S102>/Gain3'
+  // Trigonometry: '<S95>/Trigonometric Function' incorporates:
+  //   Gain: '<S95>/Gain2'
+  //   Gain: '<S95>/Gain3'
   //   Inport: '<Root>/accel'
 
   rtb_roll = FCS_model_P.Gain2_Gain * arg_accel[1];
   rtb_roll = rt_atan2f_snf(rtb_roll, FCS_model_P.Gain3_Gain * arg_accel[2]);
 
-  // Trigonometry: '<S103>/Trigonometric Function2'
+  // Trigonometry: '<S96>/Trigonometric Function2'
   rtb_rollrate = std::sin(rtb_roll);
   rtb_Product4 = std::cos(rtb_roll);
 
-  // Sum: '<S100>/Sum' incorporates:
-  //   Gain: '<S100>/Gain'
-  //   Gain: '<S103>/Gain'
+  // Sum: '<S93>/Sum' incorporates:
+  //   Gain: '<S93>/Gain'
+  //   Gain: '<S96>/Gain'
   //   Inport: '<Root>/gyro'
-  //   Product: '<S103>/Product4'
-  //   Product: '<S103>/Product5'
-  //   Sum: '<S103>/Sum1'
+  //   Product: '<S96>/Product4'
+  //   Product: '<S96>/Product5'
+  //   Sum: '<S96>/Sum1'
 
   rtb_On1Off0forthrust = (FCS_model_P.Gain_Gain_i * rtb_rollrate * arg_gyro[2] +
     rtb_Product4 * arg_gyro[1]) + FCS_model_P.w_c_pitch *
     rtb_TrigonometricFunction4;
 
-  // Trigonometry: '<S103>/Trigonometric Function4'
+  // Trigonometry: '<S96>/Trigonometric Function4'
   rtb_TrigonometricFunction4 = std::tan(rtb_TrigonometricFunction4);
 
-  // Update for DiscreteTransferFcn: '<S100>/Discrete Transfer Fcn'
+  // Update for DiscreteTransferFcn: '<S93>/Discrete Transfer Fcn'
   FCS_model_DW.DiscreteTransferFcn_states = (rtb_On1Off0forthrust -
     FCS_model_P.DiscreteTransferFcn_DenCoef_n[1] *
     FCS_model_DW.DiscreteTransferFcn_states) /
     FCS_model_P.DiscreteTransferFcn_DenCoef_n[0];
 
-  // Update for DiscreteTransferFcn: '<S101>/Discrete Transfer Fcn' incorporates:
-  //   Gain: '<S101>/Gain'
+  // Update for DiscreteTransferFcn: '<S94>/Discrete Transfer Fcn' incorporates:
+  //   Gain: '<S94>/Gain'
   //   Inport: '<Root>/gyro'
-  //   Product: '<S103>/Product'
-  //   Product: '<S103>/Product1'
-  //   Product: '<S103>/Product2'
-  //   Product: '<S103>/Product3'
-  //   Sum: '<S101>/Sum'
-  //   Sum: '<S103>/Sum'
+  //   Product: '<S96>/Product'
+  //   Product: '<S96>/Product1'
+  //   Product: '<S96>/Product2'
+  //   Product: '<S96>/Product3'
+  //   Sum: '<S94>/Sum'
+  //   Sum: '<S96>/Sum'
 
   FCS_model_DW.DiscreteTransferFcn_states_e = ((((rtb_rollrate *
     rtb_TrigonometricFunction4 * arg_gyro[1] + arg_gyro[0]) + rtb_Product4 *
@@ -831,7 +835,7 @@ void FCS_model::step(uint8_T *arg_switch, real32_T *arg_gain, real32_T
   // Update for Delay: '<S39>/MemoryX'
   FCS_model_DW.icLoad = false;
 
-  // Product: '<S63>/A[k]*xhat[k|k-1]' incorporates:
+  // Product: '<S60>/A[k]*xhat[k|k-1]' incorporates:
   //   Constant: '<S39>/A'
   //   Delay: '<S39>/MemoryX'
 
@@ -842,14 +846,14 @@ void FCS_model::step(uint8_T *arg_switch, real32_T *arg_gain, real32_T
       FCS_model_P.A_Value[iU + 12] * FCS_model_DW.MemoryX_DSTATE[3];
   }
 
-  // End of Product: '<S63>/A[k]*xhat[k|k-1]'
+  // End of Product: '<S60>/A[k]*xhat[k|k-1]'
 
   // Update for Delay: '<S39>/MemoryX' incorporates:
   //   Constant: '<S39>/B'
   //   Constant: '<S39>/u'
-  //   Product: '<S63>/B[k]*u[k]'
-  //   Product: '<S92>/Product3'
-  //   Sum: '<S63>/Add'
+  //   Product: '<S60>/B[k]*u[k]'
+  //   Product: '<S89>/Product3'
+  //   Sum: '<S60>/Add'
 
   FCS_model_DW.MemoryX_DSTATE[0] = (FCS_model_P.B_Value[0] * FCS_model_P.u_Value
     + tmp[0]) + FCS_model_B.Product3[0];
@@ -949,68 +953,68 @@ void FCS_model::initialize()
   FCS_model_PrevZCX.TriggeredSubsystem_Trig_ZCE_d = POS_ZCSIG;
   FCS_model_PrevZCX.TriggeredSubsystem_Trig_ZCE = POS_ZCSIG;
 
-  // InitializeConditions for Merge: '<S104>/Merge1' incorporates:
+  // InitializeConditions for Merge: '<S97>/Merge1' incorporates:
   //   Memory: '<S37>/Memory'
 
   FCS_model_DW.Memory_PreviousInput = FCS_model_P.Memory_InitialCondition;
 
-  // InitializeConditions for DiscreteTransferFcn: '<S100>/Discrete Transfer Fcn' 
+  // InitializeConditions for DiscreteTransferFcn: '<S93>/Discrete Transfer Fcn' 
   FCS_model_DW.DiscreteTransferFcn_states =
     FCS_model_P.DiscreteTransferFcn_InitialSt_c;
 
-  // InitializeConditions for DiscreteTransferFcn: '<S101>/Discrete Transfer Fcn' 
+  // InitializeConditions for DiscreteTransferFcn: '<S94>/Discrete Transfer Fcn' 
   FCS_model_DW.DiscreteTransferFcn_states_e =
     FCS_model_P.DiscreteTransferFcn_InitialSt_g;
 
   // InitializeConditions for Delay: '<S39>/MemoryX'
   FCS_model_DW.icLoad = true;
 
-  // SystemInitialize for IfAction SubSystem: '<S104>/If Action Subsystem'
-  // InitializeConditions for DiscreteTransferFcn: '<S107>/Discrete Transfer Fcn' 
+  // SystemInitialize for IfAction SubSystem: '<S97>/If Action Subsystem'
+  // InitializeConditions for DiscreteTransferFcn: '<S100>/Discrete Transfer Fcn' 
   FCS_model_DW.DiscreteTransferFcn_states_n =
     FCS_model_P.DiscreteTransferFcn_InitialStat;
 
-  // End of SystemInitialize for SubSystem: '<S104>/If Action Subsystem'
+  // End of SystemInitialize for SubSystem: '<S97>/If Action Subsystem'
 
-  // SystemInitialize for Triggered SubSystem: '<S108>/Triggered Subsystem'
-  // SystemInitialize for SignalConversion generated from: '<S110>/1' incorporates:
-  //   Outport: '<S110>/Out1'
+  // SystemInitialize for Triggered SubSystem: '<S101>/Triggered Subsystem'
+  // SystemInitialize for SignalConversion generated from: '<S103>/1' incorporates:
+  //   Outport: '<S103>/baro_0'
 
-  FCS_model_B.u = FCS_model_P.Out1_Y0;
+  FCS_model_B.u = FCS_model_P.baro_0_Y0;
 
-  // End of SystemInitialize for SubSystem: '<S108>/Triggered Subsystem'
+  // End of SystemInitialize for SubSystem: '<S101>/Triggered Subsystem'
 
-  // SystemInitialize for Enabled SubSystem: '<S69>/Enabled Subsystem'
-  // SystemInitialize for Product: '<S94>/Product2' incorporates:
-  //   Outport: '<S94>/deltax'
+  // SystemInitialize for Enabled SubSystem: '<S66>/Enabled Subsystem'
+  // SystemInitialize for Product: '<S91>/Product2' incorporates:
+  //   Outport: '<S91>/deltax'
 
   FCS_model_B.Product2[0] = FCS_model_P.deltax_Y0;
   FCS_model_B.Product2[1] = FCS_model_P.deltax_Y0;
   FCS_model_B.Product2[2] = FCS_model_P.deltax_Y0;
   FCS_model_B.Product2[3] = FCS_model_P.deltax_Y0;
 
-  // End of SystemInitialize for SubSystem: '<S69>/Enabled Subsystem'
+  // End of SystemInitialize for SubSystem: '<S66>/Enabled Subsystem'
 
-  // SystemInitialize for Triggered SubSystem: '<S109>/Triggered Subsystem'
-  // SystemInitialize for SignalConversion generated from: '<S111>/position' incorporates:
-  //   Outport: '<S111>/Out1'
+  // SystemInitialize for Triggered SubSystem: '<S102>/Triggered Subsystem'
+  // SystemInitialize for SignalConversion generated from: '<S104>/position' incorporates:
+  //   Outport: '<S104>/Out1'
 
-  FCS_model_B.position[0] = FCS_model_P.Out1_Y0_k[0];
-  FCS_model_B.position[1] = FCS_model_P.Out1_Y0_k[1];
-  FCS_model_B.position[2] = FCS_model_P.Out1_Y0_k[2];
+  FCS_model_B.position[0] = FCS_model_P.Out1_Y0[0];
+  FCS_model_B.position[1] = FCS_model_P.Out1_Y0[1];
+  FCS_model_B.position[2] = FCS_model_P.Out1_Y0[2];
 
-  // End of SystemInitialize for SubSystem: '<S109>/Triggered Subsystem'
+  // End of SystemInitialize for SubSystem: '<S102>/Triggered Subsystem'
 
-  // SystemInitialize for Enabled SubSystem: '<S63>/MeasurementUpdate'
-  // SystemInitialize for Product: '<S92>/Product3' incorporates:
-  //   Outport: '<S92>/L*(y[k]-yhat[k|k-1])'
+  // SystemInitialize for Enabled SubSystem: '<S60>/MeasurementUpdate'
+  // SystemInitialize for Product: '<S89>/Product3' incorporates:
+  //   Outport: '<S89>/L*(y[k]-yhat[k|k-1])'
 
   FCS_model_B.Product3[0] = FCS_model_P.Lykyhatkk1_Y0;
   FCS_model_B.Product3[1] = FCS_model_P.Lykyhatkk1_Y0;
   FCS_model_B.Product3[2] = FCS_model_P.Lykyhatkk1_Y0;
   FCS_model_B.Product3[3] = FCS_model_P.Lykyhatkk1_Y0;
 
-  // End of SystemInitialize for SubSystem: '<S63>/MeasurementUpdate'
+  // End of SystemInitialize for SubSystem: '<S60>/MeasurementUpdate'
 }
 
 // Model terminate function
