@@ -122,8 +122,8 @@ void ModeSimulink::run()
     }
 
     // '<Root>/yaw_opticalfow' ----------------------------
-    float arg_yaw{ ahrs.get_yaw() };
-
+    // float arg_yaw{ ahrs.get_yaw()}; // Drifts
+    float arg_yaw{ (float)ahrs.yaw_sensor }; // Doesn't seem to drift. Don't know why
 
     // '<Root>/flowRate' --------------------------------
     
@@ -242,7 +242,7 @@ void ModeSimulink::arm_motors()
 
     // reverse the motors
     hal.rcout->disable_channel_mask_updates();
-    change_motor_direction(false);
+    change_motor_direction(true);
 
     // disable throttle and gps failsafe
     g.failsafe_throttle.set(FS_THR_DISABLED);
