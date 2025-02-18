@@ -89,7 +89,11 @@ void ModeSimulink::run()
     float arg_gyro[3]{ gyro_vals.x, gyro_vals.y, gyro_vals.z };
     
     // '<Root>/bat_V' -------------------------------------
-    float arg_bat_V{ 0.0F };
+    float arg_bat_V{ copter.battery.voltage() };
+
+    // '<Root>/bat_A' -------------------------------------
+    float current; 
+    float arg_batt_A{ copter.battery.current_amps(current) ? current : 0.0F };
 
     // '<Root>/pos_est' -----------------------------------
     Vector3f position;
@@ -121,9 +125,11 @@ void ModeSimulink::run()
         arg_vel_est[2] = 0.0F;
     }
 
-    // '<Root>/yaw_opticalfow' ----------------------------
-    // float arg_yaw{ ahrs.get_yaw()}; // Drifts
-    float arg_yaw{ (float)ahrs.yaw_sensor }; // Doesn't seem to drift. Don't know why
+    // '<Root>/att_est' ----------------------------
+    float arg_att_est[3]{ ahrs.yaw, ahrs.pitch, ahrs.roll }; // Drifts 
+
+    // '<Root>/att_est_sensor' ---------------------
+    float arg_att_est_sensor[3]{ (float)ahrs.yaw_sensor, (float)ahrs.pitch_sensor, (float)ahrs.roll_sensor }; // Doesn't drift
 
     // '<Root>/flowRate' --------------------------------
     
@@ -150,13 +156,15 @@ void ModeSimulink::run()
     float arg_motors_refout[4];
 
     // '<Root>/logging_refout' !! The array size is modified during the build process. See also common.xml !!
-    float arg_logging_refout[40];
+    float arg_logging_refout[46];
 
     // Step the model
-    labController.step(&arg_switch, &arg_gain, arg_accel, arg_gyro, &arg_bat_V,
-                     arg_flowRate, &arg_baro, &arg_rangefinder, arg_pos_est,
-                     arg_vel_est, &arg_yaw, arg_pos_ref, arg_orient_ref,
-                     arg_motors_refout, arg_logging_refout);
+    labController.step(&arg_switch, &arg_gain, arg_pos_ref, arg_orient_ref,
+                     arg_accel, arg_gyro, &arg_bat_V, &arg_batt_A, arg_flowRate,
+                     &arg_baro, &arg_rangefinder, arg_pos_est, arg_vel_est,
+                     arg_att_est, arg_att_est_sensor, arg_motors_refout,
+                     arg_logging_refout);
+
 
     // PWM output is between 1000 and 2000 (0% - 100%)
     motor_out_1 = arg_motors_refout[0] * 1000 + 1000;
