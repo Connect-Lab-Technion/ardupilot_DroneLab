@@ -350,6 +350,8 @@ public:
 
     void handle_message(const mavlink_message_t &msg);
 
+    void send_drone_to_dashboard(uint8_t chan);
+
 protected:
     const char *name() const override { return "SIMULINK"; }
     const char *name4() const override { return "SMLK"; }
@@ -362,6 +364,7 @@ private:
     float motor_out_1,motor_out_2,motor_out_3,motor_out_4;
     uint32_t last_throttle_warning_output_ms;
     
+    float ref_time_world; 
     u_int8_t ref_master_switch;
     float ref_pos_x,ref_pos_y,ref_pos_z;
     float ref_orient_yaw, ref_orient_pitch, ref_orient_roll; 
@@ -370,6 +373,9 @@ private:
     uint32_t last_dashboard_msg_ms;
     uint32_t last_drone_msg_ms;
     uint32_t start_time;
+    
+    // '<Root>/logging_refout' !! The array size is modified during the build process. See also common.xml !!
+    float arg_logging_refout[47];
 
 };
 #endif

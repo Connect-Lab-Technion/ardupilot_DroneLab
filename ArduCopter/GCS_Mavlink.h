@@ -53,6 +53,10 @@ protected:
 
     void handle_manual_control_axes(const mavlink_manual_control_t &packet, const uint32_t tnow) override;
 
+#if MODE_SIMULINK_ENABLED
+    void send_modeSimulink_drone_to_dashboard() override;
+#endif
+
 private:
 
     void handleMessage(const mavlink_message_t &msg) override;

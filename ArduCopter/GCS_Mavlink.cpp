@@ -93,6 +93,13 @@ MAV_STATE GCS_MAVLINK_Copter::vehicle_system_status() const
 }
 
 
+#if MODE_SIMULINK_ENABLED 
+void GCS_MAVLINK_Copter::send_modeSimulink_drone_to_dashboard()
+{
+        copter.mode_simulink.send_drone_to_dashboard(chan);
+}
+#endif
+
 void GCS_MAVLINK_Copter::send_attitude_target()
 {
     const Quaternion quat  = copter.attitude_control->get_attitude_target_quat();
@@ -1416,7 +1423,7 @@ void GCS_MAVLINK_Copter::handleMessage(const mavlink_message_t &msg)
         copter.g2.toy_mode.handle_message(msg);
         break;
 #endif
-#if MODE_SIMULINK_ENABLED == ENABLED
+#if MODE_SIMULINK_ENABLED 
     case MAVLINK_MSG_ID_DASHBOARD_TO_DRONE: { 
         copter.mode_simulink.handle_message(msg);
         break;

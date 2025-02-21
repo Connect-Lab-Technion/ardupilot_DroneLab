@@ -381,7 +381,8 @@ public:
     virtual void send_winch_status() const {};
     void send_water_depth() const;
     int8_t battery_remaining_pct(const uint8_t instance) const;
-
+    virtual void send_modeSimulink_drone_to_dashboard() {};
+    
 #if HAL_HIGH_LATENCY2_ENABLED
     void send_high_latency2() const;
 #endif // HAL_HIGH_LATENCY2_ENABLED

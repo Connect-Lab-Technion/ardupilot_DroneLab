@@ -155,9 +155,6 @@ void ModeSimulink::run()
     // '<Root>/motors_refout' 
     float arg_motors_refout[4];
 
-    // '<Root>/logging_refout' !! The array size is modified during the build process. See also common.xml !!
-    float arg_logging_refout[46];
-
     // Step the model
     labController.step(&arg_switch, &arg_gain, arg_pos_ref, arg_orient_ref,
                      arg_accel, arg_gyro, &arg_bat_V, &arg_batt_A, arg_flowRate,
@@ -172,19 +169,19 @@ void ModeSimulink::run()
     motor_out_4 = arg_motors_refout[3] * 1000 + 1000;
     motor_out_3 = arg_motors_refout[2] * 1000 + 1000;
 
+    
+}
+
+// send_modeSimulink_log
+void ModeSimulink::send_drone_to_dashboard(uint8_t chan)
+{
+    // Send the log data to the dashboard
+    // mavlink_msg_drone_to_dashboard_send(chan, arg_logging_refout);
     // Mavlink message to the dashboard
-    float rate_drone_to_dashboard = 400; // Hz
-    uint32_t drone_msg_time = AP_HAL::millis() - last_drone_msg_ms;
-    if (drone_msg_time > (1000 / rate_drone_to_dashboard)) {
         if (arg_logging_refout != nullptr) {
-            uint8_t chan;
-            for(chan = 0; chan < MAVLINK_COMM_NUM_BUFFERS; chan++){
                 mavlink_msg_drone_to_dashboard_send((mavlink_channel_t)chan, arg_logging_refout);
-                last_drone_msg_ms = AP_HAL::millis();
-            }
         } else {
             gcs().send_text(MAV_SEVERITY_WARNING, "SIMULINK: logging data is null");
-        }
     }
 }
 

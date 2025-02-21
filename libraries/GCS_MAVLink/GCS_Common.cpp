@@ -952,6 +952,9 @@ ap_message GCS_MAVLINK::mavlink_id_to_ap_message_id(const uint32_t mavlink_id) c
 #if AP_OPTICALFLOW_ENABLED
         { MAVLINK_MSG_ID_OPTICAL_FLOW,          MSG_OPTICAL_FLOW},
 #endif
+#if MODE_SIMULINK_ENABLED
+        { MAVLINK_MSG_ID_DRONE_TO_DASHBOARD,    MSG_DRONE_TO_DASHBOARD},
+#endif
         { MAVLINK_MSG_ID_MAG_CAL_PROGRESS,      MSG_MAG_CAL_PROGRESS},
         { MAVLINK_MSG_ID_MAG_CAL_REPORT,        MSG_MAG_CAL_REPORT},
         { MAVLINK_MSG_ID_EKF_STATUS_REPORT,     MSG_EKF_STATUS_REPORT},
@@ -5719,6 +5722,13 @@ bool GCS_MAVLINK::try_send_message(const enum ap_message id)
         send_opticalflow();
 #endif
         break;
+
+    case MSG_DRONE_TO_DASHBOARD:
+#if MODE_SIMULINK_ENABLED
+        CHECK_PAYLOAD_SIZE(DRONE_TO_DASHBOARD);
+        send_modeSimulink_drone_to_dashboard();
+        break;
+#endif
 
     case MSG_ATTITUDE_TARGET:
         CHECK_PAYLOAD_SIZE(ATTITUDE_TARGET);
