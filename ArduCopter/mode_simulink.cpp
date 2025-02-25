@@ -39,6 +39,7 @@ bool ModeSimulink::init(bool ignore_checks)
     motor_out_4         = 0.0f;
     
     // set the initial reference values 
+    ref_time_world      = 0.0f;
     ref_master_switch   = 0;
     ref_power_gain      = 0.0f;
     ref_pos_x           = 0.0f;
@@ -73,6 +74,9 @@ void ModeSimulink::run()
     check_if_received_message_from_dashboard(2000); // 2 seconds
 
     // Prepare the arguments for the controller, given by the generated ert_main ------------
+
+    // '<Root>/time_world'
+    float arg_time_world{ ref_time_world };
 
     // '<Root>/master_switch'
     u_int8_t arg_switch{ ref_master_switch };
@@ -156,7 +160,7 @@ void ModeSimulink::run()
     float arg_motors_refout[4];
 
     // Step the model
-    labController.step(&arg_switch, &arg_gain, arg_pos_ref, arg_orient_ref,
+    labController.step(&arg_time_world, &arg_switch, &arg_gain, arg_pos_ref, arg_orient_ref,
                      arg_accel, arg_gyro, &arg_bat_V, &arg_batt_A, arg_flowRate,
                      &arg_baro, &arg_rangefinder, arg_pos_est, arg_vel_est,
                      arg_att_est, arg_att_est_sensor, arg_motors_refout,
@@ -292,8 +296,8 @@ void ModeSimulink::handle_message(const mavlink_message_t &msg)
     }
     mavlink_dashboard_to_drone_t m;
     mavlink_msg_dashboard_to_drone_decode(&msg, &m);
-
-    ref_master_switch       = m.master_switch;
+    ref_time_world      = m.time_world;
+    ref_master_switch   = m.master_switch;
     ref_power_gain      = m.power;
     ref_pos_x           = m.ref_x;
     ref_pos_y           = m.ref_y;
