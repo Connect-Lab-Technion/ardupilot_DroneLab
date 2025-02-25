@@ -377,6 +377,8 @@ private:
     // '<Root>/logging_refout' !! The array size is modified during the build process. See also common.xml !!
     float arg_logging_refout[47];
 
+    void prepare_and_send_log();
+
 };
 #endif
 

@@ -169,8 +169,41 @@ void ModeSimulink::run()
     motor_out_4 = arg_motors_refout[3] * 1000 + 1000;
     motor_out_3 = arg_motors_refout[2] * 1000 + 1000;
 
+    // Add the log from the simulink to the ardupilot log
     
 }
+
+void ModeSimulink::prepare_and_send_log()
+{
+    
+    // The AP::logger can only send 15 entries at a time
+    // The number of LAB logs is dependant on the number of entries in the simulink log.
+    // The LAB1 log will be the first 15 entries, LAB2 will be the next 15 entries and so on.
+    // The last log will have the remaining entries and may not be a full 15 entries.
+    size_t maxEntries = 15;
+    // The size of the simulink log
+    size_t sizeOfSimulinkLog = sizeof(arg_logging_refout) / sizeof(arg_logging_refout[48]); 
+    // Number of LABn logs
+    size_t numLogs = sizeOfSimulinkLog / maxEntries;
+    // Number of remaining entries in the last log
+    size_t remainingEntries = sizeOfSimulinkLog % maxEntries;
+    // Loop throught the logs
+    size_t logs;
+    for ( logs = 0; logs < numLogs; logs++ ) {
+        size_t entriesInLog = MIN(maxEntries, sizeOfSimulinkLog - (logs * maxEntries));
+        const char *logName = "LAB" + (char)logs;
+        const char *logLabels = "TimeUS," + 0;
+        
+        // const char *logFormatStr(entriesInLog, 'f'); // Create a string with 'numFs' repetitions of 'f'
+        const char *logFormat;
+        std::memset((void*)logFormat, 'f', entriesInLog); 
+
+        float logData = arg_logging_refout[logs * maxEntries];
+        AP::logger.Write(logName, logLabels, logFormat, logData);
+    }
+
+}
+
 
 // send_modeSimulink_log
 void ModeSimulink::send_drone_to_dashboard(uint8_t chan)
