@@ -374,8 +374,8 @@ private:
     uint32_t last_drone_msg_ms;
     uint32_t start_time;
     
-    // '<Root>/logging_refout' !! The array size is modified during the build process. See also common.xml !!
-    float arg_logging_refout[47];
+    // Store Simulink I/O structures for logging
+    mavlink_drone_to_dashboard_t mavlink_data;
 
 };
 #endif

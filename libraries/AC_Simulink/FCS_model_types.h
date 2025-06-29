@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'FCS_model'.
 //
-// Model version                  : 7.39
+// Model version                  : 7.203
 // Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Wed Jul 31 08:29:29 2024
+// C/C++ source code generated on : Sun Jun 29 13:35:16 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -19,6 +19,123 @@
 #ifndef RTW_HEADER_FCS_model_types_h_
 #define RTW_HEADER_FCS_model_types_h_
 #include "rtwtypes.h"
+#ifndef DEFINED_TYPEDEF_FOR_in_dashboard_
+#define DEFINED_TYPEDEF_FOR_in_dashboard_
+
+struct in_dashboard
+{
+  real_T time_world;
+  boolean_T master_switch;
+  real_T power;
+  real_T ref_x;
+  real_T ref_y;
+  real_T ref_z;
+  real_T ref_yaw;
+  real_T ref_pitch;
+  real_T ref_roll;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_in_sensors_
+#define DEFINED_TYPEDEF_FOR_in_sensors_
+
+struct in_sensors
+{
+  real_T accelerometer_x;
+  real_T accelerometer_y;
+  real_T accelerometer_z;
+  real_T gyroscope_x;
+  real_T gyroscope_y;
+  real_T gyroscope_z;
+  real_T battery_voltage;
+  real_T battery_current;
+  real_T opticalflow_x;
+  real_T opticalflow_y;
+  real_T barometer_pressure;
+  real_T rangefinder_distance;
+  real_T esc_rpm;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_in_states_
+#define DEFINED_TYPEDEF_FOR_in_states_
+
+struct in_states
+{
+  real_T x;
+  real_T y;
+  real_T z;
+  real_T dx;
+  real_T dy;
+  real_T dz;
+  real_T yaw;
+  real_T pitch;
+  real_T roll;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_out_controllers_
+#define DEFINED_TYPEDEF_FOR_out_controllers_
+
+struct out_controllers
+{
+  real_T motor1;
+  real_T motor2;
+  real_T motor3;
+  real_T motor4;
+  real_T cmd_thrust;
+  real_T cmd_tau_roll;
+  real_T cmd_tau_pitch;
+  real_T cmd_tau_yaw;
+  real_T cmd_roll;
+  real_T cmd_pitch;
+  real_T cmd_yaw;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_out_estimators_
+#define DEFINED_TYPEDEF_FOR_out_estimators_
+
+struct out_estimators
+{
+  real_T orient_roll;
+  real_T orient_pitch;
+  real_T orient_yaw;
+  real_T orient_rate_roll;
+  real_T orient_rate_pitch;
+  real_T orient_rate_yaw;
+  real_T pos_x;
+  real_T pos_y;
+  real_T pos_z;
+  real_T pos_dx;
+  real_T pos_dy;
+  real_T pos_dz;
+  real_T battery_SOC;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_out_sensors_
+#define DEFINED_TYPEDEF_FOR_out_sensors_
+
+struct out_sensors
+{
+  real_T accelerometer_x;
+  real_T accelerometer_y;
+  real_T accelerometer_z;
+  real_T gyroscope_x;
+  real_T gyroscope_y;
+  real_T gyroscope_z;
+  real_T barometer_pressure;
+  real_T rangefinder_distance;
+};
+
+#endif
+
 #ifndef DEFINED_TYPEDEF_FOR_struct_XRMsui9C07VjBvdq1msujB_
 #define DEFINED_TYPEDEF_FOR_struct_XRMsui9C07VjBvdq1msujB_
 
@@ -68,13 +185,16 @@ struct struct_q6UUpnZ4gTjFvULFx6Rxa
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_struct_OMRgDnJcZuQneKEj9vdTyD_
-#define DEFINED_TYPEDEF_FOR_struct_OMRgDnJcZuQneKEj9vdTyD_
+#ifndef DEFINED_TYPEDEF_FOR_struct_ZLGUjpQoSaF3clY8kuu5dG_
+#define DEFINED_TYPEDEF_FOR_struct_ZLGUjpQoSaF3clY8kuu5dG_
 
-struct struct_OMRgDnJcZuQneKEj9vdTyD
+struct struct_ZLGUjpQoSaF3clY8kuu5dG
 {
+  real_T w2ToGramsGain;
+  real_T w2ToThrustGain_data;
   real_T blades;
   real_T radius;
+  real_T area;
   real_T chord;
   real_T flappingOffset;
   real_T bladeMass;
@@ -90,7 +210,6 @@ struct struct_OMRgDnJcZuQneKEj9vdTyD
   real_T theta1;
   real_T theta34;
   real_T a;
-  real_T area;
   real_T lock;
   real_T b;
   real_T k;
@@ -99,29 +218,31 @@ struct struct_OMRgDnJcZuQneKEj9vdTyD
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_struct_p3FXZIgqtjF2uqDpmYjb6C_
-#define DEFINED_TYPEDEF_FOR_struct_p3FXZIgqtjF2uqDpmYjb6C_
+#ifndef DEFINED_TYPEDEF_FOR_struct_wXJeleBYpauyyNtqoXA8RF_
+#define DEFINED_TYPEDEF_FOR_struct_wXJeleBYpauyyNtqoXA8RF_
 
-struct struct_p3FXZIgqtjF2uqDpmYjb6C
+struct struct_wXJeleBYpauyyNtqoXA8RF
 {
   real_T maxLimit;
   real_T minLimit;
   real_T commandToW2Gain;
+  real_T commandToW2Offset;
+  real_T gramsToMotorCommand;
   real_T thrustToMotorCommand;
 };
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_struct_OSJpyIZcrpXqReVWwh9iuG_
-#define DEFINED_TYPEDEF_FOR_struct_OSJpyIZcrpXqReVWwh9iuG_
+#ifndef DEFINED_TYPEDEF_FOR_struct_UHvAqkoSM4a4grTGLmN7a_
+#define DEFINED_TYPEDEF_FOR_struct_UHvAqkoSM4a4grTGLmN7a_
 
-struct struct_OSJpyIZcrpXqReVWwh9iuG
+struct struct_UHvAqkoSM4a4grTGLmN7a
 {
   struct_XRMsui9C07VjBvdq1msujB SixDOF;
   struct_IZWOW0zYvpphl7qLgSfN7E PositionOnEarth;
   struct_q6UUpnZ4gTjFvULFx6Rxa Airframe;
-  struct_OMRgDnJcZuQneKEj9vdTyD Rotor;
-  struct_p3FXZIgqtjF2uqDpmYjb6C Motor;
+  struct_ZLGUjpQoSaF3clY8kuu5dG Rotor;
+  struct_wXJeleBYpauyyNtqoXA8RF Motor;
 };
 
 #endif
@@ -135,17 +256,6 @@ struct struct_sfjjhK32Dt7MmV2O18UsO
   real_T Q2Ts[16];
   real_T totalThrustMaxRelative;
   real_T motorsThrustPerMotorMax;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_struct_dNTl6UkWY4GnjER3gqbKpG_
-#define DEFINED_TYPEDEF_FOR_struct_dNTl6UkWY4GnjER3gqbKpG_
-
-struct struct_dNTl6UkWY4GnjER3gqbKpG
-{
-  real_T pwm_percentage[10];
-  real_T thrust_N[10];
 };
 
 #endif
@@ -198,10 +308,10 @@ struct struct_eFnp8sKFNJLN84XLbLzaFF
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_struct_p4xwbJBU4TOx0OKqnGpJsD_
-#define DEFINED_TYPEDEF_FOR_struct_p4xwbJBU4TOx0OKqnGpJsD_
+#ifndef DEFINED_TYPEDEF_FOR_struct_pAcs5k38eV6MpgiqrKAV4_
+#define DEFINED_TYPEDEF_FOR_struct_pAcs5k38eV6MpgiqrKAV4_
 
-struct struct_p4xwbJBU4TOx0OKqnGpJsD
+struct struct_pAcs5k38eV6MpgiqrKAV4
 {
   real_T IMUAccelGain[3];
   real_T IMUGyroGain[3];
@@ -216,6 +326,7 @@ struct struct_p4xwbJBU4TOx0OKqnGpJsD
   real_T altToPrsBias;
   real_T inverseIMUGain[6];
   real_T altSensorMin;
+  real_T velocityToOpticalFlowGain;
   real_T cameraResolution[2];
 };
 

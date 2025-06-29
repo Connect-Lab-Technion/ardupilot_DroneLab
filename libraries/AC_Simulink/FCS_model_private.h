@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'FCS_model'.
 //
-// Model version                  : 7.39
+// Model version                  : 7.203
 // Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Wed Jul 31 08:29:29 2024
+// C/C++ source code generated on : Sun Jun 29 13:35:16 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -19,13 +19,9 @@
 #ifndef RTW_HEADER_FCS_model_private_h_
 #define RTW_HEADER_FCS_model_private_h_
 #include "rtwtypes.h"
-#include "zero_crossing_types.h"
 #include "FCS_model_types.h"
-#include "FCS_model.h"
 
-extern real32_T rt_atan2f_snf(real32_T u0, real32_T u1);
-extern real32_T look1_iflf_binlx(real32_T u0, const real32_T bp0[], const
-  real32_T table[], uint32_T maxIndex);
+extern real_T rt_atan2d_snf(real_T u0, real_T u1);
 
 #endif                                 // RTW_HEADER_FCS_model_private_h_
 

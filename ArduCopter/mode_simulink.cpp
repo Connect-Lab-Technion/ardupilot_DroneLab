@@ -1,5 +1,6 @@
 #include "Copter.h"
-#include <AC_Simulink/FCS_model.h>  
+#include <AC_Simulink/FCS_model.h>
+#include <AC_Simulink/FCS_model_types.h> // Make sure this is included
 FCS_model labController;
 #include <array>
 #include <SRV_Channel/SRV_Channel.h>
@@ -49,6 +50,9 @@ bool ModeSimulink::init(bool ignore_checks)
     ref_orient_pitch    = 0.0f;
     ref_orient_roll     = 0.0f; 
 
+    // Initialize stored structures
+    memset(&mavlink_data, 0, sizeof(mavlink_data));
+
     gcs().send_text(MAV_SEVERITY_INFO, "SIMULINK: intitialised");
     return true;
 }
@@ -73,33 +77,30 @@ void ModeSimulink::run()
     // check if we have received a message from the dashboard within a given time, otherwise exit
     check_if_received_message_from_dashboard(2000); // 2 seconds
 
+    ////////////////////////////////////////////////////////
     // Prepare the arguments for the controller, given by the generated ert_main ------------
 
-    // '<Root>/time_world'
-    float arg_time_world{ ref_time_world };
-
-    // '<Root>/master_switch'
-    u_int8_t arg_switch{ ref_master_switch };
-
-    // '<Root>/power gain'
-    float arg_gain{ ref_power_gain };
-
-    // '<Root>/accel' -------------------------------------
     Vector3f accel_vals = ahrs.get_accel();
-    float arg_accel[3]{ accel_vals.x, accel_vals.y, accel_vals.z };
 
-    // '<Root>/gyro' --------------------------------------
     Vector3f gyro_vals = ahrs.get_gyro();
-    float arg_gyro[3]{ gyro_vals.x, gyro_vals.y, gyro_vals.z };
     
-    // '<Root>/bat_V' -------------------------------------
-    float arg_bat_V{ copter.battery.voltage() };
+    Vector2f optFlow_Rate = copter.optflow.flowRate();
+    
+    float current = 0.0f;
 
-    // '<Root>/bat_A' -------------------------------------
-    float current; 
-    float arg_batt_A{ copter.battery.current_amps(current) ? current : 0.0F };
-
-    // '<Root>/pos_est' -----------------------------------
+    // ESC telemetry data, rpm 
+    float gather_rpm[4];
+    for (int i = 0; i < 4; i++) {
+        float rpm;
+        if (copter.esc_telem.get_rpm(i, rpm)) {
+            // gcs().send_text(MAV_SEVERITY_INFO, "SIMULINK: ESC %i RPM: %f", i, rpm);
+            gather_rpm[i] = rpm;
+        } else {
+            gather_rpm[i] = 0.0f;
+        }
+    }
+    float arg_rpm[4]{ gather_rpm[0], gather_rpm[1], gather_rpm[2], gather_rpm[3] };
+    
     Vector3f position;
     float arg_pos_est[3];
     if (ahrs.get_relative_position_NED_origin(position)) {        
@@ -114,7 +115,6 @@ void ModeSimulink::run()
         arg_pos_est[2] = 0.0F;
     }
 
-    // '<Root>/vel_est' -----------------------------------
     Vector3f velocity;
     float arg_vel_est[3];
     if (ahrs.get_velocity_NED(velocity)) {
@@ -128,65 +128,146 @@ void ModeSimulink::run()
         arg_vel_est[1] = 0.0F;
         arg_vel_est[2] = 0.0F;
     }
-
-    // '<Root>/att_est' ----------------------------
-    float arg_att_est[3]{ ahrs.yaw, ahrs.pitch, ahrs.roll }; // Drifts 
-
-    // '<Root>/att_est_sensor' ---------------------
-    float arg_att_est_sensor[3]{ (float)ahrs.yaw_sensor, (float)ahrs.pitch_sensor, (float)ahrs.roll_sensor }; // Doesn't drift
-
-    // '<Root>/flowRate' --------------------------------
     
-    // Get the optical flow sensor
-    Vector2f optFlow_Rate = copter.optflow.flowRate();
-    float arg_flowRate[2]{ optFlow_Rate.x, optFlow_Rate.y };
+    //////////////////////////////////////////////////////// 
+    // Prepare input structures for the new step function interface 
+    in_dashboard dashboard_data = {};
+    dashboard_data.time_world       = (real_T)ref_time_world;
+    dashboard_data.master_switch    = (boolean_T)ref_master_switch;
+    dashboard_data.power            = (real_T)ref_power_gain;
+    dashboard_data.ref_x            = (real_T)ref_pos_x;
+    dashboard_data.ref_y            = (real_T)ref_pos_y;
+    dashboard_data.ref_z            = (real_T)ref_pos_z;
+    dashboard_data.ref_yaw          = (real_T)ref_orient_yaw;
+    dashboard_data.ref_pitch        = (real_T)ref_orient_pitch;
+    dashboard_data.ref_roll         = (real_T)ref_orient_roll;
+
+    in_sensors sensor_data = {};
+    sensor_data.accelerometer_x = (real_T)accel_vals.x;
+    sensor_data.accelerometer_y = (real_T)accel_vals.y;
+    sensor_data.accelerometer_z = (real_T)accel_vals.z;
+    sensor_data.gyroscope_x     = (real_T)gyro_vals.x;
+    sensor_data.gyroscope_y     = (real_T)gyro_vals.y;
+    sensor_data.gyroscope_z     = (real_T)gyro_vals.z;
+    sensor_data.battery_voltage = (real_T)copter.battery.voltage();
+    sensor_data.battery_current = (real_T)(copter.battery.current_amps(current) ? current : 0.0F);
+    sensor_data.opticalflow_x   = (real_T)optFlow_Rate.x;
+    sensor_data.opticalflow_y   = (real_T)optFlow_Rate.y;
+    sensor_data.barometer_pressure      = (real_T)copter.barometer.get_pressure();
+    sensor_data.rangefinder_distance    = (real_T)copter.rangefinder_state.alt_cm;
+    // Note: ESC RPM structure only has one field, using first motor RPM
+    sensor_data.esc_rpm = (real_T)arg_rpm[0];
+
+    in_states state_data = {};
+    state_data.x = (real_T)arg_pos_est[0];
+    state_data.y = (real_T)arg_pos_est[1];
+    state_data.z = (real_T)arg_pos_est[2];
+    state_data.dx = (real_T)arg_vel_est[0];
+    state_data.dy = (real_T)arg_vel_est[1];
+    state_data.dz = (real_T)arg_vel_est[2];
+    state_data.yaw =   (real_T)ahrs.yaw;
+    state_data.pitch = (real_T)ahrs.pitch;
+    state_data.roll =  (real_T)ahrs.roll;
+
+    // Output structures
+    out_controllers controller_outputs = {};
+    out_estimators estimator_outputs = {};
+    out_sensors sensor_outputs = {};
     
-    // '<Root>/baro' ----------------------------
-    float baro_altitude = copter.barometer.get_pressure();
-    float arg_baro{ baro_altitude };
-
-    // '<Root>/rangefinder' ----------------------------
-    float rangefinder_distance = copter.rangefinder_state.alt_cm;
-    float arg_rangefinder{ rangefinder_distance };
-
-    // '<Root>/pos_ref' -----------------------------------
-    float arg_pos_ref[3]{ ref_pos_x, ref_pos_y, ref_pos_z};
-
-    // '<Root>/orient_ref' --------------------------------
-    float arg_orient_ref[3]{ ref_orient_yaw, ref_orient_pitch, ref_orient_roll};
-
-    // Return variables from the controller ---------------
-    // '<Root>/motors_refout' 
-    float arg_motors_refout[4];
-
-    // Step the model
-    labController.step(&arg_time_world, &arg_switch, &arg_gain, arg_pos_ref, arg_orient_ref,
-                     arg_accel, arg_gyro, &arg_bat_V, &arg_batt_A, arg_flowRate,
-                     &arg_baro, &arg_rangefinder, arg_pos_est, arg_vel_est,
-                     arg_att_est, arg_att_est_sensor, arg_motors_refout,
-                     arg_logging_refout);
-
-
-    // PWM output is between 1000 and 2000 (0% - 100%)
-    motor_out_1 = arg_motors_refout[0] * 1000 + 1000;
-    motor_out_2 = arg_motors_refout[1] * 1000 + 1000;
-    motor_out_4 = arg_motors_refout[3] * 1000 + 1000;
-    motor_out_3 = arg_motors_refout[2] * 1000 + 1000;
-
+    // Step the model with new structure interface
+    labController.step(&dashboard_data, &sensor_data, &state_data, 
+                      &controller_outputs, &estimator_outputs, &sensor_outputs);
     
+
+    // PWM output is between 1000 and 2000 (0% - 100%) 
+    motor_out_1 = (float)controller_outputs.motor1 * 1000 + 1000;
+    motor_out_2 = (float)controller_outputs.motor2 * 1000 + 1000;
+    motor_out_3 = (float)controller_outputs.motor3 * 1000 + 1000;
+    motor_out_4 = (float)controller_outputs.motor4 * 1000 + 1000;
+
+    // Create mavlink structure and populate from stored Simulink structures 
+    
+    // Dashboard inputs 
+    mavlink_data.in_dashboard_time_world = (float)dashboard_data.time_world;
+    mavlink_data.in_dashboard_master_switch = (float)dashboard_data.master_switch;
+    mavlink_data.in_dashboard_power = (float)dashboard_data.power;    
+    mavlink_data.in_dashboard_ref_x = (float)dashboard_data.ref_x;
+    mavlink_data.in_dashboard_ref_y = (float)dashboard_data.ref_y;
+    mavlink_data.in_dashboard_ref_z = (float)dashboard_data.ref_z;
+    mavlink_data.in_dashboard_ref_yaw = (float)dashboard_data.ref_yaw;
+    mavlink_data.in_dashboard_ref_pitch = (float)dashboard_data.ref_pitch;
+    mavlink_data.in_dashboard_ref_roll = (float)dashboard_data.ref_roll;
+    
+    // Sensor inputs 
+    mavlink_data.in_sensors_accelerometer_x = (float)sensor_data.accelerometer_x;
+    mavlink_data.in_sensors_accelerometer_y = (float)sensor_data.accelerometer_y;
+    mavlink_data.in_sensors_accelerometer_z = (float)sensor_data.accelerometer_z;
+    mavlink_data.in_sensors_gyroscope_x = (float)sensor_data.gyroscope_x;
+    mavlink_data.in_sensors_gyroscope_y = (float)sensor_data.gyroscope_y;
+    mavlink_data.in_sensors_gyroscope_z = (float)sensor_data.gyroscope_z;
+    mavlink_data.in_sensors_battery_voltage = (float)sensor_data.battery_voltage;
+    mavlink_data.in_sensors_battery_current = (float)sensor_data.battery_current;
+    mavlink_data.in_sensors_opticalflow_x = (float)sensor_data.opticalflow_x;
+    mavlink_data.in_sensors_opticalflow_y = (float)sensor_data.opticalflow_y;
+    mavlink_data.in_sensors_barometer_pressure = (float)sensor_data.barometer_pressure;
+    mavlink_data.in_sensors_rangefinder_distance = (float)sensor_data.rangefinder_distance;
+    mavlink_data.in_sensors_esc_rpm = (float)sensor_data.esc_rpm;
+    
+    // State inputs 
+    mavlink_data.in_states_x = (float)state_data.x;
+    mavlink_data.in_states_y = (float)state_data.y;
+    mavlink_data.in_states_z = (float)state_data.z;
+    mavlink_data.in_states_dx = (float)state_data.dx;
+    mavlink_data.in_states_dy = (float)state_data.dy;
+    mavlink_data.in_states_dz = (float)state_data.dz;
+    mavlink_data.in_states_yaw = (float)state_data.yaw;
+    mavlink_data.in_states_pitch = (float)state_data.pitch;
+    mavlink_data.in_states_roll = (float)state_data.roll;
+    
+    // Estimator outputs 
+    mavlink_data.out_estimators_orient_roll = (float)estimator_outputs.orient_roll;
+    mavlink_data.out_estimators_orient_pitch = (float)estimator_outputs.orient_pitch;
+    mavlink_data.out_estimators_orient_yaw = (float)estimator_outputs.orient_yaw;
+    mavlink_data.out_estimators_orient_rate_roll = (float)estimator_outputs.orient_rate_roll;
+    mavlink_data.out_estimators_orient_rate_pitch = (float)estimator_outputs.orient_rate_pitch;
+    mavlink_data.out_estimators_orient_rate_yaw = (float)estimator_outputs.orient_rate_yaw;
+    mavlink_data.out_estimators_pos_x = (float)estimator_outputs.pos_x;
+    mavlink_data.out_estimators_pos_y = (float)estimator_outputs.pos_y;
+    mavlink_data.out_estimators_pos_z = (float)estimator_outputs.pos_z;
+    mavlink_data.out_estimators_pos_dx = (float)estimator_outputs.pos_dx;
+    mavlink_data.out_estimators_pos_dy = (float)estimator_outputs.pos_dy;
+    mavlink_data.out_estimators_pos_dz = (float)estimator_outputs.pos_dz;
+    mavlink_data.out_estimators_battery_SOC = (float)estimator_outputs.battery_SOC;
+    
+    // Controller outputs 
+    mavlink_data.out_controllers_motor1 = (float)controller_outputs.motor1;
+    mavlink_data.out_controllers_motor2 = (float)controller_outputs.motor2;
+    mavlink_data.out_controllers_motor3 = (float)controller_outputs.motor3;
+    mavlink_data.out_controllers_motor4 = (float)controller_outputs.motor4;
+    mavlink_data.out_controllers_cmd_thrust = (float)controller_outputs.cmd_thrust;
+    mavlink_data.out_controllers_cmd_tau_roll = (float)controller_outputs.cmd_tau_roll;
+    mavlink_data.out_controllers_cmd_tau_pitch = (float)controller_outputs.cmd_tau_pitch;
+    mavlink_data.out_controllers_cmd_tau_yaw = (float)controller_outputs.cmd_tau_yaw;
+    mavlink_data.out_controllers_cmd_roll = (float)controller_outputs.cmd_roll;
+    mavlink_data.out_controllers_cmd_pitch = (float)controller_outputs.cmd_pitch;
+    mavlink_data.out_controllers_cmd_yaw = (float)controller_outputs.cmd_yaw;
+    
+    // Sensor outputs 
+    mavlink_data.out_sensors_accelerometer_x = (float)sensor_outputs.accelerometer_x;
+    mavlink_data.out_sensors_accelerometer_y = (float)sensor_outputs.accelerometer_y;
+    mavlink_data.out_sensors_accelerometer_z = (float)sensor_outputs.accelerometer_z;
+    mavlink_data.out_sensors_gyroscope_x = (float)sensor_outputs.gyroscope_x;
+    mavlink_data.out_sensors_gyroscope_y = (float)sensor_outputs.gyroscope_y;
+    mavlink_data.out_sensors_gyroscope_z = (float)sensor_outputs.gyroscope_z;
+    mavlink_data.out_sensors_barometer_pressure = (float)sensor_outputs.barometer_pressure;
+    mavlink_data.out_sensors_rangefinder_distance = (float)sensor_outputs.rangefinder_distance;
 }
 
 // send_modeSimulink_log
 void ModeSimulink::send_drone_to_dashboard(uint8_t chan)
 {
-    // Send the log data to the dashboard
-    // mavlink_msg_drone_to_dashboard_send(chan, arg_logging_refout);
     // Mavlink message to the dashboard
-        if (arg_logging_refout != nullptr) {
-                mavlink_msg_drone_to_dashboard_send((mavlink_channel_t)chan, arg_logging_refout);
-        } else {
-            gcs().send_text(MAV_SEVERITY_WARNING, "SIMULINK: logging data is null");
-    }
+    mavlink_msg_drone_to_dashboard_send_struct((mavlink_channel_t)chan, &mavlink_data);
 }
 
 
@@ -251,7 +332,7 @@ void ModeSimulink::arm_motors()
 
     // reverse the motors
     hal.rcout->disable_channel_mask_updates();
-    change_motor_direction(true);
+    change_motor_direction(false);
 
     // disable throttle and gps failsafe
     g.failsafe_throttle.set(FS_THR_DISABLED);
@@ -296,15 +377,15 @@ void ModeSimulink::handle_message(const mavlink_message_t &msg)
     }
     mavlink_dashboard_to_drone_t m;
     mavlink_msg_dashboard_to_drone_decode(&msg, &m);
-    ref_time_world      = m.time_world;
+    ref_time_world      = (float)m.time_world;        // Convert double to float
     ref_master_switch   = m.master_switch;
-    ref_power_gain      = m.power;
-    ref_pos_x           = m.ref_x;
-    ref_pos_y           = m.ref_y;
-    ref_pos_z           = m.ref_z;
-    ref_orient_yaw      = m.ref_yaw;
-    ref_orient_pitch    = m.ref_pitch;
-    ref_orient_roll     = m.ref_roll; 
+    ref_power_gain      = (float)m.power;             // Convert double to float
+    ref_pos_x           = (float)m.ref_x;             // Convert double to float
+    ref_pos_y           = (float)m.ref_y;             // Convert double to float
+    ref_pos_z           = (float)m.ref_z;             // Convert double to float
+    ref_orient_yaw      = (float)m.ref_yaw;           // Convert double to float
+    ref_orient_pitch    = (float)m.ref_pitch;         // Convert double to float
+    ref_orient_roll     = (float)m.ref_roll;          // Convert double to float 
 
 }
 
