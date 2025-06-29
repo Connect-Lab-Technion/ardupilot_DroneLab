@@ -376,6 +376,7 @@ private:
     
     // Store Simulink I/O structures for logging
     mavlink_drone_to_dashboard_t mavlink_data;
+    HAL_Semaphore mavlink_data_mutex;
 
 };
 #endif
