@@ -100,33 +100,33 @@ void ModeSimulink::run()
     }
     float arg_rpm[4]{ gather_rpm[0], gather_rpm[1], gather_rpm[2], gather_rpm[3] };
     
-    Vector3f position;
-    float arg_pos_est[3];
-    if (ahrs.get_relative_position_NED_origin(position)) {        
-        arg_pos_est[0] = position.x;
-        arg_pos_est[1] = position.y;
-        arg_pos_est[2] = position.z;
-    } else {
-        // This should instead return the previous value
-        // Assign the previous values to arg_pos_est
-        arg_pos_est[0] = 0.0F;
-        arg_pos_est[1] = 0.0F;
-        arg_pos_est[2] = 0.0F;
-    }
+    // Vector3f position;
+    // float arg_pos_est[3];
+    // if (ahrs.get_relative_position_NED_origin(position)) {        
+    //     arg_pos_est[0] = position.x;
+    //     arg_pos_est[1] = position.y;
+    //     arg_pos_est[2] = position.z;
+    // } else {
+    //     // This should instead return the previous value
+    //     // Assign the previous values to arg_pos_est
+    //     arg_pos_est[0] = 0.0F;
+    //     arg_pos_est[1] = 0.0F;
+    //     arg_pos_est[2] = 0.0F;
+    // }
 
-    Vector3f velocity;
-    float arg_vel_est[3];
-    if (ahrs.get_velocity_NED(velocity)) {
-        arg_vel_est[0] = velocity.x;
-        arg_vel_est[1] = velocity.y;
-        arg_vel_est[2] = velocity.z;
-    } else {
-        // This should instead return the previous value
-        // Assign the previous values to arg_vel_est
-        arg_vel_est[0] = 0.0F;
-        arg_vel_est[1] = 0.0F;
-        arg_vel_est[2] = 0.0F;
-    }
+    // Vector3f velocity;
+    // float arg_vel_est[3];
+    // if (ahrs.get_velocity_NED(velocity)) {
+    //     arg_vel_est[0] = velocity.x;
+    //     arg_vel_est[1] = velocity.y;
+    //     arg_vel_est[2] = velocity.z;
+    // } else {
+    //     // This should instead return the previous value
+    //     // Assign the previous values to arg_vel_est
+    //     arg_vel_est[0] = 0.0F;
+    //     arg_vel_est[1] = 0.0F;
+    //     arg_vel_est[2] = 0.0F;
+    // }
     
     //////////////////////////////////////////////////////// 
     // Prepare input structures for the new step function interface 
@@ -141,32 +141,24 @@ void ModeSimulink::run()
     dashboard_data.ref_pitch        = (real_T)ref_orient_pitch;
     dashboard_data.ref_roll         = (real_T)ref_orient_roll;
 
-    in_sensors sensor_data = {};
-    sensor_data.accelerometer_x = (real_T)accel_vals.x;
-    sensor_data.accelerometer_y = (real_T)accel_vals.y;
-    sensor_data.accelerometer_z = (real_T)accel_vals.z;
-    sensor_data.gyroscope_x     = (real_T)gyro_vals.x;
-    sensor_data.gyroscope_y     = (real_T)gyro_vals.y;
-    sensor_data.gyroscope_z     = (real_T)gyro_vals.z;
-    sensor_data.battery_voltage = (real_T)copter.battery.voltage();
-    sensor_data.battery_current = (real_T)(copter.battery.current_amps(current) ? current : 0.0F);
-    sensor_data.opticalflow_x   = (real_T)optFlow_Rate.x;
-    sensor_data.opticalflow_y   = (real_T)optFlow_Rate.y;
-    sensor_data.barometer_pressure      = (real_T)copter.barometer.get_pressure();
-    sensor_data.rangefinder_distance    = (real_T)copter.rangefinder_state.alt_cm;
-    // Note: ESC RPM structure only has one field, using first motor RPM
-    sensor_data.esc_rpm = (real_T)arg_rpm[0];
-
-    in_states state_data = {};
-    state_data.x = (real_T)arg_pos_est[0];
-    state_data.y = (real_T)arg_pos_est[1];
-    state_data.z = (real_T)arg_pos_est[2];
-    state_data.dx = (real_T)arg_vel_est[0];
-    state_data.dy = (real_T)arg_vel_est[1];
-    state_data.dz = (real_T)arg_vel_est[2];
-    state_data.yaw =   (real_T)ahrs.yaw;
-    state_data.pitch = (real_T)ahrs.pitch;
-    state_data.roll =  (real_T)ahrs.roll;
+    in_parameters parameter_data = {};
+    parameter_data.accelerometer_x  = (real_T)accel_vals.x;
+    parameter_data.accelerometer_y  = (real_T)accel_vals.y;
+    parameter_data.accelerometer_z  = (real_T)accel_vals.z;
+    parameter_data.gyroscope_x      = (real_T)gyro_vals.x;
+    parameter_data.gyroscope_y      = (real_T)gyro_vals.y;
+    parameter_data.gyroscope_z      = (real_T)gyro_vals.z;
+    parameter_data.opticalflow_x    = (real_T)optFlow_Rate.x;
+    parameter_data.opticalflow_y    = (real_T)optFlow_Rate.y;
+    parameter_data.barometer_pressure       = (real_T)copter.barometer.get_pressure();
+    parameter_data.rangefinder_distance     = (real_T)copter.rangefinder_state.alt_cm;
+    parameter_data.rpm_1            = (real_T)arg_rpm[0];
+    parameter_data.rpm_2            = (real_T)arg_rpm[1];
+    parameter_data.rpm_3            = (real_T)arg_rpm[2];
+    parameter_data.rpm_4            = (real_T)arg_rpm[3];
+    parameter_data.battery_voltage  = (real_T)copter.battery.voltage();
+    parameter_data.battery_current  = (real_T)(copter.battery.current_amps(current) ? current : 0.0F);
+    parameter_data.yaw              =  (real_T)ahrs.yaw;
 
     // Output structures
     out_controllers controller_outputs = {};
@@ -174,7 +166,7 @@ void ModeSimulink::run()
     out_sensors sensor_outputs = {};
     
     // Step the model with new structure interface
-    labController.step(&dashboard_data, &sensor_data, &state_data, 
+    labController.step(&dashboard_data, &parameter_data, 
                       &controller_outputs, &estimator_outputs, &sensor_outputs);
     
 
@@ -201,31 +193,24 @@ void ModeSimulink::run()
         mavlink_data.in_dashboard_ref_pitch = (float)dashboard_data.ref_pitch;
         mavlink_data.in_dashboard_ref_roll = (float)dashboard_data.ref_roll;
         
-        // Sensor inputs 
-        mavlink_data.in_sensors_accelerometer_x = (float)sensor_data.accelerometer_x;
-        mavlink_data.in_sensors_accelerometer_y = (float)sensor_data.accelerometer_y;
-        mavlink_data.in_sensors_accelerometer_z = (float)sensor_data.accelerometer_z;
-        mavlink_data.in_sensors_gyroscope_x = (float)sensor_data.gyroscope_x;
-        mavlink_data.in_sensors_gyroscope_y = (float)sensor_data.gyroscope_y;
-        mavlink_data.in_sensors_gyroscope_z = (float)sensor_data.gyroscope_z;
-        mavlink_data.in_sensors_battery_voltage = (float)sensor_data.battery_voltage;
-        mavlink_data.in_sensors_battery_current = (float)sensor_data.battery_current;
-        mavlink_data.in_sensors_opticalflow_x = (float)sensor_data.opticalflow_x;
-        mavlink_data.in_sensors_opticalflow_y = (float)sensor_data.opticalflow_y;
-        mavlink_data.in_sensors_barometer_pressure = (float)sensor_data.barometer_pressure;
-        mavlink_data.in_sensors_rangefinder_distance = (float)sensor_data.rangefinder_distance;
-        mavlink_data.in_sensors_esc_rpm = (float)sensor_data.esc_rpm;
-        
-        // State inputs 
-        mavlink_data.in_states_x = (float)state_data.x;
-        mavlink_data.in_states_y = (float)state_data.y;
-        mavlink_data.in_states_z = (float)state_data.z;
-        mavlink_data.in_states_dx = (float)state_data.dx;
-        mavlink_data.in_states_dy = (float)state_data.dy;
-        mavlink_data.in_states_dz = (float)state_data.dz;
-        mavlink_data.in_states_yaw = (float)state_data.yaw;
-        mavlink_data.in_states_pitch = (float)state_data.pitch;
-        mavlink_data.in_states_roll = (float)state_data.roll;
+        // Parameter inputs 
+        mavlink_data.in_parameters_accelerometer_x = (float)parameter_data.accelerometer_x;
+        mavlink_data.in_parameters_accelerometer_y = (float)parameter_data.accelerometer_y;
+        mavlink_data.in_parameters_accelerometer_z = (float)parameter_data.accelerometer_z;
+        mavlink_data.in_parameters_gyroscope_x = (float)parameter_data.gyroscope_x;
+        mavlink_data.in_parameters_gyroscope_y = (float)parameter_data.gyroscope_y;
+        mavlink_data.in_parameters_gyroscope_z = (float)parameter_data.gyroscope_z;
+        mavlink_data.in_parameters_battery_voltage = (float)parameter_data.battery_voltage;
+        mavlink_data.in_parameters_battery_current = (float)parameter_data.battery_current;
+        mavlink_data.in_parameters_opticalflow_x = (float)parameter_data.opticalflow_x;
+        mavlink_data.in_parameters_opticalflow_y = (float)parameter_data.opticalflow_y;
+        mavlink_data.in_parameters_barometer_pressure = (float)parameter_data.barometer_pressure;
+        mavlink_data.in_parameters_rangefinder_distance = (float)parameter_data.rangefinder_distance;
+        mavlink_data.in_parameters_rpm_1 = (float)parameter_data.rpm_1;
+        mavlink_data.in_parameters_rpm_2 = (float)parameter_data.rpm_2;
+        mavlink_data.in_parameters_rpm_3 = (float)parameter_data.rpm_3;
+        mavlink_data.in_parameters_rpm_4 = (float)parameter_data.rpm_4;
+        mavlink_data.in_parameters_yaw = (float)parameter_data.yaw;
         
         // Estimator outputs 
         mavlink_data.out_estimators_orient_roll = (float)estimator_outputs.orient_roll;

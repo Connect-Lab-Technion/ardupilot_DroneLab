@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'FCS_model'.
 //
-// Model version                  : 7.203
+// Model version                  : 7.207
 // Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Sun Jun 29 13:35:16 2025
+// C/C++ source code generated on : Tue Jul  1 17:24:37 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -37,10 +37,10 @@ struct in_dashboard
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_in_sensors_
-#define DEFINED_TYPEDEF_FOR_in_sensors_
+#ifndef DEFINED_TYPEDEF_FOR_in_parameters_
+#define DEFINED_TYPEDEF_FOR_in_parameters_
 
-struct in_sensors
+struct in_parameters
 {
   real_T accelerometer_x;
   real_T accelerometer_y;
@@ -48,31 +48,17 @@ struct in_sensors
   real_T gyroscope_x;
   real_T gyroscope_y;
   real_T gyroscope_z;
-  real_T battery_voltage;
-  real_T battery_current;
   real_T opticalflow_x;
   real_T opticalflow_y;
   real_T barometer_pressure;
   real_T rangefinder_distance;
-  real_T esc_rpm;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_in_states_
-#define DEFINED_TYPEDEF_FOR_in_states_
-
-struct in_states
-{
-  real_T x;
-  real_T y;
-  real_T z;
-  real_T dx;
-  real_T dy;
-  real_T dz;
+  real_T rpm_1;
+  real_T rpm_2;
+  real_T rpm_3;
+  real_T rpm_4;
+  real_T battery_voltage;
+  real_T battery_current;
   real_T yaw;
-  real_T pitch;
-  real_T roll;
 };
 
 #endif

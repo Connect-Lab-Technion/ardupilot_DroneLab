@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'FCS_model'.
 //
-// Model version                  : 7.203
+// Model version                  : 7.207
 // Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Sun Jun 29 13:35:16 2025
+// C/C++ source code generated on : Tue Jul  1 17:24:37 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -185,137 +185,137 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
   3.0303030303030303,
 
   // Mask Parameter: DiscreteDerivative_ICPrevScaled
-  //  Referenced by: '<S58>/UD'
+  //  Referenced by: '<S57>/UD'
 
   0.0,
 
   // Mask Parameter: LowPassFilterDiscreteorContinuo
-  //  Referenced by: '<S124>/K'
-
-  1.0,
-
-  // Mask Parameter: LowPassFilterDiscreteorContin_d
   //  Referenced by: '<S123>/K'
 
   1.0,
 
+  // Mask Parameter: LowPassFilterDiscreteorContin_d
+  //  Referenced by: '<S122>/K'
+
+  1.0,
+
   // Mask Parameter: LowPassFilterDiscreteorContin_l
-  //  Referenced by: '<S132>/Time constant'
+  //  Referenced by: '<S131>/Time constant'
 
   0.1,
 
   // Mask Parameter: LowPassFilterDiscreteorContin_a
-  //  Referenced by: '<S125>/Time constant'
+  //  Referenced by: '<S124>/Time constant'
 
   0.1,
 
   // Mask Parameter: maxp_const
-  //  Referenced by: '<S61>/Constant'
+  //  Referenced by: '<S60>/Constant'
 
   0.6,
 
   // Mask Parameter: maxq_const
-  //  Referenced by: '<S63>/Constant'
+  //  Referenced by: '<S62>/Constant'
 
   0.6,
 
   // Mask Parameter: maxw1_const
-  //  Referenced by: '<S65>/Constant'
+  //  Referenced by: '<S64>/Constant'
 
   7.0,
 
   // Mask Parameter: maxw2_const
-  //  Referenced by: '<S66>/Constant'
+  //  Referenced by: '<S65>/Constant'
 
   7.0,
 
   // Mask Parameter: maxdw1_const
-  //  Referenced by: '<S59>/Constant'
+  //  Referenced by: '<S58>/Constant'
 
   80.0,
 
   // Mask Parameter: maxdw2_const
-  //  Referenced by: '<S60>/Constant'
+  //  Referenced by: '<S59>/Constant'
 
   80.0,
 
   // Mask Parameter: maxp2_const
-  //  Referenced by: '<S62>/Constant'
+  //  Referenced by: '<S61>/Constant'
 
   0.5,
 
   // Mask Parameter: maxq2_const
-  //  Referenced by: '<S64>/Constant'
+  //  Referenced by: '<S63>/Constant'
 
   0.5,
 
   // Mask Parameter: maxw3_const
-  //  Referenced by: '<S67>/Constant'
+  //  Referenced by: '<S66>/Constant'
 
   5.0,
 
   // Mask Parameter: maxw4_const
-  //  Referenced by: '<S68>/Constant'
+  //  Referenced by: '<S67>/Constant'
 
   5.0,
 
   // Mask Parameter: minHeightforOF_const
-  //  Referenced by: '<S69>/Constant'
+  //  Referenced by: '<S68>/Constant'
 
   -0.1,
 
   // Mask Parameter: CompareToConstant_const
-  //  Referenced by: '<S135>/Constant'
+  //  Referenced by: '<S134>/Constant'
 
   2.0,
 
   // Mask Parameter: CompareToConstant_const_p
-  //  Referenced by: '<S128>/Constant'
+  //  Referenced by: '<S127>/Constant'
 
   2.0,
 
   // Mask Parameter: DeactivateAccelerationIfOFisnot
-  //  Referenced by: '<S53>/Constant'
+  //  Referenced by: '<S52>/Constant'
 
   -0.1,
 
   // Mask Parameter: donotuseaccifopticalflowneverav
-  //  Referenced by: '<S55>/Constant'
+  //  Referenced by: '<S54>/Constant'
 
   0.0,
 
   // Mask Parameter: donotuseaccifopticalflownever_c
-  //  Referenced by: '<S56>/Constant'
+  //  Referenced by: '<S55>/Constant'
 
   0.0,
 
   // Mask Parameter: LowPassFilterDiscreteorContin_i
-  //  Referenced by: '<S132>/Constant'
+  //  Referenced by: '<S131>/Constant'
 
   1.0,
 
   // Mask Parameter: LowPassFilterDiscreteorConti_d0
-  //  Referenced by: '<S125>/Constant'
+  //  Referenced by: '<S124>/Constant'
 
   1.0,
 
   // Expression: 0
-  //  Referenced by: '<S120>/L*(y[k]-yhat[k|k-1])'
+  //  Referenced by: '<S119>/L*(y[k]-yhat[k|k-1])'
 
   0.0,
 
   // Expression: 0
-  //  Referenced by: '<S122>/deltax'
+  //  Referenced by: '<S121>/deltax'
 
   0.0,
 
   // Expression: 0
-  //  Referenced by: '<S192>/L*(y[k]-yhat[k|k-1])'
+  //  Referenced by: '<S191>/L*(y[k]-yhat[k|k-1])'
 
   0.0,
 
   // Expression: 0
-  //  Referenced by: '<S194>/deltax'
+  //  Referenced by: '<S193>/deltax'
 
   0.0,
 
@@ -334,34 +334,24 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
 
   0.0,
 
-  // Expression: 1/(60*60)
-  //  Referenced by: '<S39>/Gain'
-
-  0.00027777777777777778,
-
   // Expression: 0
-  //  Referenced by: '<S43>/Constant'
+  //  Referenced by: '<S128>/Constant'
 
   0.0,
 
   // Expression: 0
-  //  Referenced by: '<S129>/Constant'
-
-  0.0,
-
-  // Expression: 0
-  //  Referenced by: '<S136>/Constant'
+  //  Referenced by: '<S135>/Constant'
 
   0.0,
 
   // Expression: pInitialization.A
-  //  Referenced by: '<S141>/A'
+  //  Referenced by: '<S140>/A'
 
   { 1.0, 0.0, 0.0, 0.0, 0.0025, 1.0, 0.0, 0.0, 3.125E-6, 0.0025, 0.0, 0.0, 0.0,
     0.0, 1.0, 1.0 },
 
   // Expression: 1
-  //  Referenced by: '<S41>/Constant'
+  //  Referenced by: '<S42>/Constant'
 
   1.0,
 
@@ -371,7 +361,7 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
   { 0.0, 0.0, 9.81, 0.0, 0.0, 0.0 },
 
   // Expression: 0
-  //  Referenced by: '<S41>/Memory'
+  //  Referenced by: '<S42>/Memory'
 
   0.0,
 
@@ -406,19 +396,19 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
   0.0,
 
   // Expression: pInitialization.M
-  //  Referenced by: '<S143>/KalmanGainM'
+  //  Referenced by: '<S142>/KalmanGainM'
 
   { 0.069297876880651837, 0.030804669082180422, 0.0068131533667670574,
     0.0068131533667684513, -6.970361322763154E-14, -1.9322842662890616E-14,
     2.4937593615145497E-6, -0.0024937593671888521 },
 
   // Expression: pInitialization.C
-  //  Referenced by: '<S141>/C'
+  //  Referenced by: '<S140>/C'
 
   { 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, -1.0 },
 
   // Expression: pInitialization.L
-  //  Referenced by: '<S143>/KalmanGainL'
+  //  Referenced by: '<S142>/KalmanGainL'
 
   { 0.0693749098444617, 0.030821701965597498, 0.0068131533667686473,
     0.0068131533667685033, 7.7236986736014027E-12, 6.2343811745024791E-9,
@@ -436,43 +426,43 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
     0.3330609123143457, 0.14053136276241623, 0.026407724923238066 },
 
   // Expression: [0 0 g]
-  //  Referenced by: '<S140>/gravity'
+  //  Referenced by: '<S139>/gravity'
 
   { 0.0, 0.0, 9.81 },
 
   // Expression: 0
-  //  Referenced by: '<S140>/Constant'
+  //  Referenced by: '<S139>/Constant'
 
   0.0,
 
   // Expression: Estimator.alt.filterPrsNum
-  //  Referenced by: '<S140>/Discrete Filter1'
+  //  Referenced by: '<S139>/Discrete Filter1'
 
   { 3.7568380197512489E-6, 1.1270514059253748E-5, 1.1270514059253748E-5,
     3.7568380197512489E-6 },
 
   // Expression: Estimator.alt.filterPrsDen
-  //  Referenced by: '<S140>/Discrete Filter1'
+  //  Referenced by: '<S139>/Discrete Filter1'
 
   { 1.0, -2.9371707284498907, 2.8762997234793319, -0.939098940325283 },
 
   // Expression: 0
-  //  Referenced by: '<S140>/Discrete Filter1'
+  //  Referenced by: '<S139>/Discrete Filter1'
 
   0.0,
 
   // Expression: pInitialization.D
-  //  Referenced by: '<S141>/D'
+  //  Referenced by: '<S140>/D'
 
   { 0.0, 0.0 },
 
   // Expression: pInitialization.X0
-  //  Referenced by: '<S141>/X0'
+  //  Referenced by: '<S140>/X0'
 
   { 0.0, 0.0, 9.81, 0.0 },
 
   // Expression: pInitialization.B
-  //  Referenced by: '<S141>/B'
+  //  Referenced by: '<S140>/B'
 
   { 0.0, 0.0, 1.0, 0.0 },
 
@@ -521,16 +511,6 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
 
   0.0,
 
-  // Expression: 0
-  //  Referenced by: '<S2>/sw_states_passthrough'
-
-  0.0,
-
-  // Expression: 0
-  //  Referenced by: '<S2>/Switch'
-
-  0.0,
-
   // Expression: -1
   //  Referenced by: '<S27>/Gain'
 
@@ -540,11 +520,6 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
   //  Referenced by: '<S40>/Constant'
 
   { 0.0, 0.0 },
-
-  // Expression: 0
-  //  Referenced by: '<S2>/Switch'
-
-  0.0,
 
   // Expression: -1
   //  Referenced by: '<S27>/Gain1'
@@ -586,16 +561,6 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
 
   0.0,
 
-  // Expression: 0
-  //  Referenced by: '<S2>/Switch'
-
-  0.0,
-
-  // Expression: 0
-  //  Referenced by: '<S2>/Switch'
-
-  0.0,
-
   // Expression: 0.6
   //  Referenced by: '<S4>/Changing of Jzz'
 
@@ -612,131 +577,126 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
   0.0,
 
   // Expression: pInitialization.X0
-  //  Referenced by: '<S51>/X0'
+  //  Referenced by: '<S50>/X0'
 
   { 0.0, 0.0 },
 
   // Expression: pInitialization.M
-  //  Referenced by: '<S70>/KalmanGainM'
+  //  Referenced by: '<S69>/KalmanGainM'
 
   { 0.12546560898608972, 0.0, 0.0, 0.12546560898608972 },
 
   // Expression: pInitialization.C
-  //  Referenced by: '<S51>/C'
+  //  Referenced by: '<S50>/C'
 
   { 1.0, 0.0, 0.0, 1.0 },
 
   // Expression: Estimator.IMU.filterGyroNum
-  //  Referenced by: '<S50>/IIRgyroz'
+  //  Referenced by: '<S49>/IIRgyroz'
 
   { 0.28212412246252078, 1.2725392917168599, 2.4208439774454429,
     2.420843977445442, 1.2725392917168588, 0.28212412246252028 },
 
   // Expression: Estimator.IMU.filterGyroDen
-  //  Referenced by: '<S50>/IIRgyroz'
+  //  Referenced by: '<S49>/IIRgyroz'
 
   { 1.0, 2.2287149173647669, 2.5244618916938615, 1.5772531712757021,
     0.5410224068298175, 0.079562396085500878 },
 
   // Expression: 0
-  //  Referenced by: '<S50>/IIRgyroz'
+  //  Referenced by: '<S49>/IIRgyroz'
 
   0.0,
 
   // Computed Parameter: TSamp_WtEt
-  //  Referenced by: '<S58>/TSamp'
+  //  Referenced by: '<S57>/TSamp'
 
   400.0,
 
   // Expression: 0
-  //  Referenced by: '<S45>/Delay'
+  //  Referenced by: '<S44>/Delay'
 
   0.0,
 
   // Computed Parameter: Integrator_gainval
-  //  Referenced by: '<S138>/Integrator'
+  //  Referenced by: '<S137>/Integrator'
 
   0.0025,
 
   // Expression: antiwindupUpperLimit
-  //  Referenced by: '<S138>/Integrator'
+  //  Referenced by: '<S137>/Integrator'
 
   0.0,
 
   // Expression: antiwindupLowerLimit
-  //  Referenced by: '<S138>/Integrator'
+  //  Referenced by: '<S137>/Integrator'
 
   0.0,
 
   // Expression: windupUpperLimit
-  //  Referenced by: '<S138>/Saturation'
+  //  Referenced by: '<S137>/Saturation'
 
   0.0,
 
   // Expression: windupLowerLimit
-  //  Referenced by: '<S138>/Saturation'
+  //  Referenced by: '<S137>/Saturation'
 
   0.0,
 
   // Expression: 0.0
-  //  Referenced by: '<S52>/Delay2'
+  //  Referenced by: '<S51>/Delay2'
 
   0.0,
 
   // Expression: 2
-  //  Referenced by: '<S52>/Bias3'
+  //  Referenced by: '<S51>/Bias3'
 
   2.0,
 
   // Expression: 1/100
-  //  Referenced by: '<S52>/Gain5'
+  //  Referenced by: '<S51>/Gain5'
 
   0.01,
 
   // Computed Parameter: Integrator_gainval_g
-  //  Referenced by: '<S131>/Integrator'
+  //  Referenced by: '<S130>/Integrator'
 
   0.0025,
 
   // Expression: antiwindupUpperLimit
-  //  Referenced by: '<S131>/Integrator'
+  //  Referenced by: '<S130>/Integrator'
 
   0.0,
 
   // Expression: antiwindupLowerLimit
-  //  Referenced by: '<S131>/Integrator'
+  //  Referenced by: '<S130>/Integrator'
 
   0.0,
 
   // Expression: windupUpperLimit
-  //  Referenced by: '<S131>/Saturation'
+  //  Referenced by: '<S130>/Saturation'
 
   0.0,
 
   // Expression: windupLowerLimit
-  //  Referenced by: '<S131>/Saturation'
+  //  Referenced by: '<S130>/Saturation'
 
   0.0,
 
   // Expression: 0.0
-  //  Referenced by: '<S52>/Delay1'
+  //  Referenced by: '<S51>/Delay1'
 
   0.0,
 
   // Expression: 2
-  //  Referenced by: '<S52>/Bias2'
+  //  Referenced by: '<S51>/Bias2'
 
   2.0,
 
   // Expression: 1/100
-  //  Referenced by: '<S52>/Gain4'
+  //  Referenced by: '<S51>/Gain4'
 
   0.01,
-
-  // Expression: 0
-  //  Referenced by: '<S2>/Switch'
-
-  0.0,
 
   // Expression: .2
   //  Referenced by: '<S28>/Gain4'
@@ -744,17 +704,12 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
   0.2,
 
   // Computed Parameter: SimplyIntegrateVelocity_gainval
-  //  Referenced by: '<S44>/SimplyIntegrateVelocity'
+  //  Referenced by: '<S43>/SimplyIntegrateVelocity'
 
   0.0025,
 
   // Expression: 0
-  //  Referenced by: '<S44>/SimplyIntegrateVelocity'
-
-  0.0,
-
-  // Expression: 0
-  //  Referenced by: '<S2>/Switch'
+  //  Referenced by: '<S43>/SimplyIntegrateVelocity'
 
   0.0,
 
@@ -788,11 +743,6 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
 
   0.0,
 
-  // Expression: 0
-  //  Referenced by: '<S2>/Switch'
-
-  0.0,
-
   // Computed Parameter: Internal_A_o
   //  Referenced by: '<S11>/Internal'
 
@@ -815,11 +765,6 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
 
   // Expression: 0
   //  Referenced by: '<S11>/Internal'
-
-  0.0,
-
-  // Expression: 0
-  //  Referenced by: '<S2>/Switch'
 
   0.0,
 
@@ -858,11 +803,6 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
 
   0.0,
 
-  // Expression: 0
-  //  Referenced by: '<S2>/Switch'
-
-  0.0,
-
   // Computed Parameter: Internal_A_n
   //  Referenced by: '<S16>/Internal'
 
@@ -888,11 +828,6 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
 
   0.0,
 
-  // Expression: 0
-  //  Referenced by: '<S2>/Switch'
-
-  0.0,
-
   // Expression: 0.6
   //  Referenced by: '<S4>/Changing of Jxx'
 
@@ -904,49 +839,39 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
   1.0,
 
   // Expression: pInitialization.A
-  //  Referenced by: '<S51>/A'
+  //  Referenced by: '<S50>/A'
 
   { 1.0, 0.0, 0.0, 1.0 },
 
   // Expression: pInitialization.B
-  //  Referenced by: '<S51>/B'
+  //  Referenced by: '<S50>/B'
 
   { 0.0025, 0.0, 0.0, 0.0025 },
 
   // Expression: pInitialization.L
-  //  Referenced by: '<S70>/KalmanGainL'
+  //  Referenced by: '<S69>/KalmanGainL'
 
   { 0.12546560898608977, 0.0, 0.0, 0.12546560898608977 },
 
   // Expression: pInitialization.D
-  //  Referenced by: '<S51>/D'
+  //  Referenced by: '<S50>/D'
 
   { 0.0, 0.0, 0.0, 0.0 },
 
   // Expression: [0 0 -g]
-  //  Referenced by: '<S49>/gravity'
+  //  Referenced by: '<S48>/gravity'
 
   { 0.0, 0.0, -9.81 },
 
   // Expression: Estimator.pos.accelerationInputGain
-  //  Referenced by: '<S49>/gainaccinput'
+  //  Referenced by: '<S48>/gainaccinput'
 
   1.0,
-
-  // Expression: 0
-  //  Referenced by: '<S2>/Switch'
-
-  0.0,
 
   // Expression: .2
   //  Referenced by: '<S29>/Gain4'
 
   0.2,
-
-  // Expression: 0
-  //  Referenced by: '<S2>/Switch'
-
-  0.0,
 
   // Expression: .2
   //  Referenced by: '<S29>/Gain3'
@@ -988,10 +913,10 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
 
   0.0,
 
-  // Expression: 0
-  //  Referenced by: '<S2>/Switch'
+  // Expression: 1/(60*60)
+  //  Referenced by: '<S39>/Gain'
 
-  0.0,
+  0.00027777777777777778,
 
   // Expression: -1
   //  Referenced by: '<S198>/Gain1'
@@ -1019,7 +944,7 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
   -1.0,
 
   // Expression: pInitialization.Z
-  //  Referenced by: '<S143>/CovarianceZ'
+  //  Referenced by: '<S142>/CovarianceZ'
 
   { 0.0013859575376130369, 0.0006160933816436086, 0.00013626306733534115,
     0.00013626306733536904, 0.00061609338164360849, 0.018197662912787155,
@@ -1029,7 +954,7 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
     0.0018050285006156617 },
 
   // Expression: pInitialization.Z
-  //  Referenced by: '<S70>/CovarianceZ'
+  //  Referenced by: '<S69>/CovarianceZ'
 
   { 0.62732804493044869, 0.0, 0.0, 0.62732804493044869 },
 
@@ -1046,12 +971,12 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
   { 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F },
 
   // Computed Parameter: RangfinderScaleGain1_Gain
-  //  Referenced by: '<S140>/RangfinderScaleGain1'
+  //  Referenced by: '<S139>/RangfinderScaleGain1'
 
   -0.01F,
 
   // Expression: true()
-  //  Referenced by: '<S141>/Enable'
+  //  Referenced by: '<S140>/Enable'
 
   true,
 
@@ -1061,12 +986,12 @@ FCS_model::P_FCS_model_T FCS_model::FCS_model_P{
   false,
 
   // Expression: pInitialization.isSqrtUsed
-  //  Referenced by: '<S190>/isSqrtUsed'
+  //  Referenced by: '<S189>/isSqrtUsed'
 
   false,
 
   // Expression: pInitialization.isSqrtUsed
-  //  Referenced by: '<S118>/isSqrtUsed'
+  //  Referenced by: '<S117>/isSqrtUsed'
 
   false
 };

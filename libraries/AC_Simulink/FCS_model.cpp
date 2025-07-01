@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'FCS_model'.
 //
-// Model version                  : 7.203
+// Model version                  : 7.207
 // Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Sun Jun 29 13:35:16 2025
+// C/C++ source code generated on : Tue Jul  1 17:24:37 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -77,10 +77,10 @@ real_T rt_atan2d_snf(real_T u0, real_T u1)
 }
 
 // Model step function
-void FCS_model::step(in_dashboard *arg_in_dashboard, in_sensors *arg_in_sensors,
-                     in_states *arg_in_states, out_controllers
-                     *arg_out_controllers, out_estimators *arg_out_estimators,
-                     out_sensors *arg_out_sensors)
+void FCS_model::step(in_dashboard *arg_in_dashboard, in_parameters
+                     *arg_in_parameters, out_controllers *arg_out_controllers,
+                     out_estimators *arg_out_estimators, out_sensors
+                     *arg_out_sensors)
 {
   // local block i/o variables
   real_T rtb_Sum1_a;
@@ -88,50 +88,54 @@ void FCS_model::step(in_dashboard *arg_in_dashboard, in_sensors *arg_in_sensors,
   real_T rtb_Switch2;
   real_T rtb_ref_z;
   real_T rtb_ref_yaw;
-  real_T rtb_orient_rate_yaw;
-  real_T rtb_pos_dz;
-  real_T rtb_orient_rate_pitch;
+  real_T rtb_Product4;
+  real_T rtb_roll;
   real_T rtb_Product5;
+  real_T rtb_Product3;
   real_T rtb_MathFunction[9];
   real_T rtb_VectorConcatenate[9];
   real_T rtb_VectorConcatenate_g[9];
   real_T rtb_VectorConcatenate_k[9];
   real_T inverseIMU_gain[6];
   real_T rtb_Sum1_eu[6];
-  real_T rtb_Product1[4];
-  real_T rtb_Add_k[3];
+  real_T rtb_Product1_i[4];
   real_T rtb_FIR_IMUaccel[3];
-  real_T rtb_TmpSignalConversionAtProd_i[3];
+  real_T rtb_FIR_IMUaccel_0[3];
+  real_T rtb_Product_k[3];
   real_T rtb_TmpSignalConversionAtProduc[3];
   real_T rtb_sincos_o1[3];
   real_T IIRgyroz_tmp[2];
-  real_T rtb_Product_c[2];
+  real_T rtb_Product_f[2];
   real_T rtb_Reshapey[2];
   real_T rtb_SimplyIntegrateVelocity[2];
   real_T tmp[2];
   real_T DiscreteFilter1_tmp;
+  real_T DiscreteFilter1_tmp_tmp;
   real_T Sum;
   real_T rtb_Add_g_idx_0;
   real_T rtb_Add_g_idx_1;
+  real_T rtb_Add_k_idx_0;
+  real_T rtb_Add_k_idx_1;
+  real_T rtb_Add_k_idx_2;
+  real_T rtb_AvoidDividebyZero;
+  real_T rtb_AvoidDividebyZero_h;
   real_T rtb_Divide;
-  real_T rtb_K;
   real_T rtb_K_i;
-  real_T rtb_On1Off2forpitch;
-  real_T rtb_Product4;
-  real_T rtb_Saturation;
-  real_T rtb_Saturation_jg;
+  real_T rtb_Product1_tmp;
   real_T rtb_Saturation_l;
-  real_T rtb_Sum1;
-  real_T rtb_Sum1_l;
+  real_T rtb_TmpSignalConversionAtProd_0;
+  real_T rtb_TmpSignalConversionAtProd_1;
   real_T rtb_TrigonometricFunction4;
-  real_T rtb_orient_pitch;
-  real_T rtb_pos_dx;
-  real_T rtb_pos_x;
+  real_T rtb_VectorConcatenate_tmp;
+  real_T rtb_VectorConcatenate_tmp_0;
+  real_T rtb_VectorConcatenate_tmp_1;
+  real_T rtb_VectorConcatenate_tmp_2;
+  real_T rtb_VectorConcatenate_tmp_3;
+  real_T rtb_VectorConcatenate_tmp_4;
+  real_T rtb_VectorConcatenate_tmp_5;
+  real_T rtb_VectorConcatenate_tmp_tmp;
   real_T rtb_rangefinder_distance;
-  real_T rtb_roll;
-  real_T rtb_sincos_o1_p;
-  real_T rtb_zDtheta;
-  real_T tmp_0;
+  real_T rtb_rollrate;
   int32_T cff;
   int32_T denIdx;
   int32_T memOffset;
@@ -152,24 +156,24 @@ void FCS_model::step(in_dashboard *arg_in_dashboard, in_sensors *arg_in_sensors,
   // End of Bias: '<S3>/Assuming that calib was done level!'
 
   // Gain: '<S3>/inverseIMU_gain' incorporates:
-  //   Inport: '<Root>/in_sensors'
+  //   Inport: '<Root>/in_parameters'
   //   Sum: '<S3>/Sum1'
 
-  inverseIMU_gain[0] = (arg_in_sensors->accelerometer_x - rtb_Sum1_eu[0]) *
+  inverseIMU_gain[0] = (arg_in_parameters->accelerometer_x - rtb_Sum1_eu[0]) *
     FCS_model_P.inverseIMU_gain_Gain[0];
-  inverseIMU_gain[1] = (arg_in_sensors->accelerometer_y - rtb_Sum1_eu[1]) *
+  inverseIMU_gain[1] = (arg_in_parameters->accelerometer_y - rtb_Sum1_eu[1]) *
     FCS_model_P.inverseIMU_gain_Gain[1];
-  inverseIMU_gain[2] = (arg_in_sensors->accelerometer_z - rtb_Sum1_eu[2]) *
+  inverseIMU_gain[2] = (arg_in_parameters->accelerometer_z - rtb_Sum1_eu[2]) *
     FCS_model_P.inverseIMU_gain_Gain[2];
-  inverseIMU_gain[3] = (arg_in_sensors->gyroscope_x - rtb_Sum1_eu[3]) *
+  inverseIMU_gain[3] = (arg_in_parameters->gyroscope_x - rtb_Sum1_eu[3]) *
     FCS_model_P.inverseIMU_gain_Gain[3];
-  inverseIMU_gain[4] = (arg_in_sensors->gyroscope_y - rtb_Sum1_eu[4]) *
+  inverseIMU_gain[4] = (arg_in_parameters->gyroscope_y - rtb_Sum1_eu[4]) *
     FCS_model_P.inverseIMU_gain_Gain[4];
-  inverseIMU_gain[5] = (arg_in_sensors->gyroscope_z - rtb_Sum1_eu[5]) *
+  inverseIMU_gain[5] = (arg_in_parameters->gyroscope_z - rtb_Sum1_eu[5]) *
     FCS_model_P.inverseIMU_gain_Gain[5];
 
   // If: '<S200>/If1' incorporates:
-  //   Constant: '<S41>/Constant'
+  //   Constant: '<S42>/Constant'
   //   DataTypeConversion: '<S200>/Data Type Conversion'
 
   if (static_cast<real32_T>(FCS_model_P.Constant_Value_c) > 0.0F) {
@@ -184,11 +188,11 @@ void FCS_model::step(in_dashboard *arg_in_dashboard, in_sensors *arg_in_sensors,
 
     // Update for DiscreteTransferFcn: '<S203>/Discrete Transfer Fcn' incorporates:
     //   Gain: '<S203>/Gain'
-    //   Inport: '<Root>/in_states'
+    //   Inport: '<Root>/in_parameters'
     //   Sum: '<S203>/Sum'
 
     FCS_model_DW.DiscreteTransferFcn_states_p = ((FCS_model_P.w_c_yaw *
-      arg_in_states->yaw + inverseIMU_gain[5]) -
+      arg_in_parameters->yaw + inverseIMU_gain[5]) -
       FCS_model_P.DiscreteTransferFcn_DenCoef[1] *
       FCS_model_DW.DiscreteTransferFcn_states_p) /
       FCS_model_P.DiscreteTransferFcn_DenCoef[0];
@@ -200,7 +204,7 @@ void FCS_model::step(in_dashboard *arg_in_dashboard, in_sensors *arg_in_sensors,
 
     // Merge: '<S200>/Merge1' incorporates:
     //   Gain: '<S201>/Gain'
-    //   Memory: '<S41>/Memory'
+    //   Memory: '<S42>/Memory'
     //   Sum: '<S201>/Sum'
 
     FCS_model_DW.Memory_PreviousInput += FCS_model_P.Ts * inverseIMU_gain[5];
@@ -211,137 +215,165 @@ void FCS_model::step(in_dashboard *arg_in_dashboard, in_sensors *arg_in_sensors,
   // End of If: '<S200>/If1'
 
   // DiscreteTransferFcn: '<S196>/Discrete Transfer Fcn'
-  rtb_orient_pitch = FCS_model_P.DiscreteTransferFcn_NumCoef_o[1] *
+  rtb_AvoidDividebyZero = FCS_model_P.DiscreteTransferFcn_NumCoef_o[1] *
     FCS_model_DW.DiscreteTransferFcn_states;
 
   // DiscreteTransferFcn: '<S197>/Discrete Transfer Fcn'
-  rtb_K = FCS_model_P.DiscreteTransferFcn_NumCoef_f[1] *
+  rtb_AvoidDividebyZero_h = FCS_model_P.DiscreteTransferFcn_NumCoef_f[1] *
     FCS_model_DW.DiscreteTransferFcn_states_j;
 
-  // SignalConversion generated from: '<S47>/sincos' incorporates:
+  // SignalConversion generated from: '<S46>/sincos' incorporates:
   //   DiscreteTransferFcn: '<S196>/Discrete Transfer Fcn'
   //   DiscreteTransferFcn: '<S197>/Discrete Transfer Fcn'
 
   rtb_sincos_o1[0] = FCS_model_DW.Memory_PreviousInput;
-  rtb_sincos_o1[1] = rtb_orient_pitch;
-  rtb_sincos_o1[2] = rtb_K;
+  rtb_sincos_o1[1] = rtb_AvoidDividebyZero;
+  rtb_sincos_o1[2] = rtb_AvoidDividebyZero_h;
 
-  // Trigonometry: '<S142>/sincos' incorporates:
+  // Trigonometry: '<S141>/sincos' incorporates:
   //   DiscreteTransferFcn: '<S196>/Discrete Transfer Fcn'
   //   DiscreteTransferFcn: '<S197>/Discrete Transfer Fcn'
-  //   SignalConversion generated from: '<S47>/sincos'
+  //   SignalConversion generated from: '<S46>/sincos'
+  //   Trigonometry: '<S53>/sincos'
 
-  rtb_TmpSignalConversionAtProd_i[0] = std::sin
-    (FCS_model_DW.Memory_PreviousInput);
-  rtb_TmpSignalConversionAtProduc[0] = std::cos
-    (FCS_model_DW.Memory_PreviousInput);
-  rtb_TmpSignalConversionAtProd_i[1] = std::sin(rtb_orient_pitch);
-  rtb_TmpSignalConversionAtProduc[1] = std::cos(rtb_orient_pitch);
-  rtb_TmpSignalConversionAtProd_i[2] = std::sin(rtb_K);
-  rtb_TmpSignalConversionAtProduc[2] = std::cos(rtb_K);
+  rtb_TrigonometricFunction4 = std::sin(FCS_model_DW.Memory_PreviousInput);
+  Sum = std::cos(FCS_model_DW.Memory_PreviousInput);
+  rtb_TmpSignalConversionAtProd_0 = std::sin(rtb_AvoidDividebyZero);
+  rtb_Product1_tmp = std::cos(rtb_AvoidDividebyZero);
+  rtb_TmpSignalConversionAtProd_1 = std::sin(rtb_AvoidDividebyZero_h);
+  DiscreteFilter1_tmp = std::cos(rtb_AvoidDividebyZero_h);
 
-  // Fcn: '<S142>/Fcn11'
-  rtb_VectorConcatenate[0] = rtb_TmpSignalConversionAtProduc[0] *
-    rtb_TmpSignalConversionAtProduc[1];
+  // Fcn: '<S141>/Fcn11' incorporates:
+  //   Fcn: '<S53>/Fcn11'
+  //   Trigonometry: '<S141>/sincos'
 
-  // Fcn: '<S142>/Fcn21' incorporates:
-  //   Fcn: '<S142>/Fcn22'
+  rtb_VectorConcatenate_tmp_0 = Sum * rtb_Product1_tmp;
+  rtb_VectorConcatenate[0] = rtb_VectorConcatenate_tmp_0;
 
-  DiscreteFilter1_tmp = rtb_TmpSignalConversionAtProd_i[1] *
-    rtb_TmpSignalConversionAtProd_i[2];
-  rtb_VectorConcatenate[1] = DiscreteFilter1_tmp *
-    rtb_TmpSignalConversionAtProduc[0] - rtb_TmpSignalConversionAtProd_i[0] *
-    rtb_TmpSignalConversionAtProduc[2];
+  // Fcn: '<S141>/Fcn21' incorporates:
+  //   Fcn: '<S53>/Fcn21'
+  //   Trigonometry: '<S141>/sincos'
 
-  // Fcn: '<S142>/Fcn31' incorporates:
-  //   Fcn: '<S142>/Fcn32'
+  DiscreteFilter1_tmp_tmp = rtb_TmpSignalConversionAtProd_0 *
+    rtb_TmpSignalConversionAtProd_1;
+  rtb_VectorConcatenate_tmp_1 = rtb_TrigonometricFunction4 * DiscreteFilter1_tmp;
+  rtb_VectorConcatenate[1] = DiscreteFilter1_tmp_tmp * Sum -
+    rtb_VectorConcatenate_tmp_1;
 
-  Sum = rtb_TmpSignalConversionAtProd_i[1] * rtb_TmpSignalConversionAtProduc[2];
-  rtb_VectorConcatenate[2] = Sum * rtb_TmpSignalConversionAtProduc[0] +
-    rtb_TmpSignalConversionAtProd_i[0] * rtb_TmpSignalConversionAtProd_i[2];
+  // Fcn: '<S141>/Fcn31' incorporates:
+  //   Fcn: '<S53>/Fcn31'
+  //   Trigonometry: '<S141>/sincos'
 
-  // Fcn: '<S142>/Fcn12'
-  rtb_VectorConcatenate[3] = rtb_TmpSignalConversionAtProd_i[0] *
-    rtb_TmpSignalConversionAtProduc[1];
+  rtb_VectorConcatenate_tmp_tmp = rtb_TmpSignalConversionAtProd_0 *
+    DiscreteFilter1_tmp;
+  rtb_VectorConcatenate_tmp_2 = rtb_TrigonometricFunction4 *
+    rtb_TmpSignalConversionAtProd_1;
+  rtb_VectorConcatenate[2] = rtb_VectorConcatenate_tmp_tmp * Sum +
+    rtb_VectorConcatenate_tmp_2;
 
-  // Fcn: '<S142>/Fcn22'
-  rtb_VectorConcatenate[4] = DiscreteFilter1_tmp *
-    rtb_TmpSignalConversionAtProd_i[0] + rtb_TmpSignalConversionAtProduc[0] *
-    rtb_TmpSignalConversionAtProduc[2];
+  // Fcn: '<S141>/Fcn12' incorporates:
+  //   Fcn: '<S53>/Fcn12'
+  //   Trigonometry: '<S141>/sincos'
 
-  // Fcn: '<S142>/Fcn32'
-  rtb_VectorConcatenate[5] = Sum * rtb_TmpSignalConversionAtProd_i[0] -
-    rtb_TmpSignalConversionAtProduc[0] * rtb_TmpSignalConversionAtProd_i[2];
+  rtb_VectorConcatenate_tmp_3 = rtb_TrigonometricFunction4 * rtb_Product1_tmp;
+  rtb_VectorConcatenate[3] = rtb_VectorConcatenate_tmp_3;
 
-  // Fcn: '<S142>/Fcn13'
-  rtb_VectorConcatenate[6] = -rtb_TmpSignalConversionAtProd_i[1];
+  // Fcn: '<S141>/Fcn22' incorporates:
+  //   Fcn: '<S141>/Fcn21'
+  //   Fcn: '<S53>/Fcn22'
+  //   Trigonometry: '<S141>/sincos'
 
-  // Fcn: '<S142>/Fcn23'
-  rtb_VectorConcatenate[7] = rtb_TmpSignalConversionAtProduc[1] *
-    rtb_TmpSignalConversionAtProd_i[2];
+  rtb_VectorConcatenate_tmp_4 = Sum * DiscreteFilter1_tmp;
+  rtb_VectorConcatenate[4] = DiscreteFilter1_tmp_tmp *
+    rtb_TrigonometricFunction4 + rtb_VectorConcatenate_tmp_4;
 
-  // Fcn: '<S142>/Fcn33'
-  rtb_VectorConcatenate[8] = rtb_TmpSignalConversionAtProduc[1] *
-    rtb_TmpSignalConversionAtProduc[2];
+  // Fcn: '<S141>/Fcn32' incorporates:
+  //   Fcn: '<S141>/Fcn31'
+  //   Fcn: '<S53>/Fcn32'
+  //   Trigonometry: '<S141>/sincos'
+
+  rtb_VectorConcatenate_tmp_5 = Sum * rtb_TmpSignalConversionAtProd_1;
+  rtb_VectorConcatenate[5] = rtb_VectorConcatenate_tmp_tmp *
+    rtb_TrigonometricFunction4 - rtb_VectorConcatenate_tmp_5;
+
+  // Fcn: '<S141>/Fcn13' incorporates:
+  //   Trigonometry: '<S141>/sincos'
+
+  rtb_VectorConcatenate[6] = -rtb_TmpSignalConversionAtProd_0;
+
+  // Fcn: '<S141>/Fcn23' incorporates:
+  //   Fcn: '<S53>/Fcn23'
+  //   Trigonometry: '<S141>/sincos'
+
+  rtb_TmpSignalConversionAtProd_1 *= rtb_Product1_tmp;
+  rtb_VectorConcatenate[7] = rtb_TmpSignalConversionAtProd_1;
+
+  // Fcn: '<S141>/Fcn33' incorporates:
+  //   Fcn: '<S53>/Fcn33'
+  //   Trigonometry: '<S141>/sincos'
+
+  rtb_Product1_tmp *= DiscreteFilter1_tmp;
+  rtb_VectorConcatenate[8] = rtb_Product1_tmp;
   for (int32_T i{0}; i < 3; i++) {
-    // Trigonometry: '<S47>/sincos'
-    rtb_sincos_o1_p = rtb_sincos_o1[i];
+    // Trigonometry: '<S46>/sincos'
+    DiscreteFilter1_tmp = rtb_sincos_o1[i];
 
-    // Math: '<S140>/Math Function' incorporates:
-    //   Concatenate: '<S195>/Vector Concatenate'
+    // Math: '<S139>/Math Function' incorporates:
+    //   Concatenate: '<S194>/Vector Concatenate'
 
     rtb_MathFunction[3 * i] = rtb_VectorConcatenate[i];
     rtb_MathFunction[3 * i + 1] = rtb_VectorConcatenate[i + 3];
     rtb_MathFunction[3 * i + 2] = rtb_VectorConcatenate[i + 6];
 
-    // Trigonometry: '<S47>/sincos'
-    rtb_TmpSignalConversionAtProd_i[i] = std::sin(rtb_sincos_o1_p);
-    rtb_FIR_IMUaccel[i] = std::cos(rtb_sincos_o1_p);
+    // Trigonometry: '<S46>/sincos'
+    rtb_TmpSignalConversionAtProduc[i] = std::sin(DiscreteFilter1_tmp);
+    rtb_FIR_IMUaccel[i] = std::cos(DiscreteFilter1_tmp);
   }
 
-  // Fcn: '<S47>/Fcn11'
+  // Fcn: '<S46>/Fcn11'
   rtb_VectorConcatenate_k[0] = rtb_FIR_IMUaccel[0] * rtb_FIR_IMUaccel[1];
 
-  // Fcn: '<S47>/Fcn21' incorporates:
-  //   Fcn: '<S47>/Fcn22'
+  // Fcn: '<S46>/Fcn21' incorporates:
+  //   Fcn: '<S46>/Fcn22'
 
-  rtb_TrigonometricFunction4 = rtb_TmpSignalConversionAtProd_i[1] *
-    rtb_TmpSignalConversionAtProd_i[2];
-  rtb_VectorConcatenate_k[1] = rtb_TrigonometricFunction4 * rtb_FIR_IMUaccel[0]
-    - rtb_TmpSignalConversionAtProd_i[0] * rtb_FIR_IMUaccel[2];
+  rtb_Add_k_idx_0 = rtb_TmpSignalConversionAtProduc[1] *
+    rtb_TmpSignalConversionAtProduc[2];
+  rtb_VectorConcatenate_k[1] = rtb_Add_k_idx_0 * rtb_FIR_IMUaccel[0] -
+    rtb_TmpSignalConversionAtProduc[0] * rtb_FIR_IMUaccel[2];
 
-  // Fcn: '<S47>/Fcn31' incorporates:
-  //   Fcn: '<S47>/Fcn32'
+  // Fcn: '<S46>/Fcn31' incorporates:
+  //   Fcn: '<S46>/Fcn32'
 
-  rtb_roll = rtb_TmpSignalConversionAtProd_i[1] * rtb_FIR_IMUaccel[2];
-  rtb_VectorConcatenate_k[2] = rtb_roll * rtb_FIR_IMUaccel[0] +
-    rtb_TmpSignalConversionAtProd_i[0] * rtb_TmpSignalConversionAtProd_i[2];
+  rtb_Add_k_idx_1 = rtb_TmpSignalConversionAtProduc[1] * rtb_FIR_IMUaccel[2];
+  rtb_VectorConcatenate_k[2] = rtb_Add_k_idx_1 * rtb_FIR_IMUaccel[0] +
+    rtb_TmpSignalConversionAtProduc[0] * rtb_TmpSignalConversionAtProduc[2];
 
-  // Fcn: '<S47>/Fcn12'
-  rtb_VectorConcatenate_k[3] = rtb_TmpSignalConversionAtProd_i[0] *
+  // Fcn: '<S46>/Fcn12'
+  rtb_VectorConcatenate_k[3] = rtb_TmpSignalConversionAtProduc[0] *
     rtb_FIR_IMUaccel[1];
 
-  // Fcn: '<S47>/Fcn22'
-  rtb_VectorConcatenate_k[4] = rtb_TrigonometricFunction4 *
-    rtb_TmpSignalConversionAtProd_i[0] + rtb_FIR_IMUaccel[0] * rtb_FIR_IMUaccel
+  // Fcn: '<S46>/Fcn22'
+  rtb_VectorConcatenate_k[4] = rtb_Add_k_idx_0 *
+    rtb_TmpSignalConversionAtProduc[0] + rtb_FIR_IMUaccel[0] * rtb_FIR_IMUaccel
     [2];
 
-  // Fcn: '<S47>/Fcn32'
-  rtb_VectorConcatenate_k[5] = rtb_roll * rtb_TmpSignalConversionAtProd_i[0] -
-    rtb_FIR_IMUaccel[0] * rtb_TmpSignalConversionAtProd_i[2];
+  // Fcn: '<S46>/Fcn32'
+  rtb_VectorConcatenate_k[5] = rtb_Add_k_idx_1 *
+    rtb_TmpSignalConversionAtProduc[0] - rtb_FIR_IMUaccel[0] *
+    rtb_TmpSignalConversionAtProduc[2];
 
-  // Fcn: '<S47>/Fcn13'
-  rtb_VectorConcatenate_k[6] = -rtb_TmpSignalConversionAtProd_i[1];
+  // Fcn: '<S46>/Fcn13'
+  rtb_VectorConcatenate_k[6] = -rtb_TmpSignalConversionAtProduc[1];
 
-  // Fcn: '<S47>/Fcn23'
+  // Fcn: '<S46>/Fcn23'
   rtb_VectorConcatenate_k[7] = rtb_FIR_IMUaccel[1] *
-    rtb_TmpSignalConversionAtProd_i[2];
+    rtb_TmpSignalConversionAtProduc[2];
 
-  // Fcn: '<S47>/Fcn33'
+  // Fcn: '<S46>/Fcn33'
   rtb_VectorConcatenate_k[8] = rtb_FIR_IMUaccel[1] * rtb_FIR_IMUaccel[2];
 
-  // Math: '<S44>/Math Function' incorporates:
-  //   Concatenate: '<S57>/Vector Concatenate'
+  // Math: '<S43>/Math Function' incorporates:
+  //   Concatenate: '<S56>/Vector Concatenate'
 
   for (int32_T i{0}; i < 3; i++) {
     rtb_VectorConcatenate_g[3 * i] = rtb_VectorConcatenate_k[i];
@@ -352,117 +384,124 @@ void FCS_model::step(in_dashboard *arg_in_dashboard, in_sensors *arg_in_sensors,
   std::memcpy(&rtb_VectorConcatenate_k[0], &rtb_VectorConcatenate_g[0], 9U *
               sizeof(real_T));
 
-  // End of Math: '<S44>/Math Function'
+  // End of Math: '<S43>/Math Function'
 
   // DiscreteFir: '<S3>/FIR_IMUaccel'
-  Sum = inverseIMU_gain[0] * FCS_model_P.FIR_IMUaccel_Coefficients[0];
+  rtb_VectorConcatenate_tmp = inverseIMU_gain[0] *
+    FCS_model_P.FIR_IMUaccel_Coefficients[0];
   cff = 1;
   for (int32_T i{FCS_model_DW.FIR_IMUaccel_circBuf}; i < 5; i++) {
-    Sum += FCS_model_DW.FIR_IMUaccel_states[i] *
+    rtb_VectorConcatenate_tmp += FCS_model_DW.FIR_IMUaccel_states[i] *
       FCS_model_P.FIR_IMUaccel_Coefficients[cff];
     cff++;
   }
 
   for (int32_T i{0}; i < FCS_model_DW.FIR_IMUaccel_circBuf; i++) {
-    Sum += FCS_model_DW.FIR_IMUaccel_states[i] *
+    rtb_VectorConcatenate_tmp += FCS_model_DW.FIR_IMUaccel_states[i] *
       FCS_model_P.FIR_IMUaccel_Coefficients[cff];
     cff++;
   }
 
-  rtb_FIR_IMUaccel[0] = Sum;
-  Sum = FCS_model_P.FIR_IMUaccel_Coefficients[0] * inverseIMU_gain[1];
+  rtb_FIR_IMUaccel[0] = rtb_VectorConcatenate_tmp;
+  rtb_VectorConcatenate_tmp = FCS_model_P.FIR_IMUaccel_Coefficients[0] *
+    inverseIMU_gain[1];
   cff = 1;
   for (int32_T i{FCS_model_DW.FIR_IMUaccel_circBuf}; i < 5; i++) {
-    Sum += FCS_model_DW.FIR_IMUaccel_states[i + 5] *
+    rtb_VectorConcatenate_tmp += FCS_model_DW.FIR_IMUaccel_states[i + 5] *
       FCS_model_P.FIR_IMUaccel_Coefficients[cff];
     cff++;
   }
 
   for (int32_T i{0}; i < FCS_model_DW.FIR_IMUaccel_circBuf; i++) {
-    Sum += FCS_model_DW.FIR_IMUaccel_states[i + 5] *
+    rtb_VectorConcatenate_tmp += FCS_model_DW.FIR_IMUaccel_states[i + 5] *
       FCS_model_P.FIR_IMUaccel_Coefficients[cff];
     cff++;
   }
 
-  rtb_FIR_IMUaccel[1] = Sum;
-  Sum = FCS_model_P.FIR_IMUaccel_Coefficients[0] * inverseIMU_gain[2];
+  rtb_FIR_IMUaccel[1] = rtb_VectorConcatenate_tmp;
+  rtb_VectorConcatenate_tmp = FCS_model_P.FIR_IMUaccel_Coefficients[0] *
+    inverseIMU_gain[2];
   cff = 1;
   for (int32_T i{FCS_model_DW.FIR_IMUaccel_circBuf}; i < 5; i++) {
-    Sum += FCS_model_DW.FIR_IMUaccel_states[i + 10] *
+    rtb_VectorConcatenate_tmp += FCS_model_DW.FIR_IMUaccel_states[i + 10] *
       FCS_model_P.FIR_IMUaccel_Coefficients[cff];
     cff++;
   }
 
   for (int32_T i{0}; i < FCS_model_DW.FIR_IMUaccel_circBuf; i++) {
-    Sum += FCS_model_DW.FIR_IMUaccel_states[i + 10] *
+    rtb_VectorConcatenate_tmp += FCS_model_DW.FIR_IMUaccel_states[i + 10] *
       FCS_model_P.FIR_IMUaccel_Coefficients[cff];
     cff++;
   }
 
-  rtb_FIR_IMUaccel[2] = Sum;
+  rtb_FIR_IMUaccel[2] = rtb_VectorConcatenate_tmp;
 
   // Sum: '<S3>/Sum3' incorporates:
   //   Constant: '<Root>/Constant'
-  //   Inport: '<Root>/in_sensors'
+  //   Inport: '<Root>/in_parameters'
 
-  rtb_rangefinder_distance = arg_in_sensors->rangefinder_distance -
+  rtb_rangefinder_distance = arg_in_parameters->rangefinder_distance -
     FCS_model_P.sensorCalibrationData[7];
 
-  // DiscreteFilter: '<S140>/Discrete Filter1'
-  rtb_Saturation = rtb_rangefinder_distance;
+  // DiscreteFilter: '<S139>/Discrete Filter1'
+  rtb_Add_g_idx_1 = rtb_rangefinder_distance;
   denIdx = 1;
   for (int32_T i{0}; i < 3; i++) {
-    // Sum: '<S140>/Sum' incorporates:
-    //   Constant: '<S140>/gravity'
+    // Sum: '<S139>/Sum' incorporates:
+    //   Constant: '<S139>/gravity'
     //   DiscreteFir: '<S3>/FIR_IMUaccel'
-    //   Math: '<S140>/Math Function'
-    //   Product: '<S140>/Product'
+    //   Math: '<S139>/Math Function'
+    //   Product: '<S139>/Product'
 
-    rtb_TmpSignalConversionAtProd_i[i] = ((rtb_MathFunction[i + 3] *
+    rtb_TmpSignalConversionAtProduc[i] = ((rtb_MathFunction[i + 3] *
       rtb_FIR_IMUaccel[1] + rtb_MathFunction[i] * rtb_FIR_IMUaccel[0]) +
-      rtb_MathFunction[i + 6] * Sum) + FCS_model_P.gravity_Value[i];
+      rtb_MathFunction[i + 6] * rtb_VectorConcatenate_tmp) +
+      FCS_model_P.gravity_Value[i];
 
-    // DiscreteFilter: '<S140>/Discrete Filter1'
-    rtb_Saturation -= FCS_model_P.DiscreteFilter1_DenCoef[denIdx] *
+    // DiscreteFilter: '<S139>/Discrete Filter1'
+    rtb_Add_g_idx_1 -= FCS_model_P.DiscreteFilter1_DenCoef[denIdx] *
       FCS_model_DW.DiscreteFilter1_states[i];
     denIdx++;
   }
 
-  // DiscreteFilter: '<S140>/Discrete Filter1'
-  DiscreteFilter1_tmp = rtb_Saturation / FCS_model_P.DiscreteFilter1_DenCoef[0];
+  // DiscreteFilter: '<S139>/Discrete Filter1'
+  DiscreteFilter1_tmp = rtb_Add_g_idx_1 / FCS_model_P.DiscreteFilter1_DenCoef[0];
 
-  // Switch generated from: '<S2>/Switch' incorporates:
-  //   DiscreteFilter: '<S140>/Discrete Filter1'
-  //   Gain: '<S140>/RangfinderScaleGain1'
+  // Product: '<S199>/Product5' incorporates:
+  //   DiscreteFilter: '<S139>/Discrete Filter1'
 
-  rtb_pos_dz = (((FCS_model_P.DiscreteFilter1_NumCoef[0] * DiscreteFilter1_tmp +
-                  FCS_model_DW.DiscreteFilter1_states[0] *
-                  FCS_model_P.DiscreteFilter1_NumCoef[1]) +
-                 FCS_model_DW.DiscreteFilter1_states[1] *
-                 FCS_model_P.DiscreteFilter1_NumCoef[2]) +
-                FCS_model_DW.DiscreteFilter1_states[2] *
-                FCS_model_P.DiscreteFilter1_NumCoef[3]) *
-    FCS_model_P.RangfinderScaleGain1_Gain;
+  rtb_Product5 = ((FCS_model_P.DiscreteFilter1_NumCoef[0] * DiscreteFilter1_tmp
+                   + FCS_model_DW.DiscreteFilter1_states[0] *
+                   FCS_model_P.DiscreteFilter1_NumCoef[1]) +
+                  FCS_model_DW.DiscreteFilter1_states[1] *
+                  FCS_model_P.DiscreteFilter1_NumCoef[2]) +
+    FCS_model_DW.DiscreteFilter1_states[2] *
+    FCS_model_P.DiscreteFilter1_NumCoef[3];
 
-  // Product: '<S140>/Product2' incorporates:
-  //   Constant: '<S140>/Constant'
-  //   Math: '<S140>/Math Function'
-  //   SignalConversion generated from: '<S140>/Product2'
+  // Product: '<S199>/Product4' incorporates:
+  //   Gain: '<S139>/RangfinderScaleGain1'
+
+  rtb_Product4 = FCS_model_P.RangfinderScaleGain1_Gain * rtb_Product5;
+
+  // Product: '<S139>/Product2' incorporates:
+  //   Constant: '<S139>/Constant'
+  //   Math: '<S139>/Math Function'
+  //   SignalConversion generated from: '<S139>/Product2'
 
   for (int32_T i{0}; i < 3; i++) {
-    rtb_TmpSignalConversionAtProduc[i] = (rtb_MathFunction[i + 3] *
-      FCS_model_P.Constant_Value_e + rtb_MathFunction[i] *
-      FCS_model_P.Constant_Value_e) + rtb_MathFunction[i + 6] * rtb_pos_dz;
+    rtb_sincos_o1[i] = (rtb_MathFunction[i + 3] * FCS_model_P.Constant_Value_e +
+                        rtb_MathFunction[i] * FCS_model_P.Constant_Value_e) +
+      rtb_MathFunction[i + 6] * rtb_Product4;
   }
 
-  // End of Product: '<S140>/Product2'
+  // End of Product: '<S139>/Product2'
 
-  // Reshape: '<S141>/Reshapey'
-  rtb_Reshapey[0] = rtb_TmpSignalConversionAtProduc[2];
-  rtb_Reshapey[1] = rtb_TmpSignalConversionAtProd_i[2];
+  // Reshape: '<S140>/Reshapey'
+  rtb_Reshapey[0] = rtb_sincos_o1[2];
+  rtb_Reshapey[1] = rtb_TmpSignalConversionAtProduc[2];
 
-  // Delay: '<S141>/MemoryX' incorporates:
-  //   Constant: '<S141>/X0'
+  // Delay: '<S140>/MemoryX' incorporates:
+  //   Constant: '<S140>/X0'
 
   if (FCS_model_DW.icLoad) {
     FCS_model_DW.MemoryX_DSTATE[0] = FCS_model_P.X0_Value[0];
@@ -471,56 +510,56 @@ void FCS_model::step(in_dashboard *arg_in_dashboard, in_sensors *arg_in_sensors,
     FCS_model_DW.MemoryX_DSTATE[3] = FCS_model_P.X0_Value[3];
   }
 
-  // Outputs for Enabled SubSystem: '<S169>/Enabled Subsystem' incorporates:
-  //   EnablePort: '<S194>/Enable'
+  // Outputs for Enabled SubSystem: '<S168>/Enabled Subsystem' incorporates:
+  //   EnablePort: '<S193>/Enable'
 
-  // Outputs for Enabled SubSystem: '<S163>/MeasurementUpdate' incorporates:
-  //   EnablePort: '<S192>/Enable'
+  // Outputs for Enabled SubSystem: '<S162>/MeasurementUpdate' incorporates:
+  //   EnablePort: '<S191>/Enable'
 
-  // Constant: '<S141>/Enable'
+  // Constant: '<S140>/Enable'
   if (FCS_model_P.Enable_Value) {
     FCS_model_DW.MeasurementUpdate_MODE = true;
 
-    // Product: '<S192>/D[k]*u[k]'
-    rtb_Divide = rtb_TmpSignalConversionAtProd_i[2];
+    // Product: '<S191>/D[k]*u[k]'
+    rtb_Add_g_idx_0 = rtb_TmpSignalConversionAtProduc[2];
     for (int32_T i{0}; i < 2; i++) {
-      // Product: '<S192>/C[k]*xhat[k|k-1]' incorporates:
-      //   Constant: '<S141>/C'
-      //   Delay: '<S141>/MemoryX'
+      // Product: '<S191>/C[k]*xhat[k|k-1]' incorporates:
+      //   Constant: '<S140>/C'
+      //   Delay: '<S140>/MemoryX'
 
-      rtb_Add_g_idx_0 = ((FCS_model_P.C_Value[i + 2] *
+      rtb_Add_g_idx_1 = ((FCS_model_P.C_Value[i + 2] *
                           FCS_model_DW.MemoryX_DSTATE[1] + FCS_model_P.C_Value[i]
                           * FCS_model_DW.MemoryX_DSTATE[0]) +
                          FCS_model_P.C_Value[i + 4] *
                          FCS_model_DW.MemoryX_DSTATE[2]) + FCS_model_P.C_Value[i
         + 6] * FCS_model_DW.MemoryX_DSTATE[3];
 
-      // Sum: '<S192>/Sum' incorporates:
-      //   Constant: '<S141>/D'
-      //   Product: '<S192>/D[k]*u[k]'
-      //   Sum: '<S192>/Add1'
+      // Sum: '<S191>/Sum' incorporates:
+      //   Constant: '<S140>/D'
+      //   Product: '<S191>/D[k]*u[k]'
+      //   Sum: '<S191>/Add1'
 
-      IIRgyroz_tmp[i] = rtb_Reshapey[i] - (FCS_model_P.D_Value[i] * rtb_Divide +
-        rtb_Add_g_idx_0);
+      IIRgyroz_tmp[i] = rtb_Reshapey[i] - (FCS_model_P.D_Value[i] *
+        rtb_Add_g_idx_0 + rtb_Add_g_idx_1);
 
-      // Product: '<S192>/C[k]*xhat[k|k-1]' incorporates:
-      //   Constant: '<S141>/C'
-      //   Product: '<S194>/Product'
+      // Product: '<S191>/C[k]*xhat[k|k-1]' incorporates:
+      //   Constant: '<S140>/C'
+      //   Product: '<S193>/Product'
 
-      rtb_Product_c[i] = rtb_Add_g_idx_0;
+      rtb_Product_f[i] = rtb_Add_g_idx_1;
     }
 
     FCS_model_DW.EnabledSubsystem_MODE = true;
 
-    // Sum: '<S194>/Add1' incorporates:
-    //   Product: '<S194>/Product'
-    //   Reshape: '<S141>/Reshapey'
+    // Sum: '<S193>/Add1' incorporates:
+    //   Product: '<S193>/Product'
+    //   Reshape: '<S140>/Reshapey'
 
-    rtb_Divide = rtb_TmpSignalConversionAtProduc[2] - rtb_Product_c[0];
-    rtb_Add_g_idx_0 = rtb_TmpSignalConversionAtProd_i[2] - rtb_Product_c[1];
+    rtb_Add_g_idx_0 = rtb_sincos_o1[2] - rtb_Product_f[0];
+    rtb_Add_g_idx_1 = rtb_TmpSignalConversionAtProduc[2] - rtb_Product_f[1];
     for (int32_T i{0}; i < 4; i++) {
-      // Product: '<S192>/Product3' incorporates:
-      //   Constant: '<S143>/KalmanGainL'
+      // Product: '<S191>/Product3' incorporates:
+      //   Constant: '<S142>/KalmanGainL'
 
       FCS_model_B.Product3[i] = 0.0;
       FCS_model_B.Product3[i] += FCS_model_P.KalmanGainL_Value[i] *
@@ -528,18 +567,19 @@ void FCS_model::step(in_dashboard *arg_in_dashboard, in_sensors *arg_in_sensors,
       FCS_model_B.Product3[i] += FCS_model_P.KalmanGainL_Value[i + 4] *
         IIRgyroz_tmp[1];
 
-      // Product: '<S194>/Product2' incorporates:
-      //   Constant: '<S143>/KalmanGainM'
+      // Product: '<S193>/Product2' incorporates:
+      //   Constant: '<S142>/KalmanGainM'
 
       FCS_model_B.Product2[i] = 0.0;
-      FCS_model_B.Product2[i] += FCS_model_P.KalmanGainM_Value[i] * rtb_Divide;
-      FCS_model_B.Product2[i] += FCS_model_P.KalmanGainM_Value[i + 4] *
+      FCS_model_B.Product2[i] += FCS_model_P.KalmanGainM_Value[i] *
         rtb_Add_g_idx_0;
+      FCS_model_B.Product2[i] += FCS_model_P.KalmanGainM_Value[i + 4] *
+        rtb_Add_g_idx_1;
     }
   } else {
     if (FCS_model_DW.MeasurementUpdate_MODE) {
-      // Disable for Product: '<S192>/Product3' incorporates:
-      //   Outport: '<S192>/L*(y[k]-yhat[k|k-1])'
+      // Disable for Product: '<S191>/Product3' incorporates:
+      //   Outport: '<S191>/L*(y[k]-yhat[k|k-1])'
 
       FCS_model_B.Product3[0] = FCS_model_P.Lykyhatkk1_Y0_c;
       FCS_model_B.Product3[1] = FCS_model_P.Lykyhatkk1_Y0_c;
@@ -549,8 +589,8 @@ void FCS_model::step(in_dashboard *arg_in_dashboard, in_sensors *arg_in_sensors,
     }
 
     if (FCS_model_DW.EnabledSubsystem_MODE) {
-      // Disable for Product: '<S194>/Product2' incorporates:
-      //   Outport: '<S194>/deltax'
+      // Disable for Product: '<S193>/Product2' incorporates:
+      //   Outport: '<S193>/deltax'
 
       FCS_model_B.Product2[0] = FCS_model_P.deltax_Y0_k;
       FCS_model_B.Product2[1] = FCS_model_P.deltax_Y0_k;
@@ -560,12 +600,12 @@ void FCS_model::step(in_dashboard *arg_in_dashboard, in_sensors *arg_in_sensors,
     }
   }
 
-  // End of Constant: '<S141>/Enable'
-  // End of Outputs for SubSystem: '<S163>/MeasurementUpdate'
-  // End of Outputs for SubSystem: '<S169>/Enabled Subsystem'
+  // End of Constant: '<S140>/Enable'
+  // End of Outputs for SubSystem: '<S162>/MeasurementUpdate'
+  // End of Outputs for SubSystem: '<S168>/Enabled Subsystem'
 
-  // Sum: '<S169>/Add' incorporates:
-  //   Delay: '<S141>/MemoryX'
+  // Sum: '<S168>/Add' incorporates:
+  //   Delay: '<S140>/MemoryX'
 
   rtb_Add_g_idx_0 = FCS_model_B.Product2[0] + FCS_model_DW.MemoryX_DSTATE[0];
   rtb_Add_g_idx_1 = FCS_model_B.Product2[1] + FCS_model_DW.MemoryX_DSTATE[1];
@@ -586,7 +626,7 @@ void FCS_model::step(in_dashboard *arg_in_dashboard, in_sensors *arg_in_sensors,
   //   Constant: '<S31>/signal_max'
   //   Gain: '<S31>/Gain'
 
-  rtb_Divide = FCS_model_P.signal_max_Value / (FCS_model_P.Gain_Gain_n *
+  rtb_Divide = FCS_model_P.signal_max_Value / (FCS_model_P.Gain_Gain *
     FCS_model_P.cycle_time_Value);
 
   // Chart: '<S31>/takeoff_acceleration' incorporates:
@@ -641,59 +681,37 @@ void FCS_model::step(in_dashboard *arg_in_dashboard, in_sensors *arg_in_sensors,
 
   // DiscreteStateSpace: '<S30>/Internal'
   {
-    rtb_pos_dz = (FCS_model_P.Internal_C[0])*FCS_model_DW.Internal_DSTATE[0]
+    rtb_Product4 = (FCS_model_P.Internal_C[0])*FCS_model_DW.Internal_DSTATE[0]
       + (FCS_model_P.Internal_C[1])*FCS_model_DW.Internal_DSTATE[1];
   }
 
-  // Switch generated from: '<S2>/Switch' incorporates:
-  //   Constant: '<S2>/sw_states_passthrough'
-  //   Inport: '<Root>/in_states'
-
-  if (FCS_model_P.sw_states_passthrough_Value > FCS_model_P.Switch_9_Threshold)
-  {
-    rtb_Divide = rtb_Add_g_idx_0;
-  } else {
-    rtb_Divide = arg_in_states->z;
-  }
-
-  // Sum: '<S27>/Sum1' incorporates:
+  // Product: '<S199>/Product5' incorporates:
   //   Gain: '<S27>/Gain'
 
-  rtb_Sum1 = rtb_pos_dz - FCS_model_P.Gain_Gain_f * rtb_Divide;
+  rtb_Product5 = FCS_model_P.Gain_Gain_f * rtb_Add_g_idx_0;
 
-  // SignalConversion generated from: '<S140>/Product1' incorporates:
+  // Sum: '<S27>/Sum1'
+  rtb_Divide = rtb_Product4 - rtb_Product5;
+
+  // SignalConversion generated from: '<S139>/Product1' incorporates:
   //   Constant: '<S40>/Constant'
 
-  rtb_TrigonometricFunction4 = FCS_model_P.Constant_Value_c1[0];
-  rtb_roll = FCS_model_P.Constant_Value_c1[1];
+  rtb_K_i = FCS_model_P.Constant_Value_c1[0];
+  rtb_Saturation_l = FCS_model_P.Constant_Value_c1[1];
 
-  // Product: '<S140>/Product1' incorporates:
-  //   Concatenate: '<S195>/Vector Concatenate'
-  //   SignalConversion generated from: '<S140>/Product1'
+  // Product: '<S139>/Product1' incorporates:
+  //   Concatenate: '<S194>/Vector Concatenate'
+  //   SignalConversion generated from: '<S139>/Product1'
 
   for (int32_T i{0}; i < 3; i++) {
-    rtb_TmpSignalConversionAtProduc[i] = (rtb_VectorConcatenate[i + 3] *
-      rtb_roll + rtb_VectorConcatenate[i] * rtb_TrigonometricFunction4) +
+    rtb_sincos_o1[i] = (rtb_VectorConcatenate[i + 3] * rtb_Saturation_l +
+                        rtb_VectorConcatenate[i] * rtb_K_i) +
       rtb_VectorConcatenate[i + 6] * rtb_Add_g_idx_1;
   }
 
-  // End of Product: '<S140>/Product1'
+  // End of Product: '<S139>/Product1'
 
-  // Switch generated from: '<S2>/Switch' incorporates:
-  //   Constant: '<S2>/sw_states_passthrough'
-
-  if (FCS_model_P.sw_states_passthrough_Value > FCS_model_P.Switch_12_Threshold)
-  {
-    // Switch generated from: '<S2>/Switch'
-    rtb_pos_dz = rtb_TmpSignalConversionAtProduc[2];
-  } else {
-    // Switch generated from: '<S2>/Switch' incorporates:
-    //   Inport: '<Root>/in_states'
-
-    rtb_pos_dz = arg_in_states->dz;
-  }
-
-  // Sum: '<S27>/Sum4' incorporates:
+  // Product: '<S199>/Product4' incorporates:
   //   Constant: '<S27>/Constant1'
   //   Constant: '<S31>/Constant'
   //   Gain: '<S27>/Gain1'
@@ -704,82 +722,65 @@ void FCS_model::step(in_dashboard *arg_in_dashboard, in_sensors *arg_in_sensors,
   //   Product: '<S31>/Product'
   //   Sum: '<S27>/Sum2'
   //   Sum: '<S27>/Sum3'
+  //   Sum: '<S27>/Sum4'
 
-  rtb_TrigonometricFunction4 = ((FCS_model_P.zDz * rtb_Sum1 -
-    FCS_model_P.Gain1_Gain * rtb_pos_dz) * (FCS_model_P.KDz * 10.0) *
-    FCS_model_P.WithControl1WithoutControl0_Gai +
-    FCS_model_P.Vehicle.Airframe.mass * FCS_model_P.g) +
+  rtb_Product4 = FCS_model_P.Gain1_Gain * rtb_sincos_o1[2];
+  rtb_Product4 = ((FCS_model_P.zDz * rtb_Divide - rtb_Product4) *
+                  (FCS_model_P.KDz * 10.0) *
+                  FCS_model_P.WithControl1WithoutControl0_Gai +
+                  FCS_model_P.Vehicle.Airframe.mass * FCS_model_P.g) +
     FCS_model_P.Vehicle.Airframe.mass * FCS_model_B.signal_out *
     FCS_model_P.WithTakeoff1WithoutTakeoff0_Gai;
 
   // Saturate: '<S27>/SaturationThrust'
   rtb_Add_g_idx_1 = -4.0 * FCS_model_P.Controller.totalThrustMaxRelative *
     FCS_model_P.Controller.motorsThrustPerMotorMax;
-  rtb_Sum1 = 4.0 * FCS_model_P.Controller.totalThrustMaxRelative *
+  rtb_Divide = 4.0 * FCS_model_P.Controller.totalThrustMaxRelative *
     FCS_model_P.Controller.motorsThrustPerMotorMax;
-  if (rtb_TrigonometricFunction4 > rtb_Sum1) {
-    rtb_TrigonometricFunction4 = rtb_Sum1;
-  } else if (rtb_TrigonometricFunction4 < rtb_Add_g_idx_1) {
-    rtb_TrigonometricFunction4 = rtb_Add_g_idx_1;
+  if (rtb_Product4 > rtb_Divide) {
+    // Product: '<S199>/Product4'
+    rtb_Product4 = rtb_Divide;
+  } else if (rtb_Product4 < rtb_Add_g_idx_1) {
+    // Product: '<S199>/Product4'
+    rtb_Product4 = rtb_Add_g_idx_1;
   }
 
-  // Gain: '<S1>/On=1//Off=0 for thrust' incorporates:
-  //   Saturate: '<S27>/SaturationThrust'
+  // End of Saturate: '<S27>/SaturationThrust'
 
-  rtb_Add_g_idx_1 = FCS_model_P.On1Off0forthrust_Gain *
-    rtb_TrigonometricFunction4;
+  // Product: '<S199>/Product4' incorporates:
+  //   Gain: '<S1>/On=1//Off=0 for thrust'
+
+  rtb_Product4 *= FCS_model_P.On1Off0forthrust_Gain;
 
   // DiscreteStateSpace: '<S23>/Internal'
   {
-    rtb_orient_rate_yaw = (FCS_model_P.Internal_C_j[0])*
-      FCS_model_DW.Internal_DSTATE_f[0]
+    rtb_Product5 = (FCS_model_P.Internal_C_j[0])*FCS_model_DW.Internal_DSTATE_f
+      [0]
       + (FCS_model_P.Internal_C_j[1])*FCS_model_DW.Internal_DSTATE_f[1];
   }
 
-  // Switch generated from: '<S2>/Switch' incorporates:
-  //   Constant: '<S2>/sw_states_passthrough'
-  //   DiscreteTransferFcn: '<S197>/Discrete Transfer Fcn'
-  //   Inport: '<Root>/in_states'
-
-  if (FCS_model_P.sw_states_passthrough_Value > FCS_model_P.Switch_3_Threshold)
-  {
-    rtb_Sum1 = rtb_K;
-  } else {
-    rtb_Sum1 = arg_in_states->roll;
-  }
-
-  // Sum: '<S10>/Sum1'
-  rtb_Sum1_l = rtb_orient_rate_yaw - rtb_Sum1;
-
-  // Switch generated from: '<S2>/Switch' incorporates:
-  //   Constant: '<S2>/sw_states_passthrough'
-
-  if (FCS_model_P.sw_states_passthrough_Value > FCS_model_P.Switch_6_Threshold)
-  {
-    // Switch generated from: '<S2>/Switch' incorporates:
-    //   DiscreteFir: '<S3>/FIR_IMUaccel'
-
-    rtb_orient_rate_yaw = Sum;
-  } else {
-    // Switch generated from: '<S2>/Switch'
-    rtb_orient_rate_yaw = inverseIMU_gain[5];
-  }
-
-  // Gain: '<S1>/On=1//Off=1 for yaw' incorporates:
+  // Product: '<S199>/Product5' incorporates:
   //   Constant: '<S4>/yaw equilibrium'
+  //   DiscreteFir: '<S3>/FIR_IMUaccel'
+  //   DiscreteTransferFcn: '<S197>/Discrete Transfer Fcn'
   //   Gain: '<S10>/KDpsi'
   //   Gain: '<S10>/zDpsi'
+  //   Gain: '<S1>/On=1//Off=1 for yaw'
   //   Gain: '<S4>/Changing of Jzz'
+  //   Sum: '<S10>/Sum1'
   //   Sum: '<S10>/Sum3'
   //   Sum: '<S4>/Sum3'
 
-  rtb_Sum1_l = ((FCS_model_P.zDpsi * 2.0 * rtb_Sum1_l - rtb_orient_rate_yaw) *
-                (FCS_model_P.KDpsi * 1.3) * FCS_model_P.ChangingofJzz_Gain +
-                FCS_model_P.yawequilibrium_Value) *
+  rtb_Product5 = FCS_model_P.zDpsi * 2.0 * (rtb_Product5 -
+    rtb_AvoidDividebyZero_h);
+  rtb_Product5 -= rtb_VectorConcatenate_tmp;
+  rtb_Product5 = (FCS_model_P.KDpsi * 1.3 * rtb_Product5 *
+                  FCS_model_P.ChangingofJzz_Gain +
+                  FCS_model_P.yawequilibrium_Value) *
     FCS_model_P.On1Off1foryaw_Gain;
 
-  // Delay: '<S51>/MemoryX' incorporates:
-  //   Constant: '<S51>/X0'
+  // Delay: '<S50>/MemoryX' incorporates:
+  //   Constant: '<S50>/X0'
 
   if (FCS_model_DW.icLoad_n) {
     FCS_model_DW.MemoryX_DSTATE_o[0] = FCS_model_P.X0_Value_h[0];
@@ -787,75 +788,76 @@ void FCS_model::step(in_dashboard *arg_in_dashboard, in_sensors *arg_in_sensors,
   }
 
   for (cff = 0; cff < 2; cff++) {
-    // DiscreteFilter: '<S50>/IIRgyroz'
+    // DiscreteFilter: '<S49>/IIRgyroz'
     memOffset = cff * 5;
-    rtb_Saturation = inverseIMU_gain[cff + 3];
+    rtb_Add_g_idx_1 = inverseIMU_gain[cff + 3];
     denIdx = 1;
     for (int32_T i{0}; i < 5; i++) {
-      rtb_Saturation -= FCS_model_DW.IIRgyroz_states[memOffset + i] *
+      rtb_Add_g_idx_1 -= FCS_model_DW.IIRgyroz_states[memOffset + i] *
         FCS_model_P.IIRgyroz_DenCoef[denIdx];
       denIdx++;
     }
 
-    rtb_Saturation /= FCS_model_P.IIRgyroz_DenCoef[0];
-    rtb_K_i = FCS_model_P.IIRgyroz_NumCoef[0] * rtb_Saturation;
+    rtb_Add_g_idx_1 /= FCS_model_P.IIRgyroz_DenCoef[0];
+    rtb_Divide = FCS_model_P.IIRgyroz_NumCoef[0] * rtb_Add_g_idx_1;
     denIdx = 1;
     for (int32_T i{0}; i < 5; i++) {
-      rtb_K_i += FCS_model_DW.IIRgyroz_states[memOffset + i] *
+      rtb_Divide += FCS_model_DW.IIRgyroz_states[memOffset + i] *
         FCS_model_P.IIRgyroz_NumCoef[denIdx];
       denIdx++;
     }
 
-    // SampleTimeMath: '<S58>/TSamp' incorporates:
-    //   DiscreteFilter: '<S50>/IIRgyroz'
+    // SampleTimeMath: '<S57>/TSamp' incorporates:
+    //   DiscreteFilter: '<S49>/IIRgyroz'
     //
-    //  About '<S58>/TSamp':
+    //  About '<S57>/TSamp':
     //   y = u * K where K = 1 / ( w * Ts )
 
-    rtb_K_i *= FCS_model_P.TSamp_WtEt;
+    rtb_Divide *= FCS_model_P.TSamp_WtEt;
 
-    // DiscreteFilter: '<S50>/IIRgyroz' incorporates:
-    //   Sum: '<S58>/Diff'
-    //   UnitDelay: '<S58>/UD'
+    // DiscreteFilter: '<S49>/IIRgyroz' incorporates:
+    //   Sum: '<S57>/Diff'
+    //   UnitDelay: '<S57>/UD'
     //
-    //  Block description for '<S58>/Diff':
+    //  Block description for '<S57>/Diff':
     //
     //   Add in CPU
     //
-    //  Block description for '<S58>/UD':
+    //  Block description for '<S57>/UD':
     //
     //   Store in Global RAM
 
-    IIRgyroz_tmp[cff] = rtb_Saturation;
-    rtb_SimplyIntegrateVelocity[cff] = rtb_K_i - FCS_model_DW.UD_DSTATE[cff];
+    IIRgyroz_tmp[cff] = rtb_Add_g_idx_1;
+    rtb_SimplyIntegrateVelocity[cff] = rtb_Divide - FCS_model_DW.UD_DSTATE[cff];
 
-    // SampleTimeMath: '<S58>/TSamp'
+    // SampleTimeMath: '<S57>/TSamp'
     //
-    //  About '<S58>/TSamp':
+    //  About '<S57>/TSamp':
     //   y = u * K where K = 1 / ( w * Ts )
 
-    rtb_Reshapey[cff] = rtb_K_i;
+    rtb_Reshapey[cff] = rtb_Divide;
   }
 
-  // Abs: '<S50>/Abs' incorporates:
-  //   Abs: '<S50>/Abs4'
+  // Abs: '<S49>/Abs' incorporates:
+  //   Abs: '<S49>/Abs4'
 
-  rtb_Saturation = std::abs(inverseIMU_gain[3]);
+  rtb_Add_g_idx_1 = std::abs(inverseIMU_gain[3]);
 
-  // Abs: '<S50>/Abs1' incorporates:
-  //   Abs: '<S50>/Abs5'
+  // Abs: '<S49>/Abs1' incorporates:
+  //   Abs: '<S49>/Abs5'
 
-  rtb_K_i = std::abs(inverseIMU_gain[4]);
+  rtb_Divide = std::abs(inverseIMU_gain[4]);
 
-  // Logic: '<S50>/Logical Operator3' incorporates:
-  //   Abs: '<S50>/Abs'
-  //   Abs: '<S50>/Abs1'
-  //   Abs: '<S50>/Abs2'
-  //   Abs: '<S50>/Abs3'
-  //   Abs: '<S50>/Abs6'
-  //   Abs: '<S50>/Abs7'
-  //   Abs: '<S50>/Abs8'
-  //   Abs: '<S50>/Abs9'
+  // Logic: '<S49>/Logical Operator3' incorporates:
+  //   Abs: '<S49>/Abs'
+  //   Abs: '<S49>/Abs1'
+  //   Abs: '<S49>/Abs2'
+  //   Abs: '<S49>/Abs3'
+  //   Abs: '<S49>/Abs6'
+  //   Abs: '<S49>/Abs7'
+  //   Abs: '<S49>/Abs8'
+  //   Abs: '<S49>/Abs9'
+  //   Constant: '<S58>/Constant'
   //   Constant: '<S59>/Constant'
   //   Constant: '<S60>/Constant'
   //   Constant: '<S61>/Constant'
@@ -866,14 +868,14 @@ void FCS_model::step(in_dashboard *arg_in_dashboard, in_sensors *arg_in_sensors,
   //   Constant: '<S66>/Constant'
   //   Constant: '<S67>/Constant'
   //   Constant: '<S68>/Constant'
-  //   Constant: '<S69>/Constant'
-  //   Delay: '<S45>/Delay'
+  //   Delay: '<S44>/Delay'
   //   DiscreteTransferFcn: '<S196>/Discrete Transfer Fcn'
   //   DiscreteTransferFcn: '<S197>/Discrete Transfer Fcn'
-  //   Inport: '<Root>/in_sensors'
-  //   Logic: '<S50>/Logical Operator'
-  //   Logic: '<S50>/Logical Operator1'
-  //   Logic: '<S50>/Logical Operator2'
+  //   Inport: '<Root>/in_parameters'
+  //   Logic: '<S49>/Logical Operator'
+  //   Logic: '<S49>/Logical Operator1'
+  //   Logic: '<S49>/Logical Operator2'
+  //   RelationalOperator: '<S58>/Compare'
   //   RelationalOperator: '<S59>/Compare'
   //   RelationalOperator: '<S60>/Compare'
   //   RelationalOperator: '<S61>/Compare'
@@ -884,44 +886,44 @@ void FCS_model::step(in_dashboard *arg_in_dashboard, in_sensors *arg_in_sensors,
   //   RelationalOperator: '<S66>/Compare'
   //   RelationalOperator: '<S67>/Compare'
   //   RelationalOperator: '<S68>/Compare'
-  //   RelationalOperator: '<S69>/Compare'
-  //   Sum: '<S50>/Add'
+  //   Sum: '<S49>/Add'
 
-  rtb_LogicalOperator3 = ((((std::abs(rtb_orient_pitch) <=
-    FCS_model_P.maxp_const) && (std::abs(rtb_K) <= FCS_model_P.maxq_const) &&
-    (rtb_Saturation <= FCS_model_P.maxw1_const) && (rtb_K_i <=
-    FCS_model_P.maxw2_const) && (std::abs(rtb_SimplyIntegrateVelocity[0]) <=
-    FCS_model_P.maxdw1_const) && (std::abs(rtb_SimplyIntegrateVelocity[1]) <=
-    FCS_model_P.maxdw2_const)) || ((rtb_Saturation <= FCS_model_P.maxp2_const) &&
-    (rtb_K_i <= FCS_model_P.maxq2_const))) && (std::abs
-    (arg_in_sensors->opticalflow_x - FCS_model_DW.Delay_DSTATE[0]) <=
-    FCS_model_P.maxw3_const) && (std::abs(arg_in_sensors->opticalflow_y -
-    FCS_model_DW.Delay_DSTATE[1]) <= FCS_model_P.maxw4_const) &&
-    (rtb_Add_g_idx_0 <= FCS_model_P.minHeightforOF_const));
+  rtb_LogicalOperator3 = ((((std::abs(rtb_AvoidDividebyZero) <=
+    FCS_model_P.maxp_const) && (std::abs(rtb_AvoidDividebyZero_h) <=
+    FCS_model_P.maxq_const) && (rtb_Add_g_idx_1 <= FCS_model_P.maxw1_const) &&
+    (rtb_Divide <= FCS_model_P.maxw2_const) && (std::abs
+    (rtb_SimplyIntegrateVelocity[0]) <= FCS_model_P.maxdw1_const) && (std::abs
+    (rtb_SimplyIntegrateVelocity[1]) <= FCS_model_P.maxdw2_const)) ||
+    ((rtb_Add_g_idx_1 <= FCS_model_P.maxp2_const) && (rtb_Divide <=
+    FCS_model_P.maxq2_const))) && (std::abs(arg_in_parameters->opticalflow_x -
+    FCS_model_DW.Delay_DSTATE[0]) <= FCS_model_P.maxw3_const) && (std::abs
+    (arg_in_parameters->opticalflow_y - FCS_model_DW.Delay_DSTATE[1]) <=
+    FCS_model_P.maxw4_const) && (rtb_Add_g_idx_0 <=
+    FCS_model_P.minHeightforOF_const));
 
-  // Logic: '<S132>/Logical Operator' incorporates:
-  //   Constant: '<S132>/Constant'
-  //   Constant: '<S132>/Time constant'
+  // Logic: '<S131>/Logical Operator' incorporates:
+  //   Constant: '<S131>/Constant'
+  //   Constant: '<S131>/Time constant'
+  //   Constant: '<S134>/Constant'
   //   Constant: '<S135>/Constant'
-  //   Constant: '<S136>/Constant'
+  //   RelationalOperator: '<S134>/Compare'
   //   RelationalOperator: '<S135>/Compare'
-  //   RelationalOperator: '<S136>/Compare'
-  //   Sum: '<S132>/Sum1'
+  //   Sum: '<S131>/Sum1'
 
   rtb_LogicalOperator_b = ((FCS_model_P.LowPassFilterDiscreteorContin_l -
     FCS_model_B.Probe[0] <= FCS_model_P.Constant_Value_o) &&
     (FCS_model_P.LowPassFilterDiscreteorContin_i <
      FCS_model_P.CompareToConstant_const));
 
-  // Gain: '<S124>/K' incorporates:
-  //   Inport: '<Root>/in_sensors'
+  // Gain: '<S123>/K' incorporates:
+  //   Inport: '<Root>/in_parameters'
 
-  rtb_K = FCS_model_P.LowPassFilterDiscreteorContinuo *
-    arg_in_sensors->opticalflow_x;
+  rtb_Add_g_idx_1 = FCS_model_P.LowPassFilterDiscreteorContinuo *
+    arg_in_parameters->opticalflow_x;
 
-  // DiscreteIntegrator: '<S138>/Integrator'
+  // DiscreteIntegrator: '<S137>/Integrator'
   if (FCS_model_DW.Integrator_IC_LOADING != 0) {
-    FCS_model_DW.Integrator_DSTATE = rtb_K;
+    FCS_model_DW.Integrator_DSTATE = rtb_Add_g_idx_1;
     if (FCS_model_DW.Integrator_DSTATE >= FCS_model_P.Integrator_UpperSat) {
       FCS_model_DW.Integrator_DSTATE = FCS_model_P.Integrator_UpperSat;
     } else if (FCS_model_DW.Integrator_DSTATE <= FCS_model_P.Integrator_LowerSat)
@@ -931,7 +933,7 @@ void FCS_model::step(in_dashboard *arg_in_dashboard, in_sensors *arg_in_sensors,
   }
 
   if (rtb_LogicalOperator_b || (FCS_model_DW.Integrator_PrevResetState != 0)) {
-    FCS_model_DW.Integrator_DSTATE = rtb_K;
+    FCS_model_DW.Integrator_DSTATE = rtb_Add_g_idx_1;
     if (FCS_model_DW.Integrator_DSTATE >= FCS_model_P.Integrator_UpperSat) {
       FCS_model_DW.Integrator_DSTATE = FCS_model_P.Integrator_UpperSat;
     } else if (FCS_model_DW.Integrator_DSTATE <= FCS_model_P.Integrator_LowerSat)
@@ -947,40 +949,51 @@ void FCS_model::step(in_dashboard *arg_in_dashboard, in_sensors *arg_in_sensors,
     FCS_model_DW.Integrator_DSTATE = FCS_model_P.Integrator_LowerSat;
   }
 
-  // End of DiscreteIntegrator: '<S138>/Integrator'
+  // End of DiscreteIntegrator: '<S137>/Integrator'
 
-  // Saturate: '<S138>/Saturation'
+  // Saturate: '<S137>/Saturation'
   if (FCS_model_DW.Integrator_DSTATE > FCS_model_P.Saturation_UpperSat) {
-    rtb_Saturation = FCS_model_P.Saturation_UpperSat;
+    rtb_Divide = FCS_model_P.Saturation_UpperSat;
   } else if (FCS_model_DW.Integrator_DSTATE < FCS_model_P.Saturation_LowerSat) {
-    rtb_Saturation = FCS_model_P.Saturation_LowerSat;
+    rtb_Divide = FCS_model_P.Saturation_LowerSat;
   } else {
-    rtb_Saturation = FCS_model_DW.Integrator_DSTATE;
+    rtb_Divide = FCS_model_DW.Integrator_DSTATE;
   }
 
-  // End of Saturate: '<S138>/Saturation'
+  // End of Saturate: '<S137>/Saturation'
 
-  // Logic: '<S125>/Logical Operator' incorporates:
-  //   Constant: '<S125>/Constant'
-  //   Constant: '<S125>/Time constant'
+  // Product: '<S199>/Product3' incorporates:
+  //   Bias: '<S51>/Bias3'
+  //   Delay: '<S51>/Delay2'
+  //   Gain: '<S51>/Gain5'
+  //   Product: '<S51>/Product3'
+  //   Sum: '<S51>/Subtract3'
+
+  rtb_Product3 = FCS_model_DW.Delay2_DSTATE[0];
+  rtb_Product3 = (rtb_rangefinder_distance + FCS_model_P.Bias3_Bias) *
+    FCS_model_P.Gain5_Gain * (rtb_Divide - rtb_Product3);
+
+  // Logic: '<S124>/Logical Operator' incorporates:
+  //   Constant: '<S124>/Constant'
+  //   Constant: '<S124>/Time constant'
+  //   Constant: '<S127>/Constant'
   //   Constant: '<S128>/Constant'
-  //   Constant: '<S129>/Constant'
+  //   RelationalOperator: '<S127>/Compare'
   //   RelationalOperator: '<S128>/Compare'
-  //   RelationalOperator: '<S129>/Compare'
-  //   Sum: '<S125>/Sum1'
+  //   Sum: '<S124>/Sum1'
 
   rtb_LogicalOperator_j = ((FCS_model_P.LowPassFilterDiscreteorContin_a -
-    FCS_model_B.Probe_c[0] <= FCS_model_P.Constant_Value_l) &&
+    FCS_model_B.Probe_c[0] <= FCS_model_P.Constant_Value) &&
     (FCS_model_P.LowPassFilterDiscreteorConti_d0 <
      FCS_model_P.CompareToConstant_const_p));
 
-  // Gain: '<S123>/K' incorporates:
-  //   Inport: '<Root>/in_sensors'
+  // Gain: '<S122>/K' incorporates:
+  //   Inport: '<Root>/in_parameters'
 
   rtb_K_i = FCS_model_P.LowPassFilterDiscreteorContin_d *
-    arg_in_sensors->opticalflow_y;
+    arg_in_parameters->opticalflow_y;
 
-  // DiscreteIntegrator: '<S131>/Integrator'
+  // DiscreteIntegrator: '<S130>/Integrator'
   if (FCS_model_DW.Integrator_IC_LOADING_g != 0) {
     FCS_model_DW.Integrator_DSTATE_e = rtb_K_i;
     if (FCS_model_DW.Integrator_DSTATE_e >= FCS_model_P.Integrator_UpperSat_i) {
@@ -1009,127 +1022,106 @@ void FCS_model::step(in_dashboard *arg_in_dashboard, in_sensors *arg_in_sensors,
     FCS_model_DW.Integrator_DSTATE_e = FCS_model_P.Integrator_LowerSat_l;
   }
 
-  // End of DiscreteIntegrator: '<S131>/Integrator'
+  // End of DiscreteIntegrator: '<S130>/Integrator'
 
-  // Saturate: '<S131>/Saturation'
+  // Saturate: '<S130>/Saturation'
   if (FCS_model_DW.Integrator_DSTATE_e > FCS_model_P.Saturation_UpperSat_k) {
-    rtb_Saturation_jg = FCS_model_P.Saturation_UpperSat_k;
+    rtb_Saturation_l = FCS_model_P.Saturation_UpperSat_k;
   } else if (FCS_model_DW.Integrator_DSTATE_e <
              FCS_model_P.Saturation_LowerSat_h) {
-    rtb_Saturation_jg = FCS_model_P.Saturation_LowerSat_h;
+    rtb_Saturation_l = FCS_model_P.Saturation_LowerSat_h;
   } else {
-    rtb_Saturation_jg = FCS_model_DW.Integrator_DSTATE_e;
+    rtb_Saturation_l = FCS_model_DW.Integrator_DSTATE_e;
   }
 
-  // End of Saturate: '<S131>/Saturation'
+  // End of Saturate: '<S130>/Saturation'
 
-  // Reshape: '<S51>/Reshapey' incorporates:
-  //   Bias: '<S52>/Bias2'
-  //   Bias: '<S52>/Bias3'
-  //   Delay: '<S52>/Delay1'
-  //   Delay: '<S52>/Delay2'
-  //   Gain: '<S52>/Gain4'
-  //   Gain: '<S52>/Gain5'
-  //   Product: '<S52>/Product2'
-  //   Product: '<S52>/Product3'
-  //   Sum: '<S52>/Subtract2'
-  //   Sum: '<S52>/Subtract3'
+  // Reshape: '<S50>/Reshapey' incorporates:
+  //   Bias: '<S51>/Bias2'
+  //   Delay: '<S51>/Delay1'
+  //   Gain: '<S51>/Gain4'
+  //   Product: '<S51>/Product2'
+  //   Sum: '<S51>/Subtract2'
 
-  rtb_SimplyIntegrateVelocity[0] = (rtb_rangefinder_distance +
-    FCS_model_P.Bias3_Bias) * FCS_model_P.Gain5_Gain * (rtb_Saturation -
-    FCS_model_DW.Delay2_DSTATE[0U]);
+  rtb_SimplyIntegrateVelocity[0] = rtb_Product3;
   rtb_SimplyIntegrateVelocity[1] = (rtb_rangefinder_distance +
-    FCS_model_P.Bias2_Bias) * FCS_model_P.Gain4_Gain * (rtb_Saturation_jg -
+    FCS_model_P.Bias2_Bias) * FCS_model_P.Gain4_Gain * (rtb_Saturation_l -
     FCS_model_DW.Delay1_DSTATE[0U]);
 
-  // Outputs for Enabled SubSystem: '<S96>/Enabled Subsystem' incorporates:
-  //   EnablePort: '<S122>/Enable'
+  // Outputs for Enabled SubSystem: '<S95>/Enabled Subsystem' incorporates:
+  //   EnablePort: '<S121>/Enable'
 
   if (rtb_LogicalOperator3) {
     FCS_model_DW.EnabledSubsystem_MODE_g = true;
 
-    // Sum: '<S122>/Add1' incorporates:
-    //   Constant: '<S51>/C'
-    //   Delay: '<S51>/MemoryX'
-    //   Product: '<S122>/Product'
+    // Sum: '<S121>/Add1' incorporates:
+    //   Constant: '<S50>/C'
+    //   Delay: '<S50>/MemoryX'
+    //   Product: '<S121>/Product'
+    //   Reshape: '<S50>/Reshapey'
 
-    rtb_TrigonometricFunction4 = rtb_SimplyIntegrateVelocity[0] -
-      (FCS_model_P.C_Value_h[0] * FCS_model_DW.MemoryX_DSTATE_o[0] +
-       FCS_model_DW.MemoryX_DSTATE_o[1] * FCS_model_P.C_Value_h[2]);
-    rtb_roll = rtb_SimplyIntegrateVelocity[1] - (FCS_model_DW.MemoryX_DSTATE_o[0]
-      * FCS_model_P.C_Value_h[1] + FCS_model_DW.MemoryX_DSTATE_o[1] *
-      FCS_model_P.C_Value_h[3]);
+    rtb_Add_k_idx_0 = rtb_Product3 - (FCS_model_P.C_Value_h[0] *
+      FCS_model_DW.MemoryX_DSTATE_o[0] + FCS_model_DW.MemoryX_DSTATE_o[1] *
+      FCS_model_P.C_Value_h[2]);
+    rtb_Add_k_idx_1 = rtb_SimplyIntegrateVelocity[1] -
+      (FCS_model_DW.MemoryX_DSTATE_o[0] * FCS_model_P.C_Value_h[1] +
+       FCS_model_DW.MemoryX_DSTATE_o[1] * FCS_model_P.C_Value_h[3]);
 
-    // Product: '<S122>/Product2' incorporates:
-    //   Constant: '<S70>/KalmanGainM'
+    // Product: '<S121>/Product2' incorporates:
+    //   Constant: '<S69>/KalmanGainM'
 
     FCS_model_B.Product2_c[0] = FCS_model_P.KalmanGainM_Value_e[0] *
-      rtb_TrigonometricFunction4;
-    FCS_model_B.Product2_c[0] += FCS_model_P.KalmanGainM_Value_e[2] * rtb_roll;
+      rtb_Add_k_idx_0;
+    FCS_model_B.Product2_c[0] += FCS_model_P.KalmanGainM_Value_e[2] *
+      rtb_Add_k_idx_1;
     FCS_model_B.Product2_c[1] = FCS_model_P.KalmanGainM_Value_e[1] *
-      rtb_TrigonometricFunction4;
-    FCS_model_B.Product2_c[1] += FCS_model_P.KalmanGainM_Value_e[3] * rtb_roll;
+      rtb_Add_k_idx_0;
+    FCS_model_B.Product2_c[1] += FCS_model_P.KalmanGainM_Value_e[3] *
+      rtb_Add_k_idx_1;
   } else if (FCS_model_DW.EnabledSubsystem_MODE_g) {
-    // Disable for Product: '<S122>/Product2' incorporates:
-    //   Outport: '<S122>/deltax'
+    // Disable for Product: '<S121>/Product2' incorporates:
+    //   Outport: '<S121>/deltax'
 
     FCS_model_B.Product2_c[0] = FCS_model_P.deltax_Y0;
     FCS_model_B.Product2_c[1] = FCS_model_P.deltax_Y0;
     FCS_model_DW.EnabledSubsystem_MODE_g = false;
   }
 
-  // End of Outputs for SubSystem: '<S96>/Enabled Subsystem'
+  // End of Outputs for SubSystem: '<S95>/Enabled Subsystem'
 
-  // Sum: '<S96>/Add' incorporates:
-  //   Delay: '<S45>/Delay'
-  //   Delay: '<S51>/MemoryX'
+  // Sum: '<S95>/Add' incorporates:
+  //   Delay: '<S44>/Delay'
+  //   Delay: '<S50>/MemoryX'
 
   FCS_model_DW.Delay_DSTATE[0] = FCS_model_B.Product2_c[0] +
     FCS_model_DW.MemoryX_DSTATE_o[0];
   FCS_model_DW.Delay_DSTATE[1] = FCS_model_B.Product2_c[1] +
     FCS_model_DW.MemoryX_DSTATE_o[1];
 
-  // Switch generated from: '<S2>/Switch' incorporates:
-  //   Constant: '<S2>/sw_states_passthrough'
-  //   Delay: '<S45>/Delay'
-  //   Inport: '<Root>/in_states'
-
-  if (FCS_model_P.sw_states_passthrough_Value > FCS_model_P.Switch_10_Threshold)
-  {
-    rtb_pos_dx = FCS_model_DW.Delay_DSTATE[0];
-  } else {
-    rtb_pos_dx = arg_in_states->dx;
-  }
-
-  // Switch generated from: '<S2>/Switch' incorporates:
-  //   Constant: '<S2>/sw_states_passthrough'
-  //   DiscreteIntegrator: '<S44>/SimplyIntegrateVelocity'
-  //   Inport: '<Root>/in_states'
-
-  if (FCS_model_P.sw_states_passthrough_Value > FCS_model_P.Switch_7_Threshold)
-  {
-    rtb_pos_x = FCS_model_DW.SimplyIntegrateVelocity_DSTATE[0];
-  } else {
-    rtb_pos_x = arg_in_states->x;
-  }
-
-  // Gain: '<S28>/Gain1' incorporates:
-  //   Gain: '<S28>/Gain3'
-  //   Gain: '<S28>/Gain4'
+  // Product: '<S199>/Product3' incorporates:
+  //   DiscreteIntegrator: '<S43>/SimplyIntegrateVelocity'
   //   Inport: '<Root>/in_dashboard'
   //   SignalConversion generated from: '<Root>/in_dashboard'
   //   Sum: '<S28>/Subtract'
+
+  rtb_Product3 = arg_in_dashboard->ref_x;
+  rtb_Product3 -= FCS_model_DW.SimplyIntegrateVelocity_DSTATE[0];
+
+  // Gain: '<S28>/Gain1' incorporates:
+  //   Delay: '<S44>/Delay'
+  //   Gain: '<S28>/Gain3'
+  //   Gain: '<S28>/Gain4'
   //   Sum: '<S28>/Sum1'
 
-  rtb_Saturation_l = ((arg_in_dashboard->ref_x - rtb_pos_x) *
-                      FCS_model_P.Gain3_Gain - FCS_model_P.Gain4_Gain_m *
-                      rtb_pos_dx) * FCS_model_P.Gain1_Gain_b;
+  rtb_rollrate = (FCS_model_P.Gain3_Gain * rtb_Product3 -
+                  FCS_model_P.Gain4_Gain_m * FCS_model_DW.Delay_DSTATE[0]) *
+    FCS_model_P.Gain1_Gain_b;
 
   // Saturate: '<S28>/Saturation'
-  if (rtb_Saturation_l > FCS_model_P.Saturation_UpperSat_d) {
-    rtb_Saturation_l = FCS_model_P.Saturation_UpperSat_d;
-  } else if (rtb_Saturation_l < FCS_model_P.Saturation_LowerSat_a) {
-    rtb_Saturation_l = FCS_model_P.Saturation_LowerSat_a;
+  if (rtb_rollrate > FCS_model_P.Saturation_UpperSat_d) {
+    rtb_rollrate = FCS_model_P.Saturation_UpperSat_d;
+  } else if (rtb_rollrate < FCS_model_P.Saturation_LowerSat_a) {
+    rtb_rollrate = FCS_model_P.Saturation_LowerSat_a;
   }
 
   // End of Saturate: '<S28>/Saturation'
@@ -1138,100 +1130,74 @@ void FCS_model::step(in_dashboard *arg_in_dashboard, in_sensors *arg_in_sensors,
   //   Constant: '<S1>/Pos=1//Dashboard=0'
 
   if (FCS_model_P.Pos1Dashboard0_Value > FCS_model_P.Switch1_Threshold) {
-    // Switch generated from: '<S2>/Switch'
-    rtb_orient_rate_pitch = rtb_Saturation_l;
+    // Product: '<S199>/Product3'
+    rtb_Product3 = rtb_rollrate;
   } else {
-    // Switch generated from: '<S2>/Switch' incorporates:
+    // Product: '<S199>/Product3' incorporates:
     //   Inport: '<Root>/in_dashboard'
     //   SignalConversion generated from: '<Root>/in_dashboard'
 
-    rtb_orient_rate_pitch = arg_in_dashboard->ref_pitch;
+    rtb_Product3 = arg_in_dashboard->ref_pitch;
   }
 
   // End of Switch: '<S4>/Switch1'
 
-  // Switch generated from: '<S2>/Switch' incorporates:
-  //   Constant: '<S2>/sw_states_passthrough'
-  //   Inport: '<Root>/in_states'
+  // Sum: '<S8>/Sum1' incorporates:
+  //   DiscreteTransferFcn: '<S196>/Discrete Transfer Fcn'
 
-  if (!(FCS_model_P.sw_states_passthrough_Value > FCS_model_P.Switch_2_Threshold))
-  {
-    rtb_orient_pitch = arg_in_states->pitch;
-  }
-
-  // Sum: '<S8>/Sum1'
-  rtb_Sum1_a = rtb_orient_rate_pitch - rtb_orient_pitch;
+  rtb_Sum1_a = rtb_Product3 - rtb_AvoidDividebyZero;
 
   // DiscreteStateSpace: '<S11>/Internal'
   {
-    rtb_orient_rate_pitch = FCS_model_P.Internal_C_p*
-      FCS_model_DW.Internal_DSTATE_d;
-    rtb_orient_rate_pitch += FCS_model_P.Internal_D_b*rtb_Sum1_a;
+    rtb_Product3 = FCS_model_P.Internal_C_p*FCS_model_DW.Internal_DSTATE_d;
+    rtb_Product3 += FCS_model_P.Internal_D_b*rtb_Sum1_a;
   }
 
-  // Gain: '<S8>/zDtheta'
-  rtb_zDtheta = FCS_model_P.zDtheta * 7.0 * rtb_orient_rate_pitch;
-
-  // Switch generated from: '<S2>/Switch'
-  rtb_orient_rate_pitch = inverseIMU_gain[4];
-
-  // Gain: '<S1>/On=1//Off=2 for pitch' incorporates:
+  // Product: '<S199>/Product3' incorporates:
   //   Constant: '<S4>/pitch equilibrium'
+  //   Gain: '<S1>/On=1//Off=2 for pitch'
   //   Gain: '<S4>/Changing of Jyy'
   //   Gain: '<S8>/KDtheta'
+  //   Gain: '<S8>/zDtheta'
   //   Sum: '<S4>/Sum1'
   //   Sum: '<S8>/Sum3'
 
-  rtb_On1Off2forpitch = (FCS_model_P.KDtheta * 1.4 * (rtb_zDtheta -
-    rtb_orient_rate_pitch) * FCS_model_P.ChangingofJyy_Gain +
-    FCS_model_P.pitchequilibrium_Value) * FCS_model_P.On1Off2forpitch_Gain;
+  rtb_Product3 *= FCS_model_P.zDtheta * 7.0;
+  rtb_Product3 -= inverseIMU_gain[4];
+  rtb_Product3 = (FCS_model_P.KDtheta * 1.4 * rtb_Product3 *
+                  FCS_model_P.ChangingofJyy_Gain +
+                  FCS_model_P.pitchequilibrium_Value) *
+    FCS_model_P.On1Off2forpitch_Gain;
 
   // DiscreteStateSpace: '<S15>/Internal'
   {
-    rtb_Product5 = (FCS_model_P.Internal_C_n[0])*FCS_model_DW.Internal_DSTATE_k
-      [0]
+    rtb_roll = (FCS_model_P.Internal_C_n[0])*FCS_model_DW.Internal_DSTATE_k[0]
       + (FCS_model_P.Internal_C_n[1])*FCS_model_DW.Internal_DSTATE_k[1];
   }
 
-  // Switch generated from: '<S2>/Switch' incorporates:
-  //   Constant: '<S2>/sw_states_passthrough'
-  //   Inport: '<Root>/in_states'
-
-  if (FCS_model_P.sw_states_passthrough_Value > FCS_model_P.Switch_1_Threshold)
-  {
-    rtb_Product4 = FCS_model_DW.Memory_PreviousInput;
-  } else {
-    rtb_Product4 = arg_in_states->yaw;
-  }
-
   // Sum: '<S9>/Sum1'
-  rtb_Sum1_di = rtb_Product5 - rtb_Product4;
+  rtb_Sum1_di = rtb_roll - FCS_model_DW.Memory_PreviousInput;
 
   // DiscreteStateSpace: '<S16>/Internal'
   {
-    rtb_Product5 = FCS_model_P.Internal_C_a*FCS_model_DW.Internal_DSTATE_kj;
-    rtb_Product5 += FCS_model_P.Internal_D_jy*rtb_Sum1_di;
+    rtb_roll = FCS_model_P.Internal_C_a*FCS_model_DW.Internal_DSTATE_kj;
+    rtb_roll += FCS_model_P.Internal_D_jy*rtb_Sum1_di;
   }
 
-  // Gain: '<S9>/zDphi'
-  rtb_zDtheta = FCS_model_P.zDphi * 7.0 * rtb_Product5;
-
-  // Product: '<S199>/Product5' incorporates:
-  //   Switch generated from: '<S2>/Switch'
-
-  rtb_Product5 = inverseIMU_gain[3];
-
-  // Gain: '<S1>/On=1//Off=1 for roll' incorporates:
+  // Trigonometry: '<S198>/Trigonometric Function' incorporates:
   //   Constant: '<S4>/roll equilibrium'
+  //   Gain: '<S1>/On=1//Off=1 for roll'
   //   Gain: '<S4>/Changing of Jxx'
   //   Gain: '<S9>/KDphi'
+  //   Gain: '<S9>/zDphi'
   //   Sum: '<S4>/Sum2'
   //   Sum: '<S9>/Sum3'
 
-  rtb_zDtheta = (FCS_model_P.KDphi * 1.4 * (rtb_zDtheta - rtb_Product5) *
-                 FCS_model_P.ChangingofJxx_Gain +
-                 FCS_model_P.rollequilibrium_Value) *
-    FCS_model_P.On1Off1forroll_Gain;
+  rtb_roll *= FCS_model_P.zDphi * 7.0;
+  rtb_roll -= inverseIMU_gain[3];
+  rtb_roll = (FCS_model_P.KDphi * 1.4 * rtb_roll *
+              FCS_model_P.ChangingofJxx_Gain + FCS_model_P.rollequilibrium_Value)
+    * FCS_model_P.On1Off1forroll_Gain;
   for (int32_T i{0}; i < 4; i++) {
     // Saturate: '<S37>/Saturation' incorporates:
     //   Bias: '<S38>/Bias'
@@ -1243,18 +1209,21 @@ void FCS_model::step(in_dashboard *arg_in_dashboard, in_sensors *arg_in_sensors,
     //   SignalConversion generated from: '<Root>/in_dashboard'
     //   SignalConversion generated from: '<S36>/Product'
 
-    rtb_TrigonometricFunction4 =
-      ((((FCS_model_P.TorqueTotalThrustToThrustPerMot[i + 4] * rtb_Sum1_l +
-          FCS_model_P.TorqueTotalThrustToThrustPerMot[i] * rtb_Add_g_idx_1) +
-         FCS_model_P.TorqueTotalThrustToThrustPerMot[i + 8] *
-         rtb_On1Off2forpitch) + FCS_model_P.TorqueTotalThrustToThrustPerMot[i +
-        12] * rtb_zDtheta) * FCS_model_P.Vehicle.Motor.thrustToMotorCommand +
-       FCS_model_P.Vehicle.Motor.commandToW2Offset) * arg_in_dashboard->power;
-    if (rtb_TrigonometricFunction4 > FCS_model_P.Vehicle.Motor.maxLimit) {
-      rtb_TrigonometricFunction4 = FCS_model_P.Vehicle.Motor.maxLimit;
-    } else if (rtb_TrigonometricFunction4 < FCS_model_P.Vehicle.Motor.minLimit)
-    {
-      rtb_TrigonometricFunction4 = FCS_model_P.Vehicle.Motor.minLimit;
+    rtb_Add_k_idx_0 = ((((FCS_model_P.TorqueTotalThrustToThrustPerMot[i + 4] *
+                          rtb_Product5 +
+                          FCS_model_P.TorqueTotalThrustToThrustPerMot[i] *
+                          rtb_Product4) +
+                         FCS_model_P.TorqueTotalThrustToThrustPerMot[i + 8] *
+                         rtb_Product3) +
+                        FCS_model_P.TorqueTotalThrustToThrustPerMot[i + 12] *
+                        rtb_roll) *
+                       FCS_model_P.Vehicle.Motor.thrustToMotorCommand +
+                       FCS_model_P.Vehicle.Motor.commandToW2Offset) *
+      arg_in_dashboard->power;
+    if (rtb_Add_k_idx_0 > FCS_model_P.Vehicle.Motor.maxLimit) {
+      rtb_Add_k_idx_0 = FCS_model_P.Vehicle.Motor.maxLimit;
+    } else if (rtb_Add_k_idx_0 < FCS_model_P.Vehicle.Motor.minLimit) {
+      rtb_Add_k_idx_0 = FCS_model_P.Vehicle.Motor.minLimit;
     }
 
     // Product: '<S37>/Product1' incorporates:
@@ -1263,178 +1232,151 @@ void FCS_model::step(in_dashboard *arg_in_dashboard, in_sensors *arg_in_sensors,
     //   Saturate: '<S37>/Saturation'
     //   SignalConversion generated from: '<Root>/in_dashboard'
 
-    rtb_Product1[i] = rtb_TrigonometricFunction4 * static_cast<real_T>
+    rtb_Product1_i[i] = rtb_Add_k_idx_0 * static_cast<real_T>
       (arg_in_dashboard->master_switch);
   }
 
-  // SignalConversion generated from: '<S44>/Product' incorporates:
-  //   Delay: '<S45>/Delay'
+  // SignalConversion generated from: '<S43>/Product' incorporates:
+  //   Delay: '<S44>/Delay'
 
-  rtb_TrigonometricFunction4 = FCS_model_DW.Delay_DSTATE[0];
-  rtb_roll = FCS_model_DW.Delay_DSTATE[1];
-  tmp_0 = rtb_TmpSignalConversionAtProduc[2];
+  rtb_Add_k_idx_0 = FCS_model_DW.Delay_DSTATE[0];
+  rtb_Add_k_idx_1 = FCS_model_DW.Delay_DSTATE[1];
+  rtb_Add_k_idx_2 = rtb_sincos_o1[2];
+
+  // Product: '<S43>/Product' incorporates:
+  //   Concatenate: '<S56>/Vector Concatenate'
+
   for (int32_T i{0}; i < 3; i++) {
-    // Trigonometry: '<S54>/sincos'
-    rtb_sincos_o1_p = rtb_sincos_o1[i];
-    rtb_Add_k[i] = std::cos(rtb_sincos_o1_p);
-    rtb_sincos_o1[i] = std::sin(rtb_sincos_o1_p);
-
-    // Product: '<S44>/Product' incorporates:
-    //   Concatenate: '<S57>/Vector Concatenate'
-
-    rtb_TmpSignalConversionAtProduc[i] = (rtb_VectorConcatenate_k[i + 3] *
-      rtb_roll + rtb_VectorConcatenate_k[i] * rtb_TrigonometricFunction4) +
-      rtb_VectorConcatenate_k[i + 6] * tmp_0;
+    rtb_Product_k[i] = (rtb_VectorConcatenate_k[i + 3] * rtb_Add_k_idx_1 +
+                        rtb_VectorConcatenate_k[i] * rtb_Add_k_idx_0) +
+      rtb_VectorConcatenate_k[i + 6] * rtb_Add_k_idx_2;
   }
 
-  // Fcn: '<S54>/Fcn11'
-  rtb_VectorConcatenate_k[0] = rtb_Add_k[0] * rtb_Add_k[1];
+  // End of Product: '<S43>/Product'
 
-  // Fcn: '<S54>/Fcn21' incorporates:
-  //   Fcn: '<S54>/Fcn22'
+  // Fcn: '<S53>/Fcn11'
+  rtb_VectorConcatenate_k[0] = rtb_VectorConcatenate_tmp_0;
 
-  rtb_TrigonometricFunction4 = rtb_sincos_o1[1] * rtb_sincos_o1[2];
-  rtb_VectorConcatenate_k[1] = rtb_TrigonometricFunction4 * rtb_Add_k[0] -
-    rtb_sincos_o1[0] * rtb_Add_k[2];
+  // Fcn: '<S53>/Fcn21'
+  rtb_VectorConcatenate_k[1] = DiscreteFilter1_tmp_tmp * Sum -
+    rtb_VectorConcatenate_tmp_1;
 
-  // Fcn: '<S54>/Fcn31' incorporates:
-  //   Fcn: '<S54>/Fcn32'
+  // Fcn: '<S53>/Fcn31'
+  rtb_VectorConcatenate_k[2] = rtb_VectorConcatenate_tmp_tmp * Sum +
+    rtb_VectorConcatenate_tmp_2;
 
-  rtb_roll = rtb_sincos_o1[1] * rtb_Add_k[2];
-  rtb_VectorConcatenate_k[2] = rtb_roll * rtb_Add_k[0] + rtb_sincos_o1[0] *
-    rtb_sincos_o1[2];
+  // Fcn: '<S53>/Fcn12'
+  rtb_VectorConcatenate_k[3] = rtb_VectorConcatenate_tmp_3;
 
-  // Fcn: '<S54>/Fcn12'
-  rtb_VectorConcatenate_k[3] = rtb_sincos_o1[0] * rtb_Add_k[1];
+  // Fcn: '<S53>/Fcn22'
+  rtb_VectorConcatenate_k[4] = DiscreteFilter1_tmp_tmp *
+    rtb_TrigonometricFunction4 + rtb_VectorConcatenate_tmp_4;
 
-  // Fcn: '<S54>/Fcn22'
-  rtb_VectorConcatenate_k[4] = rtb_TrigonometricFunction4 * rtb_sincos_o1[0] +
-    rtb_Add_k[0] * rtb_Add_k[2];
+  // Fcn: '<S53>/Fcn32'
+  rtb_VectorConcatenate_k[5] = rtb_VectorConcatenate_tmp_tmp *
+    rtb_TrigonometricFunction4 - rtb_VectorConcatenate_tmp_5;
 
-  // Fcn: '<S54>/Fcn32'
-  rtb_VectorConcatenate_k[5] = rtb_roll * rtb_sincos_o1[0] - rtb_Add_k[0] *
-    rtb_sincos_o1[2];
+  // Fcn: '<S53>/Fcn13'
+  rtb_VectorConcatenate_k[6] = -rtb_TmpSignalConversionAtProd_0;
 
-  // Fcn: '<S54>/Fcn13'
-  rtb_VectorConcatenate_k[6] = -rtb_sincos_o1[1];
+  // Fcn: '<S53>/Fcn23'
+  rtb_VectorConcatenate_k[7] = rtb_TmpSignalConversionAtProd_1;
 
-  // Fcn: '<S54>/Fcn23'
-  rtb_VectorConcatenate_k[7] = rtb_Add_k[1] * rtb_sincos_o1[2];
+  // Fcn: '<S53>/Fcn33'
+  rtb_VectorConcatenate_k[8] = rtb_Product1_tmp;
 
-  // Fcn: '<S54>/Fcn33'
-  rtb_VectorConcatenate_k[8] = rtb_Add_k[1] * rtb_Add_k[2];
-
-  // RelationalOperator: '<S53>/Compare' incorporates:
-  //   Constant: '<S53>/Constant'
+  // RelationalOperator: '<S52>/Compare' incorporates:
+  //   Constant: '<S52>/Constant'
 
   rtb_Compare_jy = (rtb_Add_g_idx_0 <=
                     FCS_model_P.DeactivateAccelerationIfOFisnot);
 
-  // Logic: '<S49>/Logical Operator' incorporates:
+  // Logic: '<S48>/Logical Operator' incorporates:
+  //   Constant: '<S54>/Constant'
   //   Constant: '<S55>/Constant'
-  //   Constant: '<S56>/Constant'
-  //   Inport: '<Root>/in_sensors'
+  //   Inport: '<Root>/in_parameters'
+  //   RelationalOperator: '<S54>/Compare'
   //   RelationalOperator: '<S55>/Compare'
-  //   RelationalOperator: '<S56>/Compare'
 
-  rtb_LogicalOperator_c = ((arg_in_sensors->opticalflow_x !=
+  rtb_LogicalOperator_c = ((arg_in_parameters->opticalflow_x !=
     FCS_model_P.donotuseaccifopticalflowneverav) ||
-    (arg_in_sensors->opticalflow_y !=
+    (arg_in_parameters->opticalflow_y !=
      FCS_model_P.donotuseaccifopticalflownever_c));
 
-  // Sum: '<S49>/Add' incorporates:
-  //   Concatenate: '<S57>/Vector Concatenate'
-  //   Constant: '<S49>/gravity'
-  //   Product: '<S49>/Product1'
+  // Sum: '<S48>/Add' incorporates:
+  //   Concatenate: '<S56>/Vector Concatenate'
+  //   Constant: '<S48>/gravity'
+  //   Product: '<S48>/Product1'
 
   for (int32_T i{0}; i < 3; i++) {
-    rtb_sincos_o1[i] = rtb_FIR_IMUaccel[i] - ((rtb_VectorConcatenate_k[i + 3] *
-      FCS_model_P.gravity_Value_a[1] + rtb_VectorConcatenate_k[i] *
+    rtb_FIR_IMUaccel_0[i] = rtb_FIR_IMUaccel[i] - ((rtb_VectorConcatenate_k[i +
+      3] * FCS_model_P.gravity_Value_a[1] + rtb_VectorConcatenate_k[i] *
       FCS_model_P.gravity_Value_a[0]) + rtb_VectorConcatenate_k[i + 6] *
       FCS_model_P.gravity_Value_a[2]);
   }
 
-  // End of Sum: '<S49>/Add'
+  // End of Sum: '<S48>/Add'
 
-  // Product: '<S49>/Product' incorporates:
-  //   Gain: '<S49>/gainaccinput'
+  // Product: '<S48>/Product' incorporates:
+  //   Gain: '<S48>/gainaccinput'
 
-  rtb_Product_c[0] = FCS_model_P.gainaccinput_Gain * rtb_sincos_o1[0] *
+  rtb_Product_f[0] = FCS_model_P.gainaccinput_Gain * rtb_FIR_IMUaccel_0[0] *
     static_cast<real_T>(rtb_LogicalOperator_c) * static_cast<real_T>
     (rtb_Compare_jy);
-  rtb_Product_c[1] = FCS_model_P.gainaccinput_Gain * rtb_sincos_o1[1] *
+  rtb_Product_f[1] = FCS_model_P.gainaccinput_Gain * rtb_FIR_IMUaccel_0[1] *
     static_cast<real_T>(rtb_LogicalOperator_c) * static_cast<real_T>
     (rtb_Compare_jy);
 
-  // Outputs for Enabled SubSystem: '<S89>/MeasurementUpdate' incorporates:
-  //   EnablePort: '<S120>/Enable'
+  // Outputs for Enabled SubSystem: '<S88>/MeasurementUpdate' incorporates:
+  //   EnablePort: '<S119>/Enable'
 
   if (rtb_LogicalOperator3) {
     FCS_model_DW.MeasurementUpdate_MODE_h = true;
 
-    // Sum: '<S120>/Sum' incorporates:
-    //   Constant: '<S51>/C'
-    //   Constant: '<S51>/D'
-    //   Delay: '<S51>/MemoryX'
-    //   Product: '<S120>/C[k]*xhat[k|k-1]'
-    //   Product: '<S120>/D[k]*u[k]'
-    //   Sum: '<S120>/Add1'
+    // Sum: '<S119>/Sum' incorporates:
+    //   Constant: '<S50>/C'
+    //   Constant: '<S50>/D'
+    //   Delay: '<S50>/MemoryX'
+    //   Product: '<S119>/C[k]*xhat[k|k-1]'
+    //   Product: '<S119>/D[k]*u[k]'
+    //   Sum: '<S119>/Add1'
 
-    rtb_TrigonometricFunction4 = rtb_SimplyIntegrateVelocity[0] -
-      ((FCS_model_P.C_Value_h[0] * FCS_model_DW.MemoryX_DSTATE_o[0] +
-        FCS_model_DW.MemoryX_DSTATE_o[1] * FCS_model_P.C_Value_h[2]) +
-       (FCS_model_P.D_Value_b[0] * rtb_Product_c[0] + rtb_Product_c[1] *
-        FCS_model_P.D_Value_b[2]));
-    rtb_roll = rtb_SimplyIntegrateVelocity[1] - ((FCS_model_DW.MemoryX_DSTATE_o
-      [0] * FCS_model_P.C_Value_h[1] + FCS_model_DW.MemoryX_DSTATE_o[1] *
-      FCS_model_P.C_Value_h[3]) + (rtb_Product_c[0] * FCS_model_P.D_Value_b[1] +
-      rtb_Product_c[1] * FCS_model_P.D_Value_b[3]));
+    rtb_Add_k_idx_0 = rtb_SimplyIntegrateVelocity[0] - ((FCS_model_P.C_Value_h[0]
+      * FCS_model_DW.MemoryX_DSTATE_o[0] + FCS_model_DW.MemoryX_DSTATE_o[1] *
+      FCS_model_P.C_Value_h[2]) + (FCS_model_P.D_Value_b[0] * rtb_Product_f[0] +
+      rtb_Product_f[1] * FCS_model_P.D_Value_b[2]));
+    rtb_Add_k_idx_1 = rtb_SimplyIntegrateVelocity[1] -
+      ((FCS_model_DW.MemoryX_DSTATE_o[0] * FCS_model_P.C_Value_h[1] +
+        FCS_model_DW.MemoryX_DSTATE_o[1] * FCS_model_P.C_Value_h[3]) +
+       (rtb_Product_f[0] * FCS_model_P.D_Value_b[1] + rtb_Product_f[1] *
+        FCS_model_P.D_Value_b[3]));
 
-    // Product: '<S120>/Product3' incorporates:
-    //   Constant: '<S70>/KalmanGainL'
+    // Product: '<S119>/Product3' incorporates:
+    //   Constant: '<S69>/KalmanGainL'
 
     FCS_model_B.Product3_d[0] = FCS_model_P.KalmanGainL_Value_f[0] *
-      rtb_TrigonometricFunction4;
-    FCS_model_B.Product3_d[0] += FCS_model_P.KalmanGainL_Value_f[2] * rtb_roll;
+      rtb_Add_k_idx_0;
+    FCS_model_B.Product3_d[0] += FCS_model_P.KalmanGainL_Value_f[2] *
+      rtb_Add_k_idx_1;
     FCS_model_B.Product3_d[1] = FCS_model_P.KalmanGainL_Value_f[1] *
-      rtb_TrigonometricFunction4;
-    FCS_model_B.Product3_d[1] += FCS_model_P.KalmanGainL_Value_f[3] * rtb_roll;
+      rtb_Add_k_idx_0;
+    FCS_model_B.Product3_d[1] += FCS_model_P.KalmanGainL_Value_f[3] *
+      rtb_Add_k_idx_1;
   } else if (FCS_model_DW.MeasurementUpdate_MODE_h) {
-    // Disable for Product: '<S120>/Product3' incorporates:
-    //   Outport: '<S120>/L*(y[k]-yhat[k|k-1])'
+    // Disable for Product: '<S119>/Product3' incorporates:
+    //   Outport: '<S119>/L*(y[k]-yhat[k|k-1])'
 
     FCS_model_B.Product3_d[0] = FCS_model_P.Lykyhatkk1_Y0;
     FCS_model_B.Product3_d[1] = FCS_model_P.Lykyhatkk1_Y0;
     FCS_model_DW.MeasurementUpdate_MODE_h = false;
   }
 
-  // End of Outputs for SubSystem: '<S89>/MeasurementUpdate'
+  // End of Outputs for SubSystem: '<S88>/MeasurementUpdate'
 
-  // Switch generated from: '<S2>/Switch' incorporates:
-  //   Constant: '<S2>/sw_states_passthrough'
-  //   Delay: '<S45>/Delay'
-  //   Inport: '<Root>/in_states'
-
-  if (FCS_model_P.sw_states_passthrough_Value > FCS_model_P.Switch_11_Threshold)
-  {
-    rtb_Add_g_idx_0 = FCS_model_DW.Delay_DSTATE[1];
-  } else {
-    rtb_Add_g_idx_0 = arg_in_states->dy;
-  }
-
-  // Switch generated from: '<S2>/Switch' incorporates:
-  //   Constant: '<S2>/sw_states_passthrough'
-  //   DiscreteIntegrator: '<S44>/SimplyIntegrateVelocity'
-  //   Inport: '<Root>/in_states'
-
-  if (FCS_model_P.sw_states_passthrough_Value > FCS_model_P.Switch_8_Threshold)
-  {
-    rtb_TrigonometricFunction4 = FCS_model_DW.SimplyIntegrateVelocity_DSTATE[1];
-  } else {
-    rtb_TrigonometricFunction4 = arg_in_states->y;
-  }
-
-  // Gain: '<S29>/Gain1' incorporates:
+  // DiscreteIntegrator: '<S39>/Discrete-Time Integrator' incorporates:
+  //   Delay: '<S44>/Delay'
+  //   DiscreteIntegrator: '<S43>/SimplyIntegrateVelocity'
+  //   Gain: '<S29>/Gain1'
   //   Gain: '<S29>/Gain3'
   //   Gain: '<S29>/Gain4'
   //   Inport: '<Root>/in_dashboard'
@@ -1442,15 +1384,18 @@ void FCS_model::step(in_dashboard *arg_in_dashboard, in_sensors *arg_in_sensors,
   //   Sum: '<S29>/Subtract'
   //   Sum: '<S29>/Sum1'
 
-  rtb_roll = ((arg_in_dashboard->ref_y - rtb_TrigonometricFunction4) *
-              FCS_model_P.Gain3_Gain_i - FCS_model_P.Gain4_Gain_h *
-              rtb_Add_g_idx_0) * FCS_model_P.Gain1_Gain_i;
+  rtb_Switch2 = ((arg_in_dashboard->ref_y -
+                  FCS_model_DW.SimplyIntegrateVelocity_DSTATE[1]) *
+                 FCS_model_P.Gain3_Gain_i - FCS_model_P.Gain4_Gain_h *
+                 FCS_model_DW.Delay_DSTATE[1]) * FCS_model_P.Gain1_Gain_i;
 
   // Saturate: '<S29>/Saturation'
-  if (rtb_roll > FCS_model_P.Saturation_UpperSat_ku) {
-    rtb_roll = FCS_model_P.Saturation_UpperSat_ku;
-  } else if (rtb_roll < FCS_model_P.Saturation_LowerSat_j) {
-    rtb_roll = FCS_model_P.Saturation_LowerSat_j;
+  if (rtb_Switch2 > FCS_model_P.Saturation_UpperSat_ku) {
+    // DiscreteIntegrator: '<S39>/Discrete-Time Integrator'
+    rtb_Switch2 = FCS_model_P.Saturation_UpperSat_ku;
+  } else if (rtb_Switch2 < FCS_model_P.Saturation_LowerSat_j) {
+    // DiscreteIntegrator: '<S39>/Discrete-Time Integrator'
+    rtb_Switch2 = FCS_model_P.Saturation_LowerSat_j;
   }
 
   // End of Saturate: '<S29>/Saturation'
@@ -1459,102 +1404,91 @@ void FCS_model::step(in_dashboard *arg_in_dashboard, in_sensors *arg_in_sensors,
   //   BusCreator generated from: '<Root>/out_controllers'
   //   Constant: '<S6>/Constant'
 
-  arg_out_controllers->motor1 = rtb_Product1[0];
-  arg_out_controllers->motor2 = rtb_Product1[1];
-  arg_out_controllers->motor3 = rtb_Product1[2];
-  arg_out_controllers->motor4 = rtb_Product1[3];
-  arg_out_controllers->cmd_thrust = rtb_Add_g_idx_1;
-  arg_out_controllers->cmd_tau_roll = rtb_Sum1_l;
-  arg_out_controllers->cmd_tau_pitch = rtb_On1Off2forpitch;
-  arg_out_controllers->cmd_tau_yaw = rtb_zDtheta;
-  arg_out_controllers->cmd_roll = rtb_Saturation_l;
-  arg_out_controllers->cmd_pitch = rtb_roll;
+  arg_out_controllers->motor1 = rtb_Product1_i[0];
+  arg_out_controllers->motor2 = rtb_Product1_i[1];
+  arg_out_controllers->motor3 = rtb_Product1_i[2];
+  arg_out_controllers->motor4 = rtb_Product1_i[3];
+  arg_out_controllers->cmd_thrust = rtb_Product4;
+  arg_out_controllers->cmd_tau_roll = rtb_Product5;
+  arg_out_controllers->cmd_tau_pitch = rtb_Product3;
+  arg_out_controllers->cmd_tau_yaw = rtb_roll;
+  arg_out_controllers->cmd_roll = rtb_rollrate;
+  arg_out_controllers->cmd_pitch = rtb_Switch2;
   arg_out_controllers->cmd_yaw = FCS_model_P.Constant_Value_e2;
 
   // Switch: '<S4>/Switch2' incorporates:
   //   Constant: '<S1>/Pos=1//Dashboard=0'
 
-  if (FCS_model_P.Pos1Dashboard0_Value > FCS_model_P.Switch2_Threshold) {
-    // Switch: '<S4>/Switch2'
-    rtb_Switch2 = rtb_roll;
-  } else {
-    // Switch: '<S4>/Switch2' incorporates:
+  if (!(FCS_model_P.Pos1Dashboard0_Value > FCS_model_P.Switch2_Threshold)) {
+    // DiscreteIntegrator: '<S39>/Discrete-Time Integrator' incorporates:
     //   Inport: '<Root>/in_dashboard'
     //   SignalConversion generated from: '<Root>/in_dashboard'
+    //   Switch: '<S4>/Switch2'
 
     rtb_Switch2 = arg_in_dashboard->ref_roll;
   }
 
   // End of Switch: '<S4>/Switch2'
 
-  // Switch generated from: '<S2>/Switch' incorporates:
-  //   Constant: '<S2>/sw_states_passthrough'
-
-  if (FCS_model_P.sw_states_passthrough_Value > FCS_model_P.Switch_13_Threshold)
-  {
-    // Outport: '<Root>/out_estimators' incorporates:
-    //   DiscreteIntegrator: '<S39>/Discrete-Time Integrator'
-    //   Gain: '<S39>/Gain'
-
-    arg_out_estimators->battery_SOC = FCS_model_P.Gain_Gain *
-      FCS_model_DW.DiscreteTimeIntegrator_DSTATE;
-  } else {
-    // Outport: '<Root>/out_estimators' incorporates:
-    //   Constant: '<S43>/Constant'
-
-    arg_out_estimators->battery_SOC = FCS_model_P.Constant_Value;
-  }
-
   // Outport: '<Root>/out_estimators' incorporates:
   //   BusCreator generated from: '<Root>/out_estimators'
+  //   Delay: '<S44>/Delay'
+  //   DiscreteFir: '<S3>/FIR_IMUaccel'
+  //   DiscreteIntegrator: '<S39>/Discrete-Time Integrator'
+  //   DiscreteIntegrator: '<S43>/SimplyIntegrateVelocity'
+  //   DiscreteTransferFcn: '<S196>/Discrete Transfer Fcn'
+  //   DiscreteTransferFcn: '<S197>/Discrete Transfer Fcn'
+  //   Gain: '<S39>/Gain'
 
-  arg_out_estimators->orient_roll = rtb_Product4;
-  arg_out_estimators->orient_pitch = rtb_orient_pitch;
-  arg_out_estimators->orient_yaw = rtb_Sum1;
-  arg_out_estimators->orient_rate_roll = rtb_Product5;
-  arg_out_estimators->orient_rate_pitch = rtb_orient_rate_pitch;
-  arg_out_estimators->orient_rate_yaw = rtb_orient_rate_yaw;
-  arg_out_estimators->pos_x = rtb_pos_x;
-  arg_out_estimators->pos_y = rtb_TrigonometricFunction4;
-  arg_out_estimators->pos_z = rtb_Divide;
-  arg_out_estimators->pos_dx = rtb_pos_dx;
-  arg_out_estimators->pos_dy = rtb_Add_g_idx_0;
-  arg_out_estimators->pos_dz = rtb_pos_dz;
+  arg_out_estimators->orient_roll = FCS_model_DW.Memory_PreviousInput;
+  arg_out_estimators->orient_pitch = rtb_AvoidDividebyZero;
+  arg_out_estimators->orient_yaw = rtb_AvoidDividebyZero_h;
+  arg_out_estimators->orient_rate_roll = inverseIMU_gain[3];
+  arg_out_estimators->orient_rate_pitch = inverseIMU_gain[4];
+  arg_out_estimators->orient_rate_yaw = rtb_VectorConcatenate_tmp;
+  arg_out_estimators->pos_x = FCS_model_DW.SimplyIntegrateVelocity_DSTATE[0];
+  arg_out_estimators->pos_y = FCS_model_DW.SimplyIntegrateVelocity_DSTATE[1];
+  arg_out_estimators->pos_z = rtb_Add_g_idx_0;
+  arg_out_estimators->pos_dx = FCS_model_DW.Delay_DSTATE[0];
+  arg_out_estimators->pos_dy = FCS_model_DW.Delay_DSTATE[1];
+  arg_out_estimators->pos_dz = rtb_sincos_o1[2];
+  arg_out_estimators->battery_SOC = FCS_model_P.Gain_Gain_h *
+    FCS_model_DW.DiscreteTimeIntegrator_DSTATE;
 
-  // MinMax: '<S125>/Max' incorporates:
-  //   Constant: '<S125>/Time constant'
+  // MinMax: '<S124>/Max' incorporates:
+  //   Constant: '<S124>/Time constant'
 
   rtb_TrigonometricFunction4 = std::fmax(FCS_model_B.Probe_c[0],
     FCS_model_P.LowPassFilterDiscreteorContin_a);
 
-  // Fcn: '<S125>/Avoid Divide by Zero'
-  rtb_orient_pitch = static_cast<real_T>(rtb_TrigonometricFunction4 == 0.0) *
-    2.2204460492503131e-16 + rtb_TrigonometricFunction4;
+  // Fcn: '<S124>/Avoid Divide by Zero'
+  rtb_AvoidDividebyZero = static_cast<real_T>(rtb_TrigonometricFunction4 == 0.0)
+    * 2.2204460492503131e-16 + rtb_TrigonometricFunction4;
 
-  // MinMax: '<S132>/Max' incorporates:
-  //   Constant: '<S132>/Time constant'
+  // MinMax: '<S131>/Max' incorporates:
+  //   Constant: '<S131>/Time constant'
 
   rtb_TrigonometricFunction4 = std::fmax(FCS_model_B.Probe[0],
     FCS_model_P.LowPassFilterDiscreteorContin_l);
 
-  // Fcn: '<S132>/Avoid Divide by Zero'
-  rtb_Divide = static_cast<real_T>(rtb_TrigonometricFunction4 == 0.0) *
-    2.2204460492503131e-16 + rtb_TrigonometricFunction4;
+  // Fcn: '<S131>/Avoid Divide by Zero'
+  rtb_AvoidDividebyZero_h = static_cast<real_T>(rtb_TrigonometricFunction4 ==
+    0.0) * 2.2204460492503131e-16 + rtb_TrigonometricFunction4;
 
   // Outport: '<Root>/out_sensors' incorporates:
   //   BusCreator generated from: '<Root>/out_sensors'
   //   Constant: '<Root>/Constant'
   //   DiscreteFir: '<S3>/FIR_IMUaccel'
-  //   Inport: '<Root>/in_sensors'
+  //   Inport: '<Root>/in_parameters'
   //   Sum: '<S3>/Sum2'
 
   arg_out_sensors->accelerometer_x = rtb_FIR_IMUaccel[0];
   arg_out_sensors->accelerometer_y = rtb_FIR_IMUaccel[1];
-  arg_out_sensors->accelerometer_z = Sum;
+  arg_out_sensors->accelerometer_z = rtb_VectorConcatenate_tmp;
   arg_out_sensors->gyroscope_x = inverseIMU_gain[3];
   arg_out_sensors->gyroscope_y = inverseIMU_gain[4];
   arg_out_sensors->gyroscope_z = inverseIMU_gain[5];
-  arg_out_sensors->barometer_pressure = arg_in_sensors->barometer_pressure -
+  arg_out_sensors->barometer_pressure = arg_in_parameters->barometer_pressure -
     FCS_model_P.sensorCalibrationData[6];
   arg_out_sensors->rangefinder_distance = rtb_rangefinder_distance;
 
@@ -1562,50 +1496,63 @@ void FCS_model::step(in_dashboard *arg_in_dashboard, in_sensors *arg_in_sensors,
   //   Constant: '<S198>/Constant'
   //   Gain: '<S198>/Gain1'
 
-  rtb_TrigonometricFunction4 = FCS_model_P.Gain1_Gain_e * rtb_FIR_IMUaccel[0] /
+  rtb_Add_k_idx_0 = FCS_model_P.Gain1_Gain_e * rtb_FIR_IMUaccel[0] /
     FCS_model_P.g;
 
   // Trigonometry: '<S198>/Trigonometric Function1'
-  if (rtb_TrigonometricFunction4 > 1.0) {
-    rtb_TrigonometricFunction4 = 1.0;
-  } else if (rtb_TrigonometricFunction4 < -1.0) {
-    rtb_TrigonometricFunction4 = -1.0;
+  if (rtb_Add_k_idx_0 > 1.0) {
+    rtb_Add_k_idx_0 = 1.0;
+  } else if (rtb_Add_k_idx_0 < -1.0) {
+    rtb_Add_k_idx_0 = -1.0;
   }
 
   // Gain: '<S198>/Gain' incorporates:
   //   Trigonometry: '<S198>/Trigonometric Function1'
 
   rtb_TrigonometricFunction4 = FCS_model_P.Gain_Gain_e * std::asin
-    (rtb_TrigonometricFunction4);
+    (rtb_Add_k_idx_0);
 
   // Trigonometry: '<S198>/Trigonometric Function' incorporates:
   //   DiscreteFir: '<S3>/FIR_IMUaccel'
   //   Gain: '<S198>/Gain2'
   //   Gain: '<S198>/Gain3'
 
-  rtb_roll = rt_atan2d_snf(FCS_model_P.Gain2_Gain * rtb_FIR_IMUaccel[1],
-    FCS_model_P.Gain3_Gain_h * Sum);
+  rtb_roll = FCS_model_P.Gain2_Gain * rtb_FIR_IMUaccel[1];
+  rtb_roll = rt_atan2d_snf(rtb_roll, FCS_model_P.Gain3_Gain_h *
+    rtb_VectorConcatenate_tmp);
 
   // Trigonometry: '<S199>/Trigonometric Function2'
-  rtb_Add_g_idx_0 = std::sin(rtb_roll);
-  rtb_zDtheta = std::cos(rtb_roll);
+  rtb_rollrate = std::sin(rtb_roll);
+
+  // Product: '<S199>/Product3' incorporates:
+  //   Trigonometry: '<S199>/Trigonometric Function2'
+
+  rtb_Product3 = std::cos(rtb_roll);
+
+  // Product: '<S199>/Product4'
+  rtb_Product4 = rtb_Product3 * inverseIMU_gain[4];
 
   // Product: '<S199>/Product5' incorporates:
   //   Gain: '<S199>/Gain'
 
-  rtb_Product5 = FCS_model_P.Gain_Gain_p * rtb_Add_g_idx_0;
+  rtb_Product5 = FCS_model_P.Gain_Gain_p * rtb_rollrate;
   rtb_Product5 *= inverseIMU_gain[5];
 
   // Sum: '<S196>/Sum' incorporates:
   //   Gain: '<S196>/Gain'
-  //   Product: '<S199>/Product4'
   //   Sum: '<S199>/Sum1'
 
-  Sum = (rtb_zDtheta * inverseIMU_gain[4] + rtb_Product5) +
-    FCS_model_P.w_c_pitch * rtb_TrigonometricFunction4;
+  Sum = FCS_model_P.w_c_pitch * rtb_TrigonometricFunction4 + (rtb_Product4 +
+    rtb_Product5);
 
   // Trigonometry: '<S199>/Trigonometric Function4'
   rtb_TrigonometricFunction4 = std::tan(rtb_TrigonometricFunction4);
+
+  // Product: '<S199>/Product3' incorporates:
+  //   Product: '<S199>/Product1'
+
+  rtb_Product3 *= rtb_TrigonometricFunction4;
+  rtb_Product3 *= inverseIMU_gain[5];
 
   // SignalConversion generated from: '<Root>/in_dashboard' incorporates:
   //   Inport: '<Root>/in_dashboard'
@@ -1626,16 +1573,13 @@ void FCS_model::step(in_dashboard *arg_in_dashboard, in_sensors *arg_in_sensors,
   // Update for DiscreteTransferFcn: '<S197>/Discrete Transfer Fcn' incorporates:
   //   Gain: '<S197>/Gain'
   //   Product: '<S199>/Product'
-  //   Product: '<S199>/Product1'
   //   Product: '<S199>/Product2'
-  //   Product: '<S199>/Product3'
   //   Sum: '<S197>/Sum'
   //   Sum: '<S199>/Sum'
 
-  FCS_model_DW.DiscreteTransferFcn_states_j = ((((rtb_Add_g_idx_0 *
+  FCS_model_DW.DiscreteTransferFcn_states_j = ((((rtb_rollrate *
     rtb_TrigonometricFunction4 * inverseIMU_gain[4] + inverseIMU_gain[3]) +
-    rtb_zDtheta * rtb_TrigonometricFunction4 * inverseIMU_gain[5]) +
-    FCS_model_P.w_c_roll * rtb_roll) -
+    rtb_Product3) + FCS_model_P.w_c_roll * rtb_roll) -
     FCS_model_P.DiscreteTransferFcn_DenCoef_p[1] *
     FCS_model_DW.DiscreteTransferFcn_states_j) /
     FCS_model_P.DiscreteTransferFcn_DenCoef_p[0];
@@ -1657,45 +1601,46 @@ void FCS_model::step(in_dashboard *arg_in_dashboard, in_sensors *arg_in_sensors,
 
   // End of Update for DiscreteFir: '<S3>/FIR_IMUaccel'
 
-  // Update for DiscreteFilter: '<S140>/Discrete Filter1'
+  // Update for DiscreteFilter: '<S139>/Discrete Filter1'
   FCS_model_DW.DiscreteFilter1_states[2] = FCS_model_DW.DiscreteFilter1_states[1];
   FCS_model_DW.DiscreteFilter1_states[1] = FCS_model_DW.DiscreteFilter1_states[0];
   FCS_model_DW.DiscreteFilter1_states[0] = DiscreteFilter1_tmp;
 
-  // Update for Delay: '<S141>/MemoryX'
+  // Update for Delay: '<S140>/MemoryX'
   FCS_model_DW.icLoad = false;
 
-  // Product: '<S163>/A[k]*xhat[k|k-1]' incorporates:
-  //   Constant: '<S141>/A'
-  //   Delay: '<S141>/MemoryX'
+  // Product: '<S162>/A[k]*xhat[k|k-1]' incorporates:
+  //   Constant: '<S140>/A'
+  //   Delay: '<S140>/MemoryX'
 
   for (int32_T i{0}; i < 4; i++) {
-    rtb_Product1[i] = ((FCS_model_P.A_Value[i + 4] *
-                        FCS_model_DW.MemoryX_DSTATE[1] + FCS_model_P.A_Value[i] *
-                        FCS_model_DW.MemoryX_DSTATE[0]) + FCS_model_P.A_Value[i
-                       + 8] * FCS_model_DW.MemoryX_DSTATE[2]) +
-      FCS_model_P.A_Value[i + 12] * FCS_model_DW.MemoryX_DSTATE[3];
+    rtb_Product1_i[i] = ((FCS_model_P.A_Value[i + 4] *
+                          FCS_model_DW.MemoryX_DSTATE[1] + FCS_model_P.A_Value[i]
+                          * FCS_model_DW.MemoryX_DSTATE[0]) +
+                         FCS_model_P.A_Value[i + 8] *
+                         FCS_model_DW.MemoryX_DSTATE[2]) + FCS_model_P.A_Value[i
+      + 12] * FCS_model_DW.MemoryX_DSTATE[3];
   }
 
-  // End of Product: '<S163>/A[k]*xhat[k|k-1]'
+  // End of Product: '<S162>/A[k]*xhat[k|k-1]'
 
-  // Update for Delay: '<S141>/MemoryX' incorporates:
-  //   Constant: '<S141>/B'
-  //   Product: '<S163>/B[k]*u[k]'
-  //   Product: '<S192>/Product3'
-  //   Sum: '<S163>/Add'
+  // Update for Delay: '<S140>/MemoryX' incorporates:
+  //   Constant: '<S140>/B'
+  //   Product: '<S162>/B[k]*u[k]'
+  //   Product: '<S191>/Product3'
+  //   Sum: '<S162>/Add'
 
   FCS_model_DW.MemoryX_DSTATE[0] = (FCS_model_P.B_Value[0] *
-    rtb_TmpSignalConversionAtProd_i[2] + rtb_Product1[0]) +
+    rtb_TmpSignalConversionAtProduc[2] + rtb_Product1_i[0]) +
     FCS_model_B.Product3[0];
   FCS_model_DW.MemoryX_DSTATE[1] = (FCS_model_P.B_Value[1] *
-    rtb_TmpSignalConversionAtProd_i[2] + rtb_Product1[1]) +
+    rtb_TmpSignalConversionAtProduc[2] + rtb_Product1_i[1]) +
     FCS_model_B.Product3[1];
   FCS_model_DW.MemoryX_DSTATE[2] = (FCS_model_P.B_Value[2] *
-    rtb_TmpSignalConversionAtProd_i[2] + rtb_Product1[2]) +
+    rtb_TmpSignalConversionAtProduc[2] + rtb_Product1_i[2]) +
     FCS_model_B.Product3[2];
-  FCS_model_DW.MemoryX_DSTATE[3] = (rtb_TmpSignalConversionAtProd_i[2] *
-    FCS_model_P.B_Value[3] + rtb_Product1[3]) + FCS_model_B.Product3[3];
+  FCS_model_DW.MemoryX_DSTATE[3] = (rtb_TmpSignalConversionAtProduc[2] *
+    FCS_model_P.B_Value[3] + rtb_Product1_i[3]) + FCS_model_B.Product3[3];
 
   // Update for DiscreteStateSpace: '<S30>/Internal'
   {
@@ -1719,42 +1664,42 @@ void FCS_model::step(in_dashboard *arg_in_dashboard, in_sensors *arg_in_sensors,
                        sizeof(real_T)*2);
   }
 
-  // Update for Delay: '<S51>/MemoryX'
+  // Update for Delay: '<S50>/MemoryX'
   FCS_model_DW.icLoad_n = false;
 
-  // Product: '<S89>/B[k]*u[k]' incorporates:
-  //   Constant: '<S51>/B'
+  // Product: '<S88>/B[k]*u[k]' incorporates:
+  //   Constant: '<S50>/B'
 
-  rtb_SimplyIntegrateVelocity[0] = FCS_model_P.B_Value_p[0] * rtb_Product_c[0] +
-    rtb_Product_c[1] * FCS_model_P.B_Value_p[2];
+  rtb_SimplyIntegrateVelocity[0] = FCS_model_P.B_Value_p[0] * rtb_Product_f[0] +
+    rtb_Product_f[1] * FCS_model_P.B_Value_p[2];
 
-  // Product: '<S89>/A[k]*xhat[k|k-1]' incorporates:
-  //   Constant: '<S51>/A'
-  //   Delay: '<S51>/MemoryX'
+  // Product: '<S88>/A[k]*xhat[k|k-1]' incorporates:
+  //   Constant: '<S50>/A'
+  //   Delay: '<S50>/MemoryX'
 
   tmp[0] = FCS_model_P.A_Value_p[0] * FCS_model_DW.MemoryX_DSTATE_o[0] +
     FCS_model_DW.MemoryX_DSTATE_o[1] * FCS_model_P.A_Value_p[2];
 
-  // Product: '<S89>/B[k]*u[k]' incorporates:
-  //   Constant: '<S51>/B'
+  // Product: '<S88>/B[k]*u[k]' incorporates:
+  //   Constant: '<S50>/B'
 
-  rtb_SimplyIntegrateVelocity[1] = rtb_Product_c[0] * FCS_model_P.B_Value_p[1] +
-    rtb_Product_c[1] * FCS_model_P.B_Value_p[3];
+  rtb_SimplyIntegrateVelocity[1] = rtb_Product_f[0] * FCS_model_P.B_Value_p[1] +
+    rtb_Product_f[1] * FCS_model_P.B_Value_p[3];
 
-  // Product: '<S89>/A[k]*xhat[k|k-1]' incorporates:
-  //   Constant: '<S51>/A'
-  //   Delay: '<S51>/MemoryX'
+  // Product: '<S88>/A[k]*xhat[k|k-1]' incorporates:
+  //   Constant: '<S50>/A'
+  //   Delay: '<S50>/MemoryX'
 
   tmp[1] = FCS_model_DW.MemoryX_DSTATE_o[0] * FCS_model_P.A_Value_p[1] +
     FCS_model_DW.MemoryX_DSTATE_o[1] * FCS_model_P.A_Value_p[3];
   for (cff = 0; cff < 2; cff++) {
-    // Update for Delay: '<S51>/MemoryX' incorporates:
-    //   Sum: '<S89>/Add'
+    // Update for Delay: '<S50>/MemoryX' incorporates:
+    //   Sum: '<S88>/Add'
 
     FCS_model_DW.MemoryX_DSTATE_o[cff] = (rtb_SimplyIntegrateVelocity[cff] +
       tmp[cff]) + FCS_model_B.Product3_d[cff];
 
-    // Update for DiscreteFilter: '<S50>/IIRgyroz'
+    // Update for DiscreteFilter: '<S49>/IIRgyroz'
     memOffset = cff * 5;
     FCS_model_DW.IIRgyroz_states[memOffset + 4] =
       FCS_model_DW.IIRgyroz_states[memOffset + 3];
@@ -1766,22 +1711,22 @@ void FCS_model::step(in_dashboard *arg_in_dashboard, in_sensors *arg_in_sensors,
       FCS_model_DW.IIRgyroz_states[memOffset];
     FCS_model_DW.IIRgyroz_states[memOffset] = IIRgyroz_tmp[cff];
 
-    // Update for UnitDelay: '<S58>/UD'
+    // Update for UnitDelay: '<S57>/UD'
     //
-    //  Block description for '<S58>/UD':
+    //  Block description for '<S57>/UD':
     //
     //   Store in Global RAM
 
     FCS_model_DW.UD_DSTATE[cff] = rtb_Reshapey[cff];
   }
 
-  // Update for DiscreteIntegrator: '<S138>/Integrator' incorporates:
-  //   Product: '<S124>/1//T'
-  //   Sum: '<S124>/Sum1'
+  // Update for DiscreteIntegrator: '<S137>/Integrator' incorporates:
+  //   Product: '<S123>/1//T'
+  //   Sum: '<S123>/Sum1'
 
   FCS_model_DW.Integrator_IC_LOADING = 0U;
-  FCS_model_DW.Integrator_DSTATE += 1.0 / rtb_Divide * (rtb_K - rtb_Saturation) *
-    FCS_model_P.Integrator_gainval;
+  FCS_model_DW.Integrator_DSTATE += 1.0 / rtb_AvoidDividebyZero_h *
+    (rtb_Add_g_idx_1 - rtb_Divide) * FCS_model_P.Integrator_gainval;
   if (FCS_model_DW.Integrator_DSTATE >= FCS_model_P.Integrator_UpperSat) {
     FCS_model_DW.Integrator_DSTATE = FCS_model_P.Integrator_UpperSat;
   } else if (FCS_model_DW.Integrator_DSTATE <= FCS_model_P.Integrator_LowerSat)
@@ -1792,24 +1737,24 @@ void FCS_model::step(in_dashboard *arg_in_dashboard, in_sensors *arg_in_sensors,
   FCS_model_DW.Integrator_PrevResetState = static_cast<int8_T>
     (rtb_LogicalOperator_b);
 
-  // End of Update for DiscreteIntegrator: '<S138>/Integrator'
+  // End of Update for DiscreteIntegrator: '<S137>/Integrator'
 
-  // Update for Delay: '<S52>/Delay2'
+  // Update for Delay: '<S51>/Delay2'
   for (int32_T i{0}; i < 39; i++) {
     FCS_model_DW.Delay2_DSTATE[i] = FCS_model_DW.Delay2_DSTATE[i + 1];
   }
 
   FCS_model_DW.Delay2_DSTATE[39] = inverseIMU_gain[3];
 
-  // End of Update for Delay: '<S52>/Delay2'
+  // End of Update for Delay: '<S51>/Delay2'
 
-  // Update for DiscreteIntegrator: '<S131>/Integrator' incorporates:
-  //   Product: '<S123>/1//T'
-  //   Sum: '<S123>/Sum1'
+  // Update for DiscreteIntegrator: '<S130>/Integrator' incorporates:
+  //   Product: '<S122>/1//T'
+  //   Sum: '<S122>/Sum1'
 
   FCS_model_DW.Integrator_IC_LOADING_g = 0U;
-  FCS_model_DW.Integrator_DSTATE_e += 1.0 / rtb_orient_pitch * (rtb_K_i -
-    rtb_Saturation_jg) * FCS_model_P.Integrator_gainval_g;
+  FCS_model_DW.Integrator_DSTATE_e += 1.0 / rtb_AvoidDividebyZero * (rtb_K_i -
+    rtb_Saturation_l) * FCS_model_P.Integrator_gainval_g;
   if (FCS_model_DW.Integrator_DSTATE_e >= FCS_model_P.Integrator_UpperSat_i) {
     FCS_model_DW.Integrator_DSTATE_e = FCS_model_P.Integrator_UpperSat_i;
   } else if (FCS_model_DW.Integrator_DSTATE_e <=
@@ -1820,24 +1765,22 @@ void FCS_model::step(in_dashboard *arg_in_dashboard, in_sensors *arg_in_sensors,
   FCS_model_DW.Integrator_PrevResetState_e = static_cast<int8_T>
     (rtb_LogicalOperator_j);
 
-  // End of Update for DiscreteIntegrator: '<S131>/Integrator'
+  // End of Update for DiscreteIntegrator: '<S130>/Integrator'
 
-  // Update for Delay: '<S52>/Delay1'
+  // Update for Delay: '<S51>/Delay1'
   for (int32_T i{0}; i < 39; i++) {
     FCS_model_DW.Delay1_DSTATE[i] = FCS_model_DW.Delay1_DSTATE[i + 1];
   }
 
   FCS_model_DW.Delay1_DSTATE[39] = inverseIMU_gain[4];
 
-  // End of Update for Delay: '<S52>/Delay1'
+  // End of Update for Delay: '<S51>/Delay1'
 
-  // Update for DiscreteIntegrator: '<S44>/SimplyIntegrateVelocity'
+  // Update for DiscreteIntegrator: '<S43>/SimplyIntegrateVelocity'
   FCS_model_DW.SimplyIntegrateVelocity_DSTATE[0] +=
-    FCS_model_P.SimplyIntegrateVelocity_gainval *
-    rtb_TmpSignalConversionAtProduc[0];
+    FCS_model_P.SimplyIntegrateVelocity_gainval * rtb_Product_k[0];
   FCS_model_DW.SimplyIntegrateVelocity_DSTATE[1] +=
-    FCS_model_P.SimplyIntegrateVelocity_gainval *
-    rtb_TmpSignalConversionAtProduc[1];
+    FCS_model_P.SimplyIntegrateVelocity_gainval * rtb_Product_k[1];
 
   // Update for DiscreteStateSpace: '<S11>/Internal'
   {
@@ -1869,10 +1812,11 @@ void FCS_model::step(in_dashboard *arg_in_dashboard, in_sensors *arg_in_sensors,
   }
 
   // Update for DiscreteIntegrator: '<S39>/Discrete-Time Integrator' incorporates:
-  //   Inport: '<Root>/in_sensors'
+  //   Inport: '<Root>/in_parameters'
 
   FCS_model_DW.DiscreteTimeIntegrator_DSTATE +=
-    FCS_model_P.DiscreteTimeIntegrator_gainval * arg_in_sensors->battery_current;
+    FCS_model_P.DiscreteTimeIntegrator_gainval *
+    arg_in_parameters->battery_current;
 }
 
 // Model initialize function
@@ -1893,16 +1837,16 @@ void FCS_model::initialize()
   FCS_model_P.Saturation_UpperSat_k = rtInf;
   FCS_model_P.Saturation_LowerSat_h = rtMinusInf;
 
-  // Start for Probe: '<S132>/Probe'
+  // Start for Probe: '<S131>/Probe'
   FCS_model_B.Probe[0] = 0.0025;
   FCS_model_B.Probe[1] = 0.0;
 
-  // Start for Probe: '<S125>/Probe'
+  // Start for Probe: '<S124>/Probe'
   FCS_model_B.Probe_c[0] = 0.0025;
   FCS_model_B.Probe_c[1] = 0.0;
 
   // InitializeConditions for Merge: '<S200>/Merge1' incorporates:
-  //   Memory: '<S41>/Memory'
+  //   Memory: '<S42>/Memory'
 
   FCS_model_DW.Memory_PreviousInput = FCS_model_P.Memory_InitialCondition;
 
@@ -1921,7 +1865,7 @@ void FCS_model::initialize()
 
   // End of InitializeConditions for DiscreteFir: '<S3>/FIR_IMUaccel'
 
-  // InitializeConditions for DiscreteFilter: '<S140>/Discrete Filter1'
+  // InitializeConditions for DiscreteFilter: '<S139>/Discrete Filter1'
   FCS_model_DW.DiscreteFilter1_states[0] =
     FCS_model_P.DiscreteFilter1_InitialStates;
   FCS_model_DW.DiscreteFilter1_states[1] =
@@ -1929,7 +1873,7 @@ void FCS_model::initialize()
   FCS_model_DW.DiscreteFilter1_states[2] =
     FCS_model_P.DiscreteFilter1_InitialStates;
 
-  // InitializeConditions for Delay: '<S141>/MemoryX'
+  // InitializeConditions for Delay: '<S140>/MemoryX'
   FCS_model_DW.icLoad = true;
 
   // InitializeConditions for Logic: '<S31>/OR' incorporates:
@@ -1945,52 +1889,52 @@ void FCS_model::initialize()
   FCS_model_DW.Internal_DSTATE_f[0] = FCS_model_P.Internal_InitialCondition_a;
   FCS_model_DW.Internal_DSTATE_f[1] = FCS_model_P.Internal_InitialCondition_a;
 
-  // InitializeConditions for Delay: '<S51>/MemoryX'
+  // InitializeConditions for Delay: '<S50>/MemoryX'
   FCS_model_DW.icLoad_n = true;
 
-  // InitializeConditions for DiscreteFilter: '<S50>/IIRgyroz'
+  // InitializeConditions for DiscreteFilter: '<S49>/IIRgyroz'
   for (int32_T i{0}; i < 10; i++) {
     FCS_model_DW.IIRgyroz_states[i] = FCS_model_P.IIRgyroz_InitialStates;
   }
 
-  // End of InitializeConditions for DiscreteFilter: '<S50>/IIRgyroz'
+  // End of InitializeConditions for DiscreteFilter: '<S49>/IIRgyroz'
 
-  // InitializeConditions for UnitDelay: '<S58>/UD'
+  // InitializeConditions for UnitDelay: '<S57>/UD'
   //
-  //  Block description for '<S58>/UD':
+  //  Block description for '<S57>/UD':
   //
   //   Store in Global RAM
 
   FCS_model_DW.UD_DSTATE[0] = FCS_model_P.DiscreteDerivative_ICPrevScaled;
 
-  // InitializeConditions for Delay: '<S45>/Delay'
+  // InitializeConditions for Delay: '<S44>/Delay'
   FCS_model_DW.Delay_DSTATE[0] = FCS_model_P.Delay_InitialCondition;
 
-  // InitializeConditions for UnitDelay: '<S58>/UD'
+  // InitializeConditions for UnitDelay: '<S57>/UD'
   //
-  //  Block description for '<S58>/UD':
+  //  Block description for '<S57>/UD':
   //
   //   Store in Global RAM
 
   FCS_model_DW.UD_DSTATE[1] = FCS_model_P.DiscreteDerivative_ICPrevScaled;
 
-  // InitializeConditions for Delay: '<S45>/Delay'
+  // InitializeConditions for Delay: '<S44>/Delay'
   FCS_model_DW.Delay_DSTATE[1] = FCS_model_P.Delay_InitialCondition;
 
-  // InitializeConditions for DiscreteIntegrator: '<S138>/Integrator'
+  // InitializeConditions for DiscreteIntegrator: '<S137>/Integrator'
   FCS_model_DW.Integrator_IC_LOADING = 1U;
 
-  // InitializeConditions for DiscreteIntegrator: '<S131>/Integrator'
+  // InitializeConditions for DiscreteIntegrator: '<S130>/Integrator'
   FCS_model_DW.Integrator_IC_LOADING_g = 1U;
   for (int32_T i{0}; i < 40; i++) {
-    // InitializeConditions for Delay: '<S52>/Delay2'
+    // InitializeConditions for Delay: '<S51>/Delay2'
     FCS_model_DW.Delay2_DSTATE[i] = FCS_model_P.Delay2_InitialCondition;
 
-    // InitializeConditions for Delay: '<S52>/Delay1'
+    // InitializeConditions for Delay: '<S51>/Delay1'
     FCS_model_DW.Delay1_DSTATE[i] = FCS_model_P.Delay1_InitialCondition;
   }
 
-  // InitializeConditions for DiscreteIntegrator: '<S44>/SimplyIntegrateVelocity' 
+  // InitializeConditions for DiscreteIntegrator: '<S43>/SimplyIntegrateVelocity' 
   FCS_model_DW.SimplyIntegrateVelocity_DSTATE[0] =
     FCS_model_P.SimplyIntegrateVelocity_IC;
   FCS_model_DW.SimplyIntegrateVelocity_DSTATE[1] =
@@ -2017,101 +1961,101 @@ void FCS_model::initialize()
 
   // End of SystemInitialize for SubSystem: '<S200>/If Action Subsystem'
 
-  // SystemInitialize for Enabled SubSystem: '<S163>/MeasurementUpdate'
-  // SystemInitialize for Product: '<S192>/Product3' incorporates:
-  //   Outport: '<S192>/L*(y[k]-yhat[k|k-1])'
+  // SystemInitialize for Enabled SubSystem: '<S162>/MeasurementUpdate'
+  // SystemInitialize for Product: '<S191>/Product3' incorporates:
+  //   Outport: '<S191>/L*(y[k]-yhat[k|k-1])'
 
   FCS_model_B.Product3[0] = FCS_model_P.Lykyhatkk1_Y0_c;
 
-  // End of SystemInitialize for SubSystem: '<S163>/MeasurementUpdate'
+  // End of SystemInitialize for SubSystem: '<S162>/MeasurementUpdate'
 
-  // SystemInitialize for Enabled SubSystem: '<S169>/Enabled Subsystem'
-  // SystemInitialize for Product: '<S194>/Product2' incorporates:
-  //   Outport: '<S194>/deltax'
+  // SystemInitialize for Enabled SubSystem: '<S168>/Enabled Subsystem'
+  // SystemInitialize for Product: '<S193>/Product2' incorporates:
+  //   Outport: '<S193>/deltax'
 
   FCS_model_B.Product2[0] = FCS_model_P.deltax_Y0_k;
 
-  // End of SystemInitialize for SubSystem: '<S169>/Enabled Subsystem'
+  // End of SystemInitialize for SubSystem: '<S168>/Enabled Subsystem'
 
-  // SystemInitialize for Enabled SubSystem: '<S163>/MeasurementUpdate'
-  // SystemInitialize for Product: '<S192>/Product3' incorporates:
-  //   Outport: '<S192>/L*(y[k]-yhat[k|k-1])'
+  // SystemInitialize for Enabled SubSystem: '<S162>/MeasurementUpdate'
+  // SystemInitialize for Product: '<S191>/Product3' incorporates:
+  //   Outport: '<S191>/L*(y[k]-yhat[k|k-1])'
 
   FCS_model_B.Product3[1] = FCS_model_P.Lykyhatkk1_Y0_c;
 
-  // End of SystemInitialize for SubSystem: '<S163>/MeasurementUpdate'
+  // End of SystemInitialize for SubSystem: '<S162>/MeasurementUpdate'
 
-  // SystemInitialize for Enabled SubSystem: '<S169>/Enabled Subsystem'
-  // SystemInitialize for Product: '<S194>/Product2' incorporates:
-  //   Outport: '<S194>/deltax'
+  // SystemInitialize for Enabled SubSystem: '<S168>/Enabled Subsystem'
+  // SystemInitialize for Product: '<S193>/Product2' incorporates:
+  //   Outport: '<S193>/deltax'
 
   FCS_model_B.Product2[1] = FCS_model_P.deltax_Y0_k;
 
-  // End of SystemInitialize for SubSystem: '<S169>/Enabled Subsystem'
+  // End of SystemInitialize for SubSystem: '<S168>/Enabled Subsystem'
 
-  // SystemInitialize for Enabled SubSystem: '<S163>/MeasurementUpdate'
-  // SystemInitialize for Product: '<S192>/Product3' incorporates:
-  //   Outport: '<S192>/L*(y[k]-yhat[k|k-1])'
+  // SystemInitialize for Enabled SubSystem: '<S162>/MeasurementUpdate'
+  // SystemInitialize for Product: '<S191>/Product3' incorporates:
+  //   Outport: '<S191>/L*(y[k]-yhat[k|k-1])'
 
   FCS_model_B.Product3[2] = FCS_model_P.Lykyhatkk1_Y0_c;
 
-  // End of SystemInitialize for SubSystem: '<S163>/MeasurementUpdate'
+  // End of SystemInitialize for SubSystem: '<S162>/MeasurementUpdate'
 
-  // SystemInitialize for Enabled SubSystem: '<S169>/Enabled Subsystem'
-  // SystemInitialize for Product: '<S194>/Product2' incorporates:
-  //   Outport: '<S194>/deltax'
+  // SystemInitialize for Enabled SubSystem: '<S168>/Enabled Subsystem'
+  // SystemInitialize for Product: '<S193>/Product2' incorporates:
+  //   Outport: '<S193>/deltax'
 
   FCS_model_B.Product2[2] = FCS_model_P.deltax_Y0_k;
 
-  // End of SystemInitialize for SubSystem: '<S169>/Enabled Subsystem'
+  // End of SystemInitialize for SubSystem: '<S168>/Enabled Subsystem'
 
-  // SystemInitialize for Enabled SubSystem: '<S163>/MeasurementUpdate'
-  // SystemInitialize for Product: '<S192>/Product3' incorporates:
-  //   Outport: '<S192>/L*(y[k]-yhat[k|k-1])'
+  // SystemInitialize for Enabled SubSystem: '<S162>/MeasurementUpdate'
+  // SystemInitialize for Product: '<S191>/Product3' incorporates:
+  //   Outport: '<S191>/L*(y[k]-yhat[k|k-1])'
 
   FCS_model_B.Product3[3] = FCS_model_P.Lykyhatkk1_Y0_c;
 
-  // End of SystemInitialize for SubSystem: '<S163>/MeasurementUpdate'
+  // End of SystemInitialize for SubSystem: '<S162>/MeasurementUpdate'
 
-  // SystemInitialize for Enabled SubSystem: '<S169>/Enabled Subsystem'
-  // SystemInitialize for Product: '<S194>/Product2' incorporates:
-  //   Outport: '<S194>/deltax'
+  // SystemInitialize for Enabled SubSystem: '<S168>/Enabled Subsystem'
+  // SystemInitialize for Product: '<S193>/Product2' incorporates:
+  //   Outport: '<S193>/deltax'
 
   FCS_model_B.Product2[3] = FCS_model_P.deltax_Y0_k;
 
-  // End of SystemInitialize for SubSystem: '<S169>/Enabled Subsystem'
+  // End of SystemInitialize for SubSystem: '<S168>/Enabled Subsystem'
 
-  // SystemInitialize for Enabled SubSystem: '<S96>/Enabled Subsystem'
-  // SystemInitialize for Product: '<S122>/Product2' incorporates:
-  //   Outport: '<S122>/deltax'
+  // SystemInitialize for Enabled SubSystem: '<S95>/Enabled Subsystem'
+  // SystemInitialize for Product: '<S121>/Product2' incorporates:
+  //   Outport: '<S121>/deltax'
 
   FCS_model_B.Product2_c[0] = FCS_model_P.deltax_Y0;
 
-  // End of SystemInitialize for SubSystem: '<S96>/Enabled Subsystem'
+  // End of SystemInitialize for SubSystem: '<S95>/Enabled Subsystem'
 
-  // SystemInitialize for Enabled SubSystem: '<S89>/MeasurementUpdate'
-  // SystemInitialize for Product: '<S120>/Product3' incorporates:
-  //   Outport: '<S120>/L*(y[k]-yhat[k|k-1])'
+  // SystemInitialize for Enabled SubSystem: '<S88>/MeasurementUpdate'
+  // SystemInitialize for Product: '<S119>/Product3' incorporates:
+  //   Outport: '<S119>/L*(y[k]-yhat[k|k-1])'
 
   FCS_model_B.Product3_d[0] = FCS_model_P.Lykyhatkk1_Y0;
 
-  // End of SystemInitialize for SubSystem: '<S89>/MeasurementUpdate'
+  // End of SystemInitialize for SubSystem: '<S88>/MeasurementUpdate'
 
-  // SystemInitialize for Enabled SubSystem: '<S96>/Enabled Subsystem'
-  // SystemInitialize for Product: '<S122>/Product2' incorporates:
-  //   Outport: '<S122>/deltax'
+  // SystemInitialize for Enabled SubSystem: '<S95>/Enabled Subsystem'
+  // SystemInitialize for Product: '<S121>/Product2' incorporates:
+  //   Outport: '<S121>/deltax'
 
   FCS_model_B.Product2_c[1] = FCS_model_P.deltax_Y0;
 
-  // End of SystemInitialize for SubSystem: '<S96>/Enabled Subsystem'
+  // End of SystemInitialize for SubSystem: '<S95>/Enabled Subsystem'
 
-  // SystemInitialize for Enabled SubSystem: '<S89>/MeasurementUpdate'
-  // SystemInitialize for Product: '<S120>/Product3' incorporates:
-  //   Outport: '<S120>/L*(y[k]-yhat[k|k-1])'
+  // SystemInitialize for Enabled SubSystem: '<S88>/MeasurementUpdate'
+  // SystemInitialize for Product: '<S119>/Product3' incorporates:
+  //   Outport: '<S119>/L*(y[k]-yhat[k|k-1])'
 
   FCS_model_B.Product3_d[1] = FCS_model_P.Lykyhatkk1_Y0;
 
-  // End of SystemInitialize for SubSystem: '<S89>/MeasurementUpdate'
+  // End of SystemInitialize for SubSystem: '<S88>/MeasurementUpdate'
 }
 
 // Model terminate function
