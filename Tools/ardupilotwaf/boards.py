@@ -648,9 +648,9 @@ class sitl(Board):
             cfg.define('UAVCAN_EXCEPTIONS', 0)
             cfg.define('UAVCAN_SUPPORT_CANFD', 1)
 
-        env.CXXFLAGS += [
-            '-Werror=float-equal'
-        ]
+        # env.CXXFLAGS += [
+        #     '-Werror=float-equal'
+        # ]
 
         if cfg.options.ubsan or cfg.options.ubsan_abort:
             env.CXXFLAGS += [

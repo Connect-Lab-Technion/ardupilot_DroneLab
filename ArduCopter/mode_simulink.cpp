@@ -241,6 +241,7 @@ void ModeSimulink::run()
         mavlink_data.out_controllers_cmd_yaw = (float)controller_outputs.cmd_yaw;
         
         // Sensor outputs 
+        mavlink_data.out_sensors_clock           = (float)sensor_outputs.clock;
         mavlink_data.out_sensors_accelerometer_x = (float)sensor_outputs.accelerometer_x;
         mavlink_data.out_sensors_accelerometer_y = (float)sensor_outputs.accelerometer_y;
         mavlink_data.out_sensors_accelerometer_z = (float)sensor_outputs.accelerometer_z;

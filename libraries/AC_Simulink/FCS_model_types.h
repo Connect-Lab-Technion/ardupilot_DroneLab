@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'FCS_model'.
 //
-// Model version                  : 7.207
+// Model version                  : 7.216
 // Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Tue Jul  1 17:24:37 2025
+// C/C++ source code generated on : Wed Aug 13 18:22:23 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -110,6 +110,7 @@ struct out_estimators
 
 struct out_sensors
 {
+  real_T clock;
   real_T accelerometer_x;
   real_T accelerometer_y;
   real_T accelerometer_z;
@@ -282,38 +283,32 @@ struct struct_FIfaVnupBjYAxo1EdNiDlF
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_struct_eFnp8sKFNJLN84XLbLzaFF_
-#define DEFINED_TYPEDEF_FOR_struct_eFnp8sKFNJLN84XLbLzaFF_
+#ifndef DEFINED_TYPEDEF_FOR_struct_mJosrxHBvChQYFseRaabr_
+#define DEFINED_TYPEDEF_FOR_struct_mJosrxHBvChQYFseRaabr_
 
-struct struct_eFnp8sKFNJLN84XLbLzaFF
+struct struct_mJosrxHBvChQYFseRaabr
 {
-  real_T posVISNoVisionAvail[4];
-  real_T usePosVISFlag;
   real_T batteryStatus[2];
 };
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_struct_pAcs5k38eV6MpgiqrKAV4_
-#define DEFINED_TYPEDEF_FOR_struct_pAcs5k38eV6MpgiqrKAV4_
+#ifndef DEFINED_TYPEDEF_FOR_struct_Rp42EyRn8Pm5LI9qliIxcG_
+#define DEFINED_TYPEDEF_FOR_struct_Rp42EyRn8Pm5LI9qliIxcG_
 
-struct struct_pAcs5k38eV6MpgiqrKAV4
+struct struct_Rp42EyRn8Pm5LI9qliIxcG
 {
   real_T IMUAccelGain[3];
   real_T IMUGyroGain[3];
   struct_eF5OUT33sX0T9pzS8027m IMU;
   struct_FIfaVnupBjYAxo1EdNiDlF Sonar;
-  real_T NO_VIS_X;
-  real_T NO_VIS_YAW;
-  struct_eFnp8sKFNJLN84XLbLzaFF dummy;
-  real_T sensorDelay;
   real_T airDensity;
   real_T altToPrsGain;
   real_T altToPrsBias;
   real_T inverseIMUGain[6];
   real_T altSensorMin;
+  struct_mJosrxHBvChQYFseRaabr dummy;
   real_T velocityToOpticalFlowGain;
-  real_T cameraResolution[2];
 };
 
 #endif
