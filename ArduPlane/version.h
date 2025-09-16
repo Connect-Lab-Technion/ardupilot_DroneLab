@@ -6,14 +6,15 @@
 
 #include "ap_version.h"
 
-#define THISFIRMWARE "ArduPlane V4.4.4-beta1"
+#define THISFIRMWARE "ArduPlane V4.6.2"
 
 // the following line is parsed by the autotest scripts
-#define FIRMWARE_VERSION 4,4,4,FIRMWARE_VERSION_TYPE_BETA
+#define FIRMWARE_VERSION 4,6,2,FIRMWARE_VERSION_TYPE_OFFICIAL
 
 #define FW_MAJOR 4
-#define FW_MINOR 4
-#define FW_PATCH 4
-#define FW_TYPE FIRMWARE_VERSION_TYPE_BETA
+#define FW_MINOR 6
+#define FW_PATCH 2
+#define FW_TYPE FIRMWARE_VERSION_TYPE_OFFICIAL
 
 #include <AP_Common/AP_FWVersionDefine.h>
+#include <AP_CheckFirmware/AP_CheckFirmwareDefine.h>
