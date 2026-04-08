@@ -7,17 +7,17 @@
 //
 // Code generated for Simulink model 'FCS_model'.
 //
-// Model version                  : 7.216
-// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Wed Aug 13 18:22:23 2025
+// Model version                  : 11.6
+// Simulink Coder version         : 24.2 (R2024b) 21-Jun-2024
+// C/C++ source code generated on : Wed Apr  8 15:47:50 2026
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef RTW_HEADER_rt_defines_h_
-#define RTW_HEADER_rt_defines_h_
+#ifndef rt_defines_h_
+#define rt_defines_h_
 
 //===========*
 //  Constants *
@@ -48,7 +48,7 @@
 #define UNUSED_PARAMETER(x)            (void) (x)
 #endif
 #endif
-#endif                                 // RTW_HEADER_rt_defines_h_
+#endif                                 // rt_defines_h_
 
 //
 // File trailer for generated code.
