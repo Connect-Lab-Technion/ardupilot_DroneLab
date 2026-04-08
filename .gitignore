@@ -152,3 +152,19 @@ dumpstack_*out
 build.tmp.binaries/
 tasklist.json
 modules/esp_idf
+
+# Simulink runtime support files — generated locally by environment_setup.m
+# Do not commit; each machine generates its own matched to the local MATLAB version
+libraries/AC_Simulink/rtGetInf.cpp
+libraries/AC_Simulink/rtGetInf.h
+libraries/AC_Simulink/rtGetNaN.cpp
+libraries/AC_Simulink/rtGetNaN.h
+libraries/AC_Simulink/rt_nonfinite.cpp
+libraries/AC_Simulink/rt_nonfinite.h
+libraries/AC_Simulink/rtwtypes.h
+libraries/AC_Simulink/rt_defines.h
+libraries/AC_Simulink/rt_zcfcn.cpp
+libraries/AC_Simulink/rt_zcfcn.h
+libraries/AC_Simulink/solver_zc.h
+libraries/AC_Simulink/zero_crossing_types.h
+libraries/AC_Simulink/buildInfo.mat

@@ -7,17 +7,17 @@
 //
 // Code generated for Simulink model 'FCS_model'.
 //
-// Model version                  : 7.216
-// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Wed Aug 13 18:22:23 2025
+// Model version                  : 11.6
+// Simulink Coder version         : 24.2 (R2024b) 21-Jun-2024
+// C/C++ source code generated on : Wed Apr  8 15:47:50 2026
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef RTW_HEADER_FCS_model_types_h_
-#define RTW_HEADER_FCS_model_types_h_
+#ifndef FCS_model_types_h_
+#define FCS_model_types_h_
 #include "rtwtypes.h"
 #ifndef DEFINED_TYPEDEF_FOR_in_dashboard_
 #define DEFINED_TYPEDEF_FOR_in_dashboard_
@@ -27,6 +27,7 @@ struct in_dashboard
   real_T time_world;
   boolean_T master_switch;
   real_T power;
+  boolean_T estimators_reset;
   real_T ref_x;
   real_T ref_y;
   real_T ref_z;
@@ -63,22 +64,20 @@ struct in_parameters
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_out_controllers_
-#define DEFINED_TYPEDEF_FOR_out_controllers_
+#ifndef DEFINED_TYPEDEF_FOR_out_sensors_
+#define DEFINED_TYPEDEF_FOR_out_sensors_
 
-struct out_controllers
+struct out_sensors
 {
-  real_T motor1;
-  real_T motor2;
-  real_T motor3;
-  real_T motor4;
-  real_T cmd_thrust;
-  real_T cmd_tau_roll;
-  real_T cmd_tau_pitch;
-  real_T cmd_tau_yaw;
-  real_T cmd_roll;
-  real_T cmd_pitch;
-  real_T cmd_yaw;
+  real_T clock;
+  real_T accelerometer_x;
+  real_T accelerometer_y;
+  real_T accelerometer_z;
+  real_T gyroscope_x;
+  real_T gyroscope_y;
+  real_T gyroscope_z;
+  real_T barometer_pressure;
+  real_T rangefinder_distance;
 };
 
 #endif
@@ -105,20 +104,22 @@ struct out_estimators
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_out_sensors_
-#define DEFINED_TYPEDEF_FOR_out_sensors_
+#ifndef DEFINED_TYPEDEF_FOR_out_controllers_
+#define DEFINED_TYPEDEF_FOR_out_controllers_
 
-struct out_sensors
+struct out_controllers
 {
-  real_T clock;
-  real_T accelerometer_x;
-  real_T accelerometer_y;
-  real_T accelerometer_z;
-  real_T gyroscope_x;
-  real_T gyroscope_y;
-  real_T gyroscope_z;
-  real_T barometer_pressure;
-  real_T rangefinder_distance;
+  real_T motor1;
+  real_T motor2;
+  real_T motor3;
+  real_T motor4;
+  real_T cmd_thrust;
+  real_T cmd_tau_roll;
+  real_T cmd_tau_pitch;
+  real_T cmd_tau_yaw;
+  real_T cmd_roll;
+  real_T cmd_pitch;
+  real_T cmd_yaw;
 };
 
 #endif
@@ -233,86 +234,7 @@ struct struct_UHvAqkoSM4a4grTGLmN7a
 };
 
 #endif
-
-#ifndef DEFINED_TYPEDEF_FOR_struct_sfjjhK32Dt7MmV2O18UsO_
-#define DEFINED_TYPEDEF_FOR_struct_sfjjhK32Dt7MmV2O18UsO_
-
-struct struct_sfjjhK32Dt7MmV2O18UsO
-{
-  real_T Ts2Q[16];
-  real_T Q2Ts[16];
-  real_T totalThrustMaxRelative;
-  real_T motorsThrustPerMotorMax;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_struct_eF5OUT33sX0T9pzS8027m_
-#define DEFINED_TYPEDEF_FOR_struct_eF5OUT33sX0T9pzS8027m_
-
-struct struct_eF5OUT33sX0T9pzS8027m
-{
-  real_T cg[3];
-  real_T location[3];
-  real_T accNatFreq;
-  real_T accDamping;
-  real_T accScaleCross[9];
-  real_T accBias[3];
-  real_T accLimits[6];
-  real_T gyroNatFreq;
-  real_T gyroDamping;
-  real_T gyroScaleCross[9];
-  real_T gyroBias[3];
-  real_T gyroGBias[3];
-  real_T gyroLimits[6];
-  real_T noiseSeeds[6];
-  real_T noiseWeights[6];
-  real_T noisePower[6];
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_struct_FIfaVnupBjYAxo1EdNiDlF_
-#define DEFINED_TYPEDEF_FOR_struct_FIfaVnupBjYAxo1EdNiDlF_
-
-struct struct_FIfaVnupBjYAxo1EdNiDlF
-{
-  real_T noisePower;
-  real_T noiseSeeds;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_struct_mJosrxHBvChQYFseRaabr_
-#define DEFINED_TYPEDEF_FOR_struct_mJosrxHBvChQYFseRaabr_
-
-struct struct_mJosrxHBvChQYFseRaabr
-{
-  real_T batteryStatus[2];
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_struct_Rp42EyRn8Pm5LI9qliIxcG_
-#define DEFINED_TYPEDEF_FOR_struct_Rp42EyRn8Pm5LI9qliIxcG_
-
-struct struct_Rp42EyRn8Pm5LI9qliIxcG
-{
-  real_T IMUAccelGain[3];
-  real_T IMUGyroGain[3];
-  struct_eF5OUT33sX0T9pzS8027m IMU;
-  struct_FIfaVnupBjYAxo1EdNiDlF Sonar;
-  real_T airDensity;
-  real_T altToPrsGain;
-  real_T altToPrsBias;
-  real_T inverseIMUGain[6];
-  real_T altSensorMin;
-  struct_mJosrxHBvChQYFseRaabr dummy;
-  real_T velocityToOpticalFlowGain;
-};
-
-#endif
-#endif                                 // RTW_HEADER_FCS_model_types_h_
+#endif                                 // FCS_model_types_h_
 
 //
 // File trailer for generated code.
