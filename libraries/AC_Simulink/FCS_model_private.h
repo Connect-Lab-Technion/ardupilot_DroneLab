@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'FCS_model'.
 //
-// Model version                  : 11.6
+// Model version                  : 11.80
 // Simulink Coder version         : 24.2 (R2024b) 21-Jun-2024
-// C/C++ source code generated on : Wed Apr  8 15:47:50 2026
+// C/C++ source code generated on : Mon Aug 24 18:19:14 2026
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -19,7 +19,6 @@
 #ifndef FCS_model_private_h_
 #define FCS_model_private_h_
 #include "rtwtypes.h"
-#include "zero_crossing_types.h"
 #include "FCS_model_types.h"
 
 extern real_T rt_atan2d_snf(real_T u0, real_T u1);

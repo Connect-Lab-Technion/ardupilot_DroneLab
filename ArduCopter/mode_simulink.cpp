@@ -151,7 +151,7 @@ void ModeSimulink::run()
     parameter_data.opticalflow_x    = (real_T)optFlow_Rate.x;
     parameter_data.opticalflow_y    = (real_T)optFlow_Rate.y;
     parameter_data.barometer_pressure       = (real_T)copter.barometer.get_pressure();
-    parameter_data.rangefinder_distance     = (real_T)copter.rangefinder_state.alt_cm;
+    parameter_data.rangefinder_distance     = (real_T)copter.rangefinder.distance_cm_orient(ROTATION_PITCH_270);
     parameter_data.rpm_1            = (real_T)arg_rpm[0];
     parameter_data.rpm_2            = (real_T)arg_rpm[1];
     parameter_data.rpm_3            = (real_T)arg_rpm[2];
