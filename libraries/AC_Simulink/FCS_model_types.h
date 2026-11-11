@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'FCS_model'.
 //
-// Model version                  : 11.80
+// Model version                  : 11.147
 // Simulink Coder version         : 24.2 (R2024b) 21-Jun-2024
-// C/C++ source code generated on : Mon Aug 24 18:19:14 2026
+// C/C++ source code generated on : Tue Nov 10 18:31:25 2026
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -120,6 +120,92 @@ struct out_controllers
   real_T cmd_roll;
   real_T cmd_pitch;
   real_T cmd_yaw;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_struct_UQs6UweinuCGUdrx8ru7ZF_
+#define DEFINED_TYPEDEF_FOR_struct_UQs6UweinuCGUdrx8ru7ZF_
+
+struct struct_UQs6UweinuCGUdrx8ru7ZF
+{
+  real_T mass;
+  real_T I_xx;
+  real_T I_yy;
+  real_T I_zz;
+  real_T I[9];
+  real_T d;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_struct_Q4UgRXgCmqIJuvBvZmRz3F_
+#define DEFINED_TYPEDEF_FOR_struct_Q4UgRXgCmqIJuvBvZmRz3F_
+
+struct struct_Q4UgRXgCmqIJuvBvZmRz3F
+{
+  real_T blades;
+  real_T r;
+  real_T A;
+  real_T c;
+  real_T mass;
+  real_T I;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_struct_KFmowG5BzH9BP6tWlx0zHF_
+#define DEFINED_TYPEDEF_FOR_struct_KFmowG5BzH9BP6tWlx0zHF_
+
+struct struct_KFmowG5BzH9BP6tWlx0zHF
+{
+  real_T z;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_struct_5VfFgW81WFmYODmWm81b3C_
+#define DEFINED_TYPEDEF_FOR_struct_5VfFgW81WFmYODmWm81b3C_
+
+struct struct_5VfFgW81WFmYODmWm81b3C
+{
+  real_T MaxThrust;
+  real_T MaxTau;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_struct_vI4vsjHnfoXTVOkGapZrmH_
+#define DEFINED_TYPEDEF_FOR_struct_vI4vsjHnfoXTVOkGapZrmH_
+
+struct struct_vI4vsjHnfoXTVOkGapZrmH
+{
+  real_T AccelCutoff;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_struct_6h7Vd6IAE9rJxc9Sulkro_
+#define DEFINED_TYPEDEF_FOR_struct_6h7Vd6IAE9rJxc9Sulkro_
+
+struct struct_6h7Vd6IAE9rJxc9Sulkro
+{
+  struct_UQs6UweinuCGUdrx8ru7ZF Af;
+  struct_Q4UgRXgCmqIJuvBvZmRz3F Rot;
+  struct_KFmowG5BzH9BP6tWlx0zHF Ref;
+  struct_5VfFgW81WFmYODmWm81b3C Cont;
+  struct_vI4vsjHnfoXTVOkGapZrmH Est;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_struct_gKN8B6Y1MhlJD4aQI00k6C_
+#define DEFINED_TYPEDEF_FOR_struct_gKN8B6Y1MhlJD4aQI00k6C_
+
+struct struct_gKN8B6Y1MhlJD4aQI00k6C
+{
+  real_T g;
+  real_T rho;
 };
 
 #endif

@@ -79,7 +79,7 @@ void ModeSimulink::run()
     ////////////////////////////////////////////////////////
     // Prepare the arguments for the controller, given by the generated ert_main ------------
 
-    Vector3f accel_vals = ahrs.get_accel();
+    Vector3f accel_vals = ahrs.get_accel() - ahrs.get_accel_bias();
 
     Vector3f gyro_vals = ahrs.get_gyro();
 
